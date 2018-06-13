@@ -38,6 +38,9 @@ import org.dyn4j.geometry.Vector2;
 import org.dyn4j.samples.framework.SimulationBody;
 import org.dyn4j.samples.framework.SimulationFrame;
 
+import javax.swing.plaf.synth.SynthTextAreaUI;
+import java.util.concurrent.ThreadLocalRandom;
+
 /**
  * A simple scene showing how to capture mouse input and create
  * bodies dynamically.
@@ -48,12 +51,17 @@ import org.dyn4j.samples.framework.SimulationFrame;
 public class MouseInteraction extends SimulationFrame {
 	/** The serial version id */
 	private static final long serialVersionUID = -1366264828445805140L;
+	static int MIN_BALLS_TO_CREATE = 1;
+	static int MAX_BALLS_TO_CREATE = 4;
+	static double MAX_BOUNDARY_X = 27;
+	static double MIN_BOUNDARY_X = -27;
+	static double BOUNDARY_Y = 75;
 
 	/** A point for tracking the mouse click */
 	private Point point;
 
 	private Vector2 shootingVector;
-	private List<Body> bodyList;
+	private List<Body> ballList;
 	private static double actionTimer = 5.0;
 	private static double timercounter;
 	private static Point shootingBall = new Point(300,80);
@@ -66,14 +74,17 @@ public class MouseInteraction extends SimulationFrame {
 	private final class CustomMouseAdapter extends MouseAdapter {
 		@Override
 		public void mousePressed(MouseEvent e) {
-			// store the mouse click postion for use later
+			//Maus Klick Position speichern
 			point = new Point(e.getX(), e.getY());
+
+			//Neuen Vektor für die Schuesse erstellen
 			shootingVector = new Vector2();
-			//bodyList = world.getBodies();
 			double dx = 0.1*(e.getX()-shootingBall.getX());
 			double dy = -0.1*(e.getY()-shootingBall.getY());
-			System.out.println(dx);
-			System.out.println(dy);
+			System.out.print(dx);
+			System.out.print(" x ");
+			System.out.print(dy);
+			System.out.println("");
 			shootingVector.set(dx,dy);
 		}
 		
@@ -126,10 +137,7 @@ public class MouseInteraction extends SimulationFrame {
 		this.world.addBody(rightWall);
 		this.world.addBody(ceiling);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.dyn4j.samples.SimulationFrame#update(java.awt.Graphics2D, double)
-	 */
+
 	@Override
 	protected void update(Graphics2D g, double elapsedTime) {
 		
@@ -149,7 +157,6 @@ public class MouseInteraction extends SimulationFrame {
 
 			no.translate(x, y);
 			no.setLinearVelocity(shootingVector);
-			//no.setLinearVelocity(0, -500);
 			no.setMass(MassType.NORMAL);
 			this.world.addBody(no);
 
@@ -160,13 +167,29 @@ public class MouseInteraction extends SimulationFrame {
 
 		timercounter += elapsedTime;
 		if (timercounter > actionTimer){
-			System.out.println(timercounter);
+			//System.out.println(timercounter);
 			timercounter = 0;
+
 		}
 
 		super.update(g, elapsedTime);
 	}
-	
+
+	private void CreateBalls(){
+
+		int randomNoBalls = ThreadLocalRandom.current().nextInt(MIN_BALLS_TO_CREATE, MAX_BALLS_TO_CREATE + 1);
+		for(int i = 0; i < randomNoBalls + 1; i++){
+
+
+
+			SimulationBody no = new SimulationBody();
+			BodyFixture fixture = new BodyFixture(Geometry.createCircle(0.3));
+			no.addFixture(fixture);
+			//no.translate();
+			no.setMass(MassType.INFINITE);
+		}
+	}
+
 	/**
 	 * Entry point for the example application.
 	 * @param args command line arguments
@@ -175,4 +198,5 @@ public class MouseInteraction extends SimulationFrame {
 		MouseInteraction simulation = new MouseInteraction();
 		simulation.run();
 	}
+
 }

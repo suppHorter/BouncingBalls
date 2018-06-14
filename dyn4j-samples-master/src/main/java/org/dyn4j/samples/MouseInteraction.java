@@ -27,7 +27,6 @@ package org.dyn4j.samples;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.List;
 import java.util.*;
 
 import org.dyn4j.dynamics.BodyFixture;
@@ -53,9 +52,11 @@ public class MouseInteraction extends SimulationFrame {
 
 	//Statics für die Gamelogik
 	//private static long SLEEPTIMER = 5; //Zeit bis man eine neue Salve abfeuern kann
-	private static double BALLTIMER = 0.1; //Zeit zwischen den Schuessen einer Salve
-	private static int MAXBALLS = 5; //Anzahl an Schuessen pro Salve
-	private static double TIMERCOUNTER; //Zaehlt die vergangenen Sekunden
+	private static double TIME_BETWEEN_BALLS = 0.1; //Zeit zwischen den Schuessen einer Salve
+    private static double TIMERCOUNTER_BETWEEN_BALLS; //Zaehlt die vergangenen Sekunden - wird zurückgedsetzt
+
+    private static int MAXBALLS = 5; //Anzahl an Schuessen pro Salve
+    private static double TIMER; //Zaehlt die Vergangenen Sekunden
 	private static Point POINTSHOOTER = new Point(250,40); //Punkt an dem Schuesse abgefeuert werden
 
 
@@ -92,13 +93,11 @@ public class MouseInteraction extends SimulationFrame {
 		this.canvas.addMouseListener(ml);
 	}
 
-		protected void initializeWorld() {
-
+	protected void initializeWorld() {
 		//Wände erstellen und Positionieren
 		SimulationBody leftWall = new SimulationBody();
 		SimulationBody rightWall = new SimulationBody();
 		SimulationBody ceiling = new SimulationBody();
-
 
 		leftWall.addFixture(Geometry.createRectangle(11, 100));
 		leftWall.setColor(Color.GRAY);
@@ -123,18 +122,20 @@ public class MouseInteraction extends SimulationFrame {
 
 	@Override
 	protected void update(Graphics2D g, double elapsedTime) {
-		TIMERCOUNTER += elapsedTime;
-		if (TIMERCOUNTER > BALLTIMER && this.ballSack.size() < MAXBALLS){
-			//System.out.println(TIMERCOUNTER);
-			TIMERCOUNTER = 0;
-			// see if the user clicked
-			if (this.point != null && this.shootingVector != null) {
-				// convert from screen space to world space coordinates
+		TIMERCOUNTER_BETWEEN_BALLS += elapsedTime;
+		TIMER += elapsedTime;
 
+		//Nur schiessen falls Salve noch nicht beendet wurde
+		if (TIMERCOUNTER_BETWEEN_BALLS > TIME_BETWEEN_BALLS && this.ballSack.size() < MAXBALLS){
+			//System.out.println(TIMERCOUNTER_BETWEEN_BALLS);
+			TIMERCOUNTER_BETWEEN_BALLS = 0;
+			//Wurde geklickt und gibt es einen Vektor
+			if (this.point != null && this.shootingVector != null) {
+				//Umrechnung der Dimensionen
 				double x =  (this.POINTSHOOTER.getX() - this.canvas.getWidth() / 2.0) / this.scale;
 				double y = -(this.POINTSHOOTER.getY() - this.canvas.getHeight() / 2.0) / this.scale;
 
-				// Neuen Ball erstellen und
+				// Neuen Schuss erstellen
 				SimulationBody no = new SimulationBody();
 				BodyFixture fixture = new BodyFixture(Geometry.createCircle(0.3));
 
@@ -147,7 +148,7 @@ public class MouseInteraction extends SimulationFrame {
 				no.setMass(MassType.NORMAL);
                 //Schuss der Welt hinzufuegen
 				this.world.addBody(no);
-				//ballSack befuellen
+				//Arraylist ballSack befuellen
 				ballSack.add(no);
 			}
 		}

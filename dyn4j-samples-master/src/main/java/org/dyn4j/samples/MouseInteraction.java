@@ -85,6 +85,7 @@ public class MouseInteraction extends SimulationFrame {
             {
                 liftBalls();
             }
+
             createBalls();
             point = new Point(e.getX(), e.getY());
             //Neuen Vektor für die Schuesse erstellen
@@ -189,10 +190,11 @@ public class MouseInteraction extends SimulationFrame {
 
 	private void createBall(double xKoord, double yKoord)
 	{
-		SimulationBody no = new SimulationBody();
+		SimulationBody target = new SimulationBody();
 
-        BodyFixture fixture = new BodyFixture(Geometry.createCircle(1));;
-        int rndState = ThreadLocalRandom.current().nextInt(0, 2);
+        BodyFixture fixture = new BodyFixture(Geometry.createCircle(1));
+        int rndState = ThreadLocalRandom.current().nextInt(0, 3);
+
         switch(rndState)
         {
             case 0:
@@ -202,16 +204,17 @@ public class MouseInteraction extends SimulationFrame {
                 fixture = new BodyFixture(Geometry.createRightTriangle(1.5,1.5));
                 break;
             default:
-                fixture = new BodyFixture(Geometry.createRightTriangle(1.5,1.5));
+                fixture = new BodyFixture(Geometry.createIsoscelesTriangle(1.5,1.5));
                 break;
         }
 
-		no.addFixture(fixture);
+        target.addFixture(fixture);
 		fixture.setRestitution(0.5);
-		no.translate(xKoord,yKoord);
-		no.setMass(MassType.INFINITE);
-		this.world.addBody(no);
-		targetSack.add(no);
+        target.translate(xKoord,yKoord);
+		target.setMass(MassType.INFINITE);
+		this.world.addBody(target);
+        this.world.addListener(new TargetCollisionListener(target, world, 5));
+		targetSack.add(target);
 	}
 
 	//private SimulationBody ballSack[] = new SimulationBody[20];

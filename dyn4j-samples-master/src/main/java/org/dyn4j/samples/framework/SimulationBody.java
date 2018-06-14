@@ -4,10 +4,12 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
+import java.util.concurrent.ThreadLocalRandom;
 
 import org.dyn4j.dynamics.Body;
 import org.dyn4j.dynamics.BodyFixture;
 import org.dyn4j.geometry.Convex;
+import org.dyn4j.geometry.Shape;
 
 /**
  * Custom Body class to add drawing functionality.
@@ -18,6 +20,7 @@ import org.dyn4j.geometry.Convex;
 public class SimulationBody extends Body {
 	/** The color of the object */
 	protected Color color;
+	public int hitNumber = 0;
 	
 	/**
 	 * Default constructor.
@@ -79,10 +82,11 @@ public class SimulationBody extends Body {
 				this.getLocalCenter().y * scale - pr * 0.5,
 				pr,
 				pr);
+
 		g.setColor(Color.WHITE);
-		g.fill(ce);
-		g.setColor(Color.DARK_GRAY);
-		g.draw(ce);
+		//g.fill(ce);
+		g.setColor(Color.WHITE);
+		//g.draw(ce);
 		
 		// set the original transform
 		g.setTransform(ot);

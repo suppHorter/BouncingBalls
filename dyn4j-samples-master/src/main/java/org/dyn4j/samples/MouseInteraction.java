@@ -164,7 +164,7 @@ public class MouseInteraction extends SimulationFrame {
 				fixture.setDensity(200);
 				fixture.setRestitution(0.9);
 				ball.addFixture(fixture);
-
+                ball.hitNumber =  ThreadLocalRandom.current().nextInt(1,  5);
 				ball.translate(x, y);
 				ball.setLinearVelocity(shootingVector);
 				ball.setMass(MassType.NORMAL);
@@ -184,7 +184,6 @@ public class MouseInteraction extends SimulationFrame {
 		BodyFixture fixture = new BodyFixture(Geometry.createCircle(1));
 		no.addFixture(fixture);
 		fixture.setRestitution(1.5);
-		no.translate(xKoord,yKoord);
 		no.setMass(MassType.INFINITE);
 		this.world.addBody(no);
 		targetSack.add(no);

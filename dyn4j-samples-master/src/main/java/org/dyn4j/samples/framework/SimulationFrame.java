@@ -242,7 +242,7 @@ public abstract class SimulationFrame extends JFrame {
 		final int h = this.canvas.getHeight();
 		
 		// lets draw over everything with a white background
-		g.setColor(Color.WHITE);
+		g.setColor(Color.BLACK);
 		g.fillRect(-w / 2, -h / 2, w, h);
 	}
 	

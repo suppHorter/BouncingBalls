@@ -62,7 +62,7 @@ public class MouseInteraction extends SimulationFrame {
 	private static double ACTIONTIMER = 5.0; //Zeit bis neue Baelle auftauchen
 
 	private static double TIMERCOUNTER;
-	private static Point POINTSHOOTER = new Point(300,80);
+	private static Point POINTSHOOTER = new Point(250,40);
 
 
 
@@ -101,9 +101,6 @@ public class MouseInteraction extends SimulationFrame {
 		this.canvas.addMouseListener(ml);
 	}
 
-	/**
-	 * Creates game objects and adds them to the world.
-	 */
 		protected void initializeWorld() {
 
 		//Wände erstellen und Positionieren
@@ -112,11 +109,11 @@ public class MouseInteraction extends SimulationFrame {
 		SimulationBody ceiling = new SimulationBody();
 
 
-		leftWall.addFixture(Geometry.createRectangle(10, 100));
+		leftWall.addFixture(Geometry.createRectangle(11, 100));
 		leftWall.setColor(Color.GRAY);
 		leftWall.translate(-13.5,0);
 
-		rightWall.addFixture(Geometry.createRectangle(10, 100));
+		rightWall.addFixture(Geometry.createRectangle(11, 100));
 		rightWall.setColor(Color.GRAY);
 		rightWall.translate(13.5,0);
 

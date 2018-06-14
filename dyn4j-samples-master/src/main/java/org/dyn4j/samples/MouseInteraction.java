@@ -136,23 +136,22 @@ public class MouseInteraction extends SimulationFrame {
 				double y = -(this.POINTSHOOTER.getY() - this.canvas.getHeight() / 2.0) / this.scale;
 
 				// Neuen Schuss erstellen
-				SimulationBody no = new SimulationBody();
+				SimulationBody ball = new SimulationBody();
 				BodyFixture fixture = new BodyFixture(Geometry.createCircle(0.3));
 
 				fixture.setDensity(200);
 				fixture.setRestitution(0.9);
-				no.addFixture(fixture);
+				ball.addFixture(fixture);
 
-				no.translate(x, y);
-				no.setLinearVelocity(shootingVector);
-				no.setMass(MassType.NORMAL);
+				ball.translate(x, y);
+				ball.setLinearVelocity(shootingVector);
+				ball.setMass(MassType.NORMAL);
                 //Schuss der Welt hinzufuegen
-				this.world.addBody(no);
+				this.world.addBody(ball);
 				//Arraylist ballSack befuellen
-				ballSack.add(no);
+				ballSack.add(ball);
 			}
 		}
-
 		super.update(g, elapsedTime);
 	}
 

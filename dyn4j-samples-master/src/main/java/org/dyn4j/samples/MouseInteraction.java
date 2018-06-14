@@ -52,7 +52,7 @@ public class MouseInteraction extends SimulationFrame {
 	static int TURN = 1;
 	static boolean WAIT = false;
 	static double[] Yebenen = {4,0,-4,-8};
-	static double[] Xebenen = {5,0,-5};
+	static double[] Xebenen = {-5, 0, 5};
 
 	ArrayList<SimulationBody> targetSack= new ArrayList<>();
 
@@ -61,6 +61,9 @@ public class MouseInteraction extends SimulationFrame {
 	//Vektor fuer
 	private Vector2 shootingVector;
 	//Liste aller erstellten Baelle
+	private List<Body> ballList;
+	//Boundary am unteren Ende
+	private Body lowerBounds;
 	static ArrayList<SimulationBody> ballSack = new ArrayList<>();
 
 	//Statics für die Gamelogik
@@ -84,6 +87,8 @@ public class MouseInteraction extends SimulationFrame {
             {
                 liftBalls();
             }
+
+            createBalls();
             point = new Point(e.getX(), e.getY());
             //Neuen Vektor für die Schuesse erstellen
             shootingVector = new Vector2();
@@ -120,12 +125,13 @@ public class MouseInteraction extends SimulationFrame {
 		SimulationBody leftWall = new SimulationBody();
 		SimulationBody rightWall = new SimulationBody();
 		SimulationBody ceiling = new SimulationBody();
+		lowerBounds = new SimulationBody();
 
-		leftWall.addFixture(Geometry.createRectangle(11, 100));
+		leftWall.addFixture(Geometry.createRectangle(10, 100));
 		leftWall.setColor(Color.GRAY);
 		leftWall.translate(-13.5,0);
 
-		rightWall.addFixture(Geometry.createRectangle(11, 100));
+		rightWall.addFixture(Geometry.createRectangle(10, 100));
 		rightWall.setColor(Color.GRAY);
 		rightWall.translate(13.5,0);
 
@@ -133,13 +139,18 @@ public class MouseInteraction extends SimulationFrame {
 		ceiling.setColor(Color.GRAY);
 		ceiling.translate(0,17);
 
+		lowerBounds.addFixture(Geometry.createRectangle(50, 10));
+		lowerBounds.translate(0, -17);
+
 	    leftWall.setMass(MassType.INFINITE);
 		rightWall.setMass(MassType.INFINITE);
 		ceiling.setMass(MassType.INFINITE);
+		lowerBounds.setMass(MassType.INFINITE);
 
 	    this.world.addBody(leftWall);
 		this.world.addBody(rightWall);
 		this.world.addBody(ceiling);
+		this.world.addBody(lowerBounds);
 	}
 
 	@Override
@@ -170,6 +181,8 @@ public class MouseInteraction extends SimulationFrame {
 				ball.setMass(MassType.NORMAL);
                 //Schuss der Welt hinzufuegen
 				this.world.addBody(ball);
+				this.world.addListener(new BoundaryCollisionListener(ball, lowerBounds, world));
+
 				//Arraylist ballSack befuellen
 				ballSack.add(ball);
 			}
@@ -180,13 +193,31 @@ public class MouseInteraction extends SimulationFrame {
 
 	private void createBall(double xKoord, double yKoord)
 	{
-		SimulationBody no = new SimulationBody();
-		BodyFixture fixture = new BodyFixture(Geometry.createCircle(1));
-		no.addFixture(fixture);
-		fixture.setRestitution(1.5);
-		no.setMass(MassType.INFINITE);
-		this.world.addBody(no);
-		targetSack.add(no);
+		SimulationBody target = new SimulationBody();
+
+        BodyFixture fixture = new BodyFixture(Geometry.createCircle(1));
+        int rndState = ThreadLocalRandom.current().nextInt(0, 3);
+
+        switch(rndState)
+        {
+            case 0:
+                fixture = new BodyFixture(Geometry.createCircle(1));
+                break;
+            case 1:
+                fixture = new BodyFixture(Geometry.createRightTriangle(1.5,1.5));
+                break;
+            default:
+                fixture = new BodyFixture(Geometry.createIsoscelesTriangle(1.5,1.5));
+                break;
+        }
+
+        target.addFixture(fixture);
+		fixture.setRestitution(0.5);
+        target.translate(xKoord,yKoord);
+		target.setMass(MassType.INFINITE);
+		this.world.addBody(target);
+        this.world.addListener(new TargetCollisionListener(target, world, 5));
+		targetSack.add(target);
 	}
 
 	//private SimulationBody ballSack[] = new SimulationBody[20];
@@ -194,12 +225,25 @@ public class MouseInteraction extends SimulationFrame {
 	//Zu zerstörende Baelle generieren
 	private void createBalls(){
 		//Zufallsanzahl an Baellen
+        int randomPosBallsArr[] = new int[3];
 		int randomNoBalls = ThreadLocalRandom.current().nextInt(MIN_BALLS_TO_CREATE, MAX_BALLS_TO_CREATE );
 		for(int i = 0; i < randomNoBalls + 1; i++){
-			createBall(Xebenen[i],Yebenen[3]); //-4|-8
-			//System.out.println(targetSack.get(i).getTransform().getTranslationX()+" "+targetSack.get(i).getTransform().getTranslationY());
-		}
+            ///createBall(Xebenen[0],Yebenen[3]); //-4|-8
+            createBall(Xebenen[i],Yebenen[3]); //-4|-8
+        }
 	}
+
+	private boolean searchInArray(int arr[],int no)
+    {
+        for (int i=0;i<arr.length;i++)
+        {
+            if (arr[i]==no)
+            {
+                return false;
+            }
+        }
+        return true;
+    }
 
 	public void liftBalls()
 	{
@@ -208,6 +252,7 @@ public class MouseInteraction extends SimulationFrame {
 			if (targetSack.get(i).getTransform().getTranslationY() >= 3)
 			{
 				System.out.println("Verloren!!!");
+                targetSack.get(i).removeAllFixtures();
 				//TODO: Game Exit
 			}else
 			{

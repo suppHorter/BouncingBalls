@@ -28,8 +28,8 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
+import java.util.*;
 
-import org.dyn4j.dynamics.Body;
 import org.dyn4j.dynamics.BodyFixture;
 import org.dyn4j.geometry.Geometry;
 import org.dyn4j.geometry.MassType;
@@ -40,29 +40,23 @@ import org.dyn4j.samples.framework.SimulationFrame;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class MouseInteraction extends SimulationFrame {
-
-	//private static final long serialVersionUID = -1366264828445805140L;
 	static int MIN_BALLS_TO_CREATE = 1;
 	static int MAX_BALLS_TO_CREATE = 4;
-	static double MAX_BOUNDARY_X = 27;
-	static double MIN_BOUNDARY_X = -27;
-	static double BOUNDARY_Y = 75;
-	static int TURN = 1;
-	static boolean WAIT = false;
 
 	//Point um Mauspos. zu speichern
 	private Point point;
 	//Vektor fuer
 	private Vector2 shootingVector;
+
 	//Liste aller erstellten Baelle
-	private List<Body> ballList;
+	static ArrayList<SimulationBody> ballSack = new ArrayList<>();
 
 	//Statics für die Gamelogik
-	private static long SLEEPTIME = 150; //Zeit in ms zwischen Schuessen
-	private static double ACTIONTIMER = 5.0; //Zeit bis neue Baelle auftauchen
-
-	private static double TIMERCOUNTER;
-	private static Point POINTSHOOTER = new Point(250,40);
+	//private static long SLEEPTIMER = 5; //Zeit bis man eine neue Salve abfeuern kann
+	private static double BALLTIMER = 0.1; //Zeit zwischen den Schuessen einer Salve
+	private static int MAXBALLS = 5; //Anzahl an Schuessen pro Salve
+	private static double TIMERCOUNTER; //Zaehlt die vergangenen Sekunden
+	private static Point POINTSHOOTER = new Point(250,40); //Punkt an dem Schuesse abgefeuert werden
 
 
 
@@ -70,28 +64,25 @@ public class MouseInteraction extends SimulationFrame {
 		@Override
 
 		public void mousePressed(MouseEvent e) {
-            //Maus Klick Position speichern
-            point = new Point(e.getX(), e.getY());
-            //Neuen Vektor für die Schuesse erstellen
-            shootingVector = new Vector2();
-            double dx = 0.1 * (e.getX() - POINTSHOOTER.getX());
-            double dy = -0.1 * (e.getY() - POINTSHOOTER.getY());
-            System.out.print(dx);
-            System.out.print(" x ");
-            System.out.print(dy);
-            System.out.println("");
-            shootingVector.set(dx, dy);
+				point = new Point(e.getX(), e.getY());
+				//Maus Klick Position speichern
+				//Neuen Vektor für die Schuesse erstellen
+				shootingVector = new Vector2();
+				double dx = 0.1 * (e.getX() - POINTSHOOTER.getX());
+				double dy = -0.1 * (e.getY() - POINTSHOOTER.getY());
+				System.out.print(dx);
+				System.out.print(" x ");
+				System.out.print(dy);
+				System.out.println("");
+				shootingVector.set(dx, dy);
 		}
 
 		@Override
 		public void mouseReleased(MouseEvent e) {
-			point = null;
+			//point = null;
 		}
 	}
 
-	/**
-	 * Default constructor.
-	 */
 	public MouseInteraction() {
 		super("Mouse Interaction", 32.0);
 
@@ -132,36 +123,33 @@ public class MouseInteraction extends SimulationFrame {
 
 	@Override
 	protected void update(Graphics2D g, double elapsedTime) {
-
-		// see if the user clicked
-		if (this.point != null && this.shootingVector != null) {
-			// convert from screen space to world space coordinates
-			double x =  (this.POINTSHOOTER.getX() - this.canvas.getWidth() / 2.0) / this.scale;
-			double y = -(this.POINTSHOOTER.getY() - this.canvas.getHeight() / 2.0) / this.scale;
-
-			// Neuen Ball erstellen und
-			SimulationBody no = new SimulationBody();
-			BodyFixture fixture = new BodyFixture(Geometry.createCircle(0.3));
-
-			fixture.setDensity(200);
-			fixture.setRestitution(0.9);
-			no.addFixture(fixture);
-
-			no.translate(x, y);
-			no.setLinearVelocity(shootingVector);
-			no.setMass(MassType.NORMAL);
-			this.world.addBody(no);
-
-
-			// clear the point
-			this.point = null;
-		}
-
 		TIMERCOUNTER += elapsedTime;
-		if (TIMERCOUNTER > ACTIONTIMER){
+		if (TIMERCOUNTER > BALLTIMER && this.ballSack.size() < MAXBALLS){
 			//System.out.println(TIMERCOUNTER);
 			TIMERCOUNTER = 0;
+			// see if the user clicked
+			if (this.point != null && this.shootingVector != null) {
+				// convert from screen space to world space coordinates
 
+				double x =  (this.POINTSHOOTER.getX() - this.canvas.getWidth() / 2.0) / this.scale;
+				double y = -(this.POINTSHOOTER.getY() - this.canvas.getHeight() / 2.0) / this.scale;
+
+				// Neuen Ball erstellen und
+				SimulationBody no = new SimulationBody();
+				BodyFixture fixture = new BodyFixture(Geometry.createCircle(0.3));
+
+				fixture.setDensity(200);
+				fixture.setRestitution(0.9);
+				no.addFixture(fixture);
+
+				no.translate(x, y);
+				no.setLinearVelocity(shootingVector);
+				no.setMass(MassType.NORMAL);
+                //Schuss der Welt hinzufuegen
+				this.world.addBody(no);
+				//ballSack befuellen
+				ballSack.add(no);
+			}
 		}
 
 		super.update(g, elapsedTime);

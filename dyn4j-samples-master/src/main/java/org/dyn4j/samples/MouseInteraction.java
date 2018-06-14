@@ -62,7 +62,7 @@ public class MouseInteraction extends SimulationFrame {
 	private static double ACTIONTIMER = 5.0; //Zeit bis neue Baelle auftauchen
 
 	private static double TIMERCOUNTER;
-	private static Point shootingBall = new Point(300,80);
+	private static Point POINTSHOOTER = new Point(300,80);
 
 
 
@@ -72,13 +72,13 @@ public class MouseInteraction extends SimulationFrame {
 		public void mousePressed(MouseEvent e) {
 		    if (!WAIT) {
                 WAIT = true;
-                for (int i = 0; i < 4; i++) {
+                for (int i = 0; i < TURN; i++) {
                     point = new Point(e.getX(), e.getY());
                     //Maus Klick Position speichern
                     //Neuen Vektor für die Schuesse erstellen
                     shootingVector = new Vector2();
-                    double dx = 0.1 * (e.getX() - shootingBall.getX());
-                    double dy = -0.1 * (e.getY() - shootingBall.getY());
+                    double dx = 0.1 * (e.getX() - POINTSHOOTER.getX());
+                    double dy = -0.1 * (e.getY() - POINTSHOOTER.getY());
                     System.out.print(dx);
                     System.out.print(" x ");
                     System.out.print(dy);
@@ -151,8 +151,8 @@ public class MouseInteraction extends SimulationFrame {
 		// see if the user clicked
 		if (this.point != null && this.shootingVector != null) {
 			// convert from screen space to world space coordinates
-			double x =  (this.shootingBall.getX() - this.canvas.getWidth() / 2.0) / this.scale;
-			double y = -(this.shootingBall.getY() - this.canvas.getHeight() / 2.0) / this.scale;
+			double x =  (this.POINTSHOOTER.getX() - this.canvas.getWidth() / 2.0) / this.scale;
+			double y = -(this.POINTSHOOTER.getY() - this.canvas.getHeight() / 2.0) / this.scale;
 			
 			// Neuen Ball erstellen und
 			SimulationBody no = new SimulationBody();

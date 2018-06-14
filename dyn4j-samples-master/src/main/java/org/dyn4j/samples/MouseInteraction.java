@@ -61,14 +61,16 @@ public class MouseInteraction extends SimulationFrame {
 	//Vektor fuer
 	private Vector2 shootingVector;
 	//Liste aller erstellten Baelle
-	private List<Body> ballList;
+	static ArrayList<SimulationBody> ballSack = new ArrayList<>();
 
 	//Statics für die Gamelogik
-	private static long SLEEPTIME = 150; //Zeit in ms zwischen Schuessen
-	private static double ACTIONTIMER = 5.0; //Zeit bis neue Baelle auftauchen
+	//private static long SLEEPTIMER = 5; //Zeit bis man eine neue Salve abfeuern kann
+	private static double TIME_BETWEEN_BALLS = 0.1; //Zeit zwischen den Schuessen einer Salve
+    private static double TIMERCOUNTER_BETWEEN_BALLS; //Zaehlt die vergangenen Sekunden - wird zurückgedsetzt
 
-	private static double TIMERCOUNTER;
-	private static Point POINTSHOOTER = new Point(250,40);
+    private static int MAXBALLS = 5; //Anzahl an Schuessen pro Salve
+    private static double TIMER; //Zaehlt die Vergangenen Sekunden
+	private static Point POINTSHOOTER = new Point(250,40); //Punkt an dem Schuesse abgefeuert werden
 
 
 
@@ -78,29 +80,26 @@ public class MouseInteraction extends SimulationFrame {
 		public void mousePressed(MouseEvent e) {
             //Maus Klick Position speichern
 
-			if (targetSack.size()>0)
-			{
-				liftBalls();
-			}
-
+            if (targetSack.size()>0)
+            {
+                liftBalls();
+            }
             point = new Point(e.getX(), e.getY());
             //Neuen Vektor für die Schuesse erstellen
             shootingVector = new Vector2();
             double dx = 0.1 * (e.getX() - POINTSHOOTER.getX());
             double dy = -0.1 * (e.getY() - POINTSHOOTER.getY());
-            /*
             System.out.print(dx);
             System.out.print(" x ");
             System.out.print(dy);
             System.out.println("");
-            */
             shootingVector.set(dx, dy);
-			createBalls();
+            createBalls();
 		}
 
 		@Override
 		public void mouseReleased(MouseEvent e) {
-			point = null;
+			//point = null;
 		}
 	}
 
@@ -116,8 +115,7 @@ public class MouseInteraction extends SimulationFrame {
 		this.canvas.addMouseListener(ml);
 	}
 
-		protected void initializeWorld() {
-
+	protected void initializeWorld() {
 		//Wände erstellen und Positionieren
 		SimulationBody leftWall = new SimulationBody();
 		SimulationBody rightWall = new SimulationBody();
@@ -146,37 +144,36 @@ public class MouseInteraction extends SimulationFrame {
 
 	@Override
 	protected void update(Graphics2D g, double elapsedTime) {
+		TIMERCOUNTER_BETWEEN_BALLS += elapsedTime;
+		TIMER += elapsedTime;
 
-		// see if the user clicked
-		if (this.point != null && this.shootingVector != null) {
-			// convert from screen space to world space coordinates
-			double x =  (this.POINTSHOOTER.getX() - this.canvas.getWidth() / 2.0) / this.scale;
-			double y = -(this.POINTSHOOTER.getY() - this.canvas.getHeight() / 2.0) / this.scale;
+		//Nur schiessen falls Salve noch nicht beendet wurde
+		if (TIMERCOUNTER_BETWEEN_BALLS > TIME_BETWEEN_BALLS && this.ballSack.size() < MAXBALLS){
+			//System.out.println(TIMERCOUNTER_BETWEEN_BALLS);
+			TIMERCOUNTER_BETWEEN_BALLS = 0;
+			//Wurde geklickt und gibt es einen Vektor
+			if (this.point != null && this.shootingVector != null) {
+				//Umrechnung der Dimensionen
+				double x =  (this.POINTSHOOTER.getX() - this.canvas.getWidth() / 2.0) / this.scale;
+				double y = -(this.POINTSHOOTER.getY() - this.canvas.getHeight() / 2.0) / this.scale;
 
-			// Neuen Ball erstellen und
-			SimulationBody no = new SimulationBody();
-			BodyFixture fixture = new BodyFixture(Geometry.createCircle(0.3));
+				// Neuen Schuss erstellen
+				SimulationBody ball = new SimulationBody();
+				BodyFixture fixture = new BodyFixture(Geometry.createCircle(0.3));
 
-			fixture.setDensity(200);
-			fixture.setRestitution(0.9);
-			no.addFixture(fixture);
+				fixture.setDensity(200);
+				fixture.setRestitution(0.9);
+				ball.addFixture(fixture);
 
-			no.translate(x, y);
-			no.setLinearVelocity(shootingVector);
-			no.setMass(MassType.NORMAL);
-			this.world.addBody(no);
-
-			// clear the point
-			this.point = null;
+				ball.translate(x, y);
+				ball.setLinearVelocity(shootingVector);
+				ball.setMass(MassType.NORMAL);
+                //Schuss der Welt hinzufuegen
+				this.world.addBody(ball);
+				//Arraylist ballSack befuellen
+				ballSack.add(ball);
+			}
 		}
-
-		TIMERCOUNTER += elapsedTime;
-		if (TIMERCOUNTER > ACTIONTIMER){
-			//System.out.println(TIMERCOUNTER);
-			TIMERCOUNTER = 0;
-
-		}
-
 		super.update(g, elapsedTime);
 	}
 
@@ -232,4 +229,5 @@ public class MouseInteraction extends SimulationFrame {
 		MouseInteraction simulation = new MouseInteraction();
 		simulation.run();
 	}
+
 }

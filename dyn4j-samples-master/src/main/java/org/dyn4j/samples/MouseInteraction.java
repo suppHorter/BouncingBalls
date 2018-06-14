@@ -24,13 +24,6 @@
  */
 package org.dyn4j.samples;
 
-import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-
-import java.util.List;
-import java.util.*;
-
 import org.dyn4j.dynamics.Body;
 import org.dyn4j.dynamics.BodyFixture;
 import org.dyn4j.geometry.Geometry;
@@ -39,6 +32,11 @@ import org.dyn4j.geometry.Vector2;
 import org.dyn4j.samples.framework.SimulationBody;
 import org.dyn4j.samples.framework.SimulationFrame;
 
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class MouseInteraction extends SimulationFrame {
@@ -61,6 +59,9 @@ public class MouseInteraction extends SimulationFrame {
 	//Vektor fuer
 	private Vector2 shootingVector;
 	//Liste aller erstellten Baelle
+	private List<Body> ballList;
+	//Boundary am unteren Ende
+	private Body lowerBounds;
 	static ArrayList<SimulationBody> ballSack = new ArrayList<>();
 
 	//Statics für die Gamelogik
@@ -120,12 +121,13 @@ public class MouseInteraction extends SimulationFrame {
 		SimulationBody leftWall = new SimulationBody();
 		SimulationBody rightWall = new SimulationBody();
 		SimulationBody ceiling = new SimulationBody();
+		lowerBounds = new SimulationBody();
 
-		leftWall.addFixture(Geometry.createRectangle(11, 100));
+		leftWall.addFixture(Geometry.createRectangle(10, 100));
 		leftWall.setColor(Color.GRAY);
 		leftWall.translate(-13.5,0);
 
-		rightWall.addFixture(Geometry.createRectangle(11, 100));
+		rightWall.addFixture(Geometry.createRectangle(10, 100));
 		rightWall.setColor(Color.GRAY);
 		rightWall.translate(13.5,0);
 
@@ -133,13 +135,18 @@ public class MouseInteraction extends SimulationFrame {
 		ceiling.setColor(Color.GRAY);
 		ceiling.translate(0,17);
 
+		lowerBounds.addFixture(Geometry.createRectangle(50, 10));
+		lowerBounds.translate(0, -17);
+
 	    leftWall.setMass(MassType.INFINITE);
 		rightWall.setMass(MassType.INFINITE);
 		ceiling.setMass(MassType.INFINITE);
+		lowerBounds.setMass(MassType.INFINITE);
 
 	    this.world.addBody(leftWall);
 		this.world.addBody(rightWall);
 		this.world.addBody(ceiling);
+		this.world.addBody(lowerBounds);
 	}
 
 	@Override
@@ -170,6 +177,8 @@ public class MouseInteraction extends SimulationFrame {
 				ball.setMass(MassType.NORMAL);
                 //Schuss der Welt hinzufuegen
 				this.world.addBody(ball);
+				this.world.addListener(new BoundaryCollisionListener(ball, lowerBounds, world));
+
 				//Arraylist ballSack befuellen
 				ballSack.add(ball);
 			}
@@ -229,5 +238,4 @@ public class MouseInteraction extends SimulationFrame {
 		MouseInteraction simulation = new MouseInteraction();
 		simulation.run();
 	}
-
 }

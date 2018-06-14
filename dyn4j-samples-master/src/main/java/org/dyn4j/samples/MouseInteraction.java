@@ -52,7 +52,7 @@ public class MouseInteraction extends SimulationFrame {
 	static int TURN = 1;
 	static boolean WAIT = false;
 	static double[] Yebenen = {4,0,-4,-8};
-	static double[] Xebenen = {5,0,-5};
+	static double[] Xebenen = {-5, 0, 5};
 
 	ArrayList<SimulationBody> targetSack= new ArrayList<>();
 
@@ -84,6 +84,7 @@ public class MouseInteraction extends SimulationFrame {
             {
                 liftBalls();
             }
+            createBalls();
             point = new Point(e.getX(), e.getY());
             //Neuen Vektor für die Schuesse erstellen
             shootingVector = new Vector2();
@@ -94,7 +95,6 @@ public class MouseInteraction extends SimulationFrame {
             System.out.print(dy);
             System.out.println("");
             shootingVector.set(dx, dy);
-            createBalls();
 		}
 
 		@Override
@@ -181,9 +181,24 @@ public class MouseInteraction extends SimulationFrame {
 	private void createBall(double xKoord, double yKoord)
 	{
 		SimulationBody no = new SimulationBody();
-		BodyFixture fixture = new BodyFixture(Geometry.createCircle(1));
+
+        BodyFixture fixture = new BodyFixture(Geometry.createCircle(1));;
+        int rndState = ThreadLocalRandom.current().nextInt(0, 2);
+        switch(rndState)
+        {
+            case 0:
+                fixture = new BodyFixture(Geometry.createCircle(1));
+                break;
+            case 1:
+                fixture = new BodyFixture(Geometry.createRightTriangle(1.5,1.5));
+                break;
+            default:
+                fixture = new BodyFixture(Geometry.createRightTriangle(1.5,1.5));
+                break;
+        }
+
 		no.addFixture(fixture);
-		fixture.setRestitution(1.5);
+		fixture.setRestitution(0.5);
 		no.translate(xKoord,yKoord);
 		no.setMass(MassType.INFINITE);
 		this.world.addBody(no);
@@ -195,32 +210,37 @@ public class MouseInteraction extends SimulationFrame {
 	//Zu zerstörende Baelle generieren
 	private void createBalls(){
 		//Zufallsanzahl an Baellen
+        int randomPosBallsArr[] = new int[3];
 		int randomNoBalls = ThreadLocalRandom.current().nextInt(MIN_BALLS_TO_CREATE, MAX_BALLS_TO_CREATE );
 		for(int i = 0; i < randomNoBalls + 1; i++){
-			createBall(Xebenen[i],Yebenen[3]); //-4|-8
-			//System.out.println(targetSack.get(i).getTransform().getTranslationX()+" "+targetSack.get(i).getTransform().getTranslationY());
-		}
+            ///createBall(Xebenen[0],Yebenen[3]); //-4|-8
+            createBall(Xebenen[i],Yebenen[3]); //-4|-8
+        }
 	}
+
+	private boolean searchInArray(int arr[],int no)
+    {
+        for (int i=0;i<arr.length;i++)
+        {
+            if (arr[i]==no)
+            {
+                return false;
+            }
+        }
+        return true;
+    }
 
 	public void liftBalls()
 	{
-
 		for(int i = 0; i < targetSack.size(); i++){
 			if (targetSack.get(i).getTransform().getTranslationY() >= 3)
 			{
 				System.out.println("Verloren!!!");
+                targetSack.get(i).removeAllFixtures();
 				//TODO: Game Exit
 			}else
 			{
-				//double tempX = targetSack.get(i).getTransform().getTranslationX();
-				//double tempY = targetSack.get(i).getTransform().getTranslationY();
-				//tempX += 4;
-				//System.out.println("Targetsack: "+tempX + " " +tempY);
-
 				targetSack.get(i).translate(0,4);
-				//System.out.println(targetSack.get(i).getTransform().getTranslationX()+" "+targetSack.get(i).getTransform().getTranslationY());
-				//For schleife
-				//Y Koordinaten eine ebene hoch
 			}
 		}
 	}

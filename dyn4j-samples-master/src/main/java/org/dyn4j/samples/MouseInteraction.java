@@ -28,8 +28,7 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
-import com.sun.xml.internal.ws.client.sei.ResponseBuilder;
-import org.dyn4j.collision.Bounds;
+
 import org.dyn4j.dynamics.Body;
 import org.dyn4j.dynamics.BodyFixture;
 import org.dyn4j.geometry.Geometry;
@@ -38,54 +37,62 @@ import org.dyn4j.geometry.Vector2;
 import org.dyn4j.samples.framework.SimulationBody;
 import org.dyn4j.samples.framework.SimulationFrame;
 
-import javax.swing.plaf.synth.SynthTextAreaUI;
 import java.util.concurrent.ThreadLocalRandom;
 
-/**
- * A simple scene showing how to capture mouse input and create
- * bodies dynamically.
- * @author William Bittle
- * @version 3.2.1
- * @since 3.2.0
- */
 public class MouseInteraction extends SimulationFrame {
-	/** The serial version id */
-	private static final long serialVersionUID = -1366264828445805140L;
+
+	//private static final long serialVersionUID = -1366264828445805140L;
 	static int MIN_BALLS_TO_CREATE = 1;
 	static int MAX_BALLS_TO_CREATE = 4;
 	static double MAX_BOUNDARY_X = 27;
 	static double MIN_BOUNDARY_X = -27;
 	static double BOUNDARY_Y = 75;
+	static int TURN = 1;
+	static boolean WAIT = false;
 
-	/** A point for tracking the mouse click */
+	//Point um Mauspos. zu speichern
 	private Point point;
-
+	//Vektor fuer
 	private Vector2 shootingVector;
+	//Liste aller erstellten Baelle
 	private List<Body> ballList;
-	private static double actionTimer = 5.0;
-	private static double timercounter;
+
+	//Statics für die Gamelogik
+	private static long SLEEPTIME = 150; //Zeit in ms zwischen Schuessen
+	private static double ACTIONTIMER = 5.0; //Zeit bis neue Baelle auftauchen
+
+	private static double TIMERCOUNTER;
 	private static Point shootingBall = new Point(300,80);
-	/**
-	 * A custom mouse adapter for listening for mouse clicks.
-	 * @author William Bittle
-	 * @version 3.2.1
-	 * @since 3.2.0
-	 */
+
+
+
 	private final class CustomMouseAdapter extends MouseAdapter {
 		@Override
-		public void mousePressed(MouseEvent e) {
-			//Maus Klick Position speichern
-			point = new Point(e.getX(), e.getY());
 
-			//Neuen Vektor für die Schuesse erstellen
-			shootingVector = new Vector2();
-			double dx = 0.1*(e.getX()-shootingBall.getX());
-			double dy = -0.1*(e.getY()-shootingBall.getY());
-			System.out.print(dx);
-			System.out.print(" x ");
-			System.out.print(dy);
-			System.out.println("");
-			shootingVector.set(dx,dy);
+		public void mousePressed(MouseEvent e) {
+		    if (!WAIT) {
+                WAIT = true;
+                for (int i = 0; i < 4; i++) {
+                    point = new Point(e.getX(), e.getY());
+                    //Maus Klick Position speichern
+                    //Neuen Vektor für die Schuesse erstellen
+                    shootingVector = new Vector2();
+                    double dx = 0.1 * (e.getX() - shootingBall.getX());
+                    double dy = -0.1 * (e.getY() - shootingBall.getY());
+                    System.out.print(dx);
+                    System.out.print(" x ");
+                    System.out.print(dy);
+                    System.out.println("");
+                    shootingVector.set(dx, dy);
+                    try {
+                        Thread.sleep(SLEEPTIME);
+                    } catch (InterruptedException e1) {
+                        e1.printStackTrace();
+                    }
+                }
+                if(TURN < 5) {TURN += 1;}
+                WAIT = false;
+            }
 		}
 		
 		@Override
@@ -165,23 +172,21 @@ public class MouseInteraction extends SimulationFrame {
 			this.point = null;
 		}
 
-		timercounter += elapsedTime;
-		if (timercounter > actionTimer){
-			//System.out.println(timercounter);
-			timercounter = 0;
+		TIMERCOUNTER += elapsedTime;
+		if (TIMERCOUNTER > ACTIONTIMER){
+			//System.out.println(TIMERCOUNTER);
+			TIMERCOUNTER = 0;
 
 		}
 
 		super.update(g, elapsedTime);
 	}
 
+	//Zu zerstörende Baelle generieren
 	private void CreateBalls(){
-
+		//Zufallsanzahl an Baellen
 		int randomNoBalls = ThreadLocalRandom.current().nextInt(MIN_BALLS_TO_CREATE, MAX_BALLS_TO_CREATE + 1);
 		for(int i = 0; i < randomNoBalls + 1; i++){
-
-
-
 			SimulationBody no = new SimulationBody();
 			BodyFixture fixture = new BodyFixture(Geometry.createCircle(0.3));
 			no.addFixture(fixture);

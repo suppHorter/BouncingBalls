@@ -62,7 +62,7 @@ public class MouseInteraction extends SimulationFrame {
 	private static double ACTIONTIMER = 5.0; //Zeit bis neue Baelle auftauchen
 
 	private static double TIMERCOUNTER;
-	private static Point POINTSHOOTER = new Point(300,80);
+	private static Point POINTSHOOTER = new Point(250,40);
 
 
 
@@ -70,31 +70,19 @@ public class MouseInteraction extends SimulationFrame {
 		@Override
 
 		public void mousePressed(MouseEvent e) {
-		    if (!WAIT) {
-                WAIT = true;
-                for (int i = 0; i < TURN; i++) {
-                    point = new Point(e.getX(), e.getY());
-                    //Maus Klick Position speichern
-                    //Neuen Vektor für die Schuesse erstellen
-                    shootingVector = new Vector2();
-                    double dx = 0.1 * (e.getX() - POINTSHOOTER.getX());
-                    double dy = -0.1 * (e.getY() - POINTSHOOTER.getY());
-                    System.out.print(dx);
-                    System.out.print(" x ");
-                    System.out.print(dy);
-                    System.out.println("");
-                    shootingVector.set(dx, dy);
-                    try {
-                        Thread.sleep(SLEEPTIME);
-                    } catch (InterruptedException e1) {
-                        e1.printStackTrace();
-                    }
-                }
-                if(TURN < 5) {TURN += 1;}
-                WAIT = false;
-            }
+            //Maus Klick Position speichern
+            point = new Point(e.getX(), e.getY());
+            //Neuen Vektor für die Schuesse erstellen
+            shootingVector = new Vector2();
+            double dx = 0.1 * (e.getX() - POINTSHOOTER.getX());
+            double dy = -0.1 * (e.getY() - POINTSHOOTER.getY());
+            System.out.print(dx);
+            System.out.print(" x ");
+            System.out.print(dy);
+            System.out.println("");
+            shootingVector.set(dx, dy);
 		}
-		
+
 		@Override
 		public void mouseReleased(MouseEvent e) {
 			point = null;
@@ -106,16 +94,13 @@ public class MouseInteraction extends SimulationFrame {
 	 */
 	public MouseInteraction() {
 		super("Mouse Interaction", 32.0);
-		
+
 		MouseAdapter ml = new CustomMouseAdapter();
 		this.canvas.addMouseMotionListener(ml);
 		this.canvas.addMouseWheelListener(ml);
 		this.canvas.addMouseListener(ml);
 	}
-	
-	/**
-	 * Creates game objects and adds them to the world.
-	 */
+
 		protected void initializeWorld() {
 
 		//Wände erstellen und Positionieren
@@ -124,11 +109,11 @@ public class MouseInteraction extends SimulationFrame {
 		SimulationBody ceiling = new SimulationBody();
 
 
-		leftWall.addFixture(Geometry.createRectangle(10, 100));
+		leftWall.addFixture(Geometry.createRectangle(11, 100));
 		leftWall.setColor(Color.GRAY);
 		leftWall.translate(-13.5,0);
 
-		rightWall.addFixture(Geometry.createRectangle(10, 100));
+		rightWall.addFixture(Geometry.createRectangle(11, 100));
 		rightWall.setColor(Color.GRAY);
 		rightWall.translate(13.5,0);
 
@@ -147,13 +132,13 @@ public class MouseInteraction extends SimulationFrame {
 
 	@Override
 	protected void update(Graphics2D g, double elapsedTime) {
-		
+
 		// see if the user clicked
 		if (this.point != null && this.shootingVector != null) {
 			// convert from screen space to world space coordinates
 			double x =  (this.POINTSHOOTER.getX() - this.canvas.getWidth() / 2.0) / this.scale;
 			double y = -(this.POINTSHOOTER.getY() - this.canvas.getHeight() / 2.0) / this.scale;
-			
+
 			// Neuen Ball erstellen und
 			SimulationBody no = new SimulationBody();
 			BodyFixture fixture = new BodyFixture(Geometry.createCircle(0.3));
@@ -167,7 +152,7 @@ public class MouseInteraction extends SimulationFrame {
 			no.setMass(MassType.NORMAL);
 			this.world.addBody(no);
 
-			
+
 			// clear the point
 			this.point = null;
 		}
@@ -195,10 +180,6 @@ public class MouseInteraction extends SimulationFrame {
 		}
 	}
 
-	/**
-	 * Entry point for the example application.
-	 * @param args command line arguments
-	 */
 	public static void main(String[] args) {
 		MouseInteraction simulation = new MouseInteraction();
 		simulation.run();

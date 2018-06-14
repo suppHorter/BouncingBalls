@@ -27,7 +27,9 @@ package org.dyn4j.samples;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+
 import java.util.List;
+import java.util.*;
 
 import org.dyn4j.dynamics.Body;
 import org.dyn4j.dynamics.BodyFixture;
@@ -43,12 +45,16 @@ public class MouseInteraction extends SimulationFrame {
 
 	//private static final long serialVersionUID = -1366264828445805140L;
 	static int MIN_BALLS_TO_CREATE = 1;
-	static int MAX_BALLS_TO_CREATE = 4;
+	static int MAX_BALLS_TO_CREATE = 3;
 	static double MAX_BOUNDARY_X = 27;
 	static double MIN_BOUNDARY_X = -27;
 	static double BOUNDARY_Y = 75;
 	static int TURN = 1;
 	static boolean WAIT = false;
+	static double[] Yebenen = {4,0,-4,-8};
+	static double[] Xebenen = {5,0,-5};
+
+	ArrayList<SimulationBody> targetSack= new ArrayList<>();
 
 	//Point um Mauspos. zu speichern
 	private Point point;
@@ -71,16 +77,25 @@ public class MouseInteraction extends SimulationFrame {
 
 		public void mousePressed(MouseEvent e) {
             //Maus Klick Position speichern
+
+			if (targetSack.size()>0)
+			{
+				liftBalls();
+			}
+
             point = new Point(e.getX(), e.getY());
             //Neuen Vektor für die Schuesse erstellen
             shootingVector = new Vector2();
             double dx = 0.1 * (e.getX() - POINTSHOOTER.getX());
             double dy = -0.1 * (e.getY() - POINTSHOOTER.getY());
+            /*
             System.out.print(dx);
             System.out.print(" x ");
             System.out.print(dy);
             System.out.println("");
+            */
             shootingVector.set(dx, dy);
+			createBalls();
 		}
 
 		@Override
@@ -107,7 +122,6 @@ public class MouseInteraction extends SimulationFrame {
 		SimulationBody leftWall = new SimulationBody();
 		SimulationBody rightWall = new SimulationBody();
 		SimulationBody ceiling = new SimulationBody();
-
 
 		leftWall.addFixture(Geometry.createRectangle(11, 100));
 		leftWall.setColor(Color.GRAY);
@@ -152,7 +166,6 @@ public class MouseInteraction extends SimulationFrame {
 			no.setMass(MassType.NORMAL);
 			this.world.addBody(no);
 
-
 			// clear the point
 			this.point = null;
 		}
@@ -167,16 +180,51 @@ public class MouseInteraction extends SimulationFrame {
 		super.update(g, elapsedTime);
 	}
 
+
+	private void createBall(double xKoord, double yKoord)
+	{
+		SimulationBody no = new SimulationBody();
+		BodyFixture fixture = new BodyFixture(Geometry.createCircle(1));
+		no.addFixture(fixture);
+		fixture.setRestitution(1.5);
+		no.translate(xKoord,yKoord);
+		no.setMass(MassType.INFINITE);
+		this.world.addBody(no);
+		targetSack.add(no);
+	}
+
+	//private SimulationBody ballSack[] = new SimulationBody[20];
+
 	//Zu zerstörende Baelle generieren
-	private void CreateBalls(){
+	private void createBalls(){
 		//Zufallsanzahl an Baellen
-		int randomNoBalls = ThreadLocalRandom.current().nextInt(MIN_BALLS_TO_CREATE, MAX_BALLS_TO_CREATE + 1);
+		int randomNoBalls = ThreadLocalRandom.current().nextInt(MIN_BALLS_TO_CREATE, MAX_BALLS_TO_CREATE );
 		for(int i = 0; i < randomNoBalls + 1; i++){
-			SimulationBody no = new SimulationBody();
-			BodyFixture fixture = new BodyFixture(Geometry.createCircle(0.3));
-			no.addFixture(fixture);
-			//no.translate();
-			no.setMass(MassType.INFINITE);
+			createBall(Xebenen[i],Yebenen[3]); //-4|-8
+			//System.out.println(targetSack.get(i).getTransform().getTranslationX()+" "+targetSack.get(i).getTransform().getTranslationY());
+		}
+	}
+
+	public void liftBalls()
+	{
+
+		for(int i = 0; i < targetSack.size(); i++){
+			if (targetSack.get(i).getTransform().getTranslationY() >= 3)
+			{
+				System.out.println("Verloren!!!");
+				//TODO: Game Exit
+			}else
+			{
+				//double tempX = targetSack.get(i).getTransform().getTranslationX();
+				//double tempY = targetSack.get(i).getTransform().getTranslationY();
+				//tempX += 4;
+				//System.out.println("Targetsack: "+tempX + " " +tempY);
+
+				targetSack.get(i).translate(0,4);
+				//System.out.println(targetSack.get(i).getTransform().getTranslationX()+" "+targetSack.get(i).getTransform().getTranslationY());
+				//For schleife
+				//Y Koordinaten eine ebene hoch
+			}
 		}
 	}
 
@@ -184,5 +232,4 @@ public class MouseInteraction extends SimulationFrame {
 		MouseInteraction simulation = new MouseInteraction();
 		simulation.run();
 	}
-
 }

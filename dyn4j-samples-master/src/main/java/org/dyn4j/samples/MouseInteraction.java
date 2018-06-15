@@ -25,40 +25,33 @@
 package org.dyn4j.samples;
 
 import java.awt.*;
-import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Ellipse2D;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.util.List;
 import java.util.*;
 
-import javax.imageio.ImageIO;
+import com.sun.xml.internal.ws.util.Pool;
 import org.dyn4j.dynamics.Body;
 import org.dyn4j.dynamics.BodyFixture;
-import org.dyn4j.dynamics.DetectResult;
 import org.dyn4j.geometry.*;
-import org.dyn4j.geometry.Shape;
 import org.dyn4j.samples.framework.SimulationBody;
 import org.dyn4j.samples.framework.SimulationFrame;
-import org.dyn4j.samples.framework.Graphics2DRenderer;
-import org.dyn4j.samples.framework.SimulationBody;
-import org.dyn4j.samples.framework.SimulationFrame;
+
 import java.util.concurrent.ThreadLocalRandom;
 
 public class MouseInteraction extends SimulationFrame {
     //private static final long serialVersionUID = -1366264828445805140L;
     static int ballsInGame = 0; //Anzahl an Schuessen die momentan im Spiel vorhanden sind (maximal MAXBALLS)
+    static int ballsCreated = 0; //Anzahl aller Schuesse die jemals erstellt wurden
     static boolean canShoot = true; //Man darf nur schiessen wenn die ballsInGame leer geworden sind
+    static int rowsOfTargetsCreated;
 	static int TURN = 1;
 	static boolean WAIT = false;
 	static double[] Yebenen = {4,0,-4,-8};
 	static double[] Xebenen = {-5, 0, 5};
 
-	ArrayList<SimulationBody> targetSack= new ArrayList<>();
+	static ArrayList<SimulationBody> targetSack= new ArrayList<>();
 
 	//Point um Mauspos. zu speichern
 	private Point point;
@@ -71,7 +64,7 @@ public class MouseInteraction extends SimulationFrame {
 
 	//Statics für die Gamelogik
 	//private static long SLEEPTIMER = 5; //Zeit bis man eine neue Salve abfeuern kann
-	private static double TIME_BETWEEN_BALLS = 0.2; //Zeit zwischen den Schuessen einer Salve
+	private static double TIME_BETWEEN_BALLS = 0.5; //Zeit zwischen den Schuessen einer Salve
     private static double TIMERCOUNTER_BETWEEN_BALLS; //Zaehlt die vergangenen Sekunden - wird zurückgedsetzt
     private static int MIN_BALLS_TO_CREATE = 1;
     private static int MAX_BALLS_TO_CREATE = 3;
@@ -87,10 +80,6 @@ public class MouseInteraction extends SimulationFrame {
 		public void mousePressed(MouseEvent e) {
 		    //Maus Klick Position speichern
             if (canShoot) {
-                if (targetSack.size() > 0) {
-                    liftBalls();
-                }
-                createBalls();
                 point = new Point(e.getX(), e.getY());
                 //Neuen Vektor für die Schuesse erstellen
                 shootingVector = new Vector2();
@@ -101,7 +90,6 @@ public class MouseInteraction extends SimulationFrame {
                 System.out.print(dy);
                 System.out.println("");
                 shootingVector.set(dx, dy);
-                createBalls();
             }
 		}
 
@@ -111,9 +99,6 @@ public class MouseInteraction extends SimulationFrame {
 		}
 	}
 
-	/**
-	 * Default constructor.
-	 */
 	public MouseInteraction() {
 		super("Mouse Interaction", 32.0);
 		MouseAdapter ml = new CustomMouseAdapter();
@@ -123,6 +108,11 @@ public class MouseInteraction extends SimulationFrame {
 	}
 
 	protected void initializeWorld() {
+	    //Gravitation der Welt anpassen
+        Vector2 gravityVector = new Vector2();
+        gravityVector.set(0,-20);
+        this.world.setGravity(gravityVector);
+
 		//Wände erstellen und Positionieren
 		SimulationBody leftWall = new SimulationBody();
 		SimulationBody rightWall = new SimulationBody();
@@ -131,18 +121,18 @@ public class MouseInteraction extends SimulationFrame {
 
 		leftWall.addFixture(Geometry.createRectangle(10, 100));
 		leftWall.setColor(Color.GRAY);
-		leftWall.translate(-13.5,0);
+		leftWall.translate(-13.9,0);
 
 		rightWall.addFixture(Geometry.createRectangle(10, 100));
 		rightWall.setColor(Color.GRAY);
-		rightWall.translate(13.5,0);
+		rightWall.translate(13.9,0);
 
 		ceiling.addFixture(Geometry.createRectangle(50, 10));
 		ceiling.setColor(Color.GRAY);
 		ceiling.translate(0,17);
 
 		lowerBounds.addFixture(Geometry.createRectangle(50, 10));
-		lowerBounds.translate(0, -50);
+		lowerBounds.translate(0, -40);
 
 	    leftWall.setMass(MassType.INFINITE);
 		rightWall.setMass(MassType.INFINITE);
@@ -153,16 +143,24 @@ public class MouseInteraction extends SimulationFrame {
 		this.world.addBody(rightWall);
 		this.world.addBody(ceiling);
 		this.world.addBody(lowerBounds);
+        //Ersten Targets erstellen
+        createTargets();
 	}
 
 	@Override
 	protected void update(Graphics2D g, double elapsedTime) {
 		TIMERCOUNTER_BETWEEN_BALLS += elapsedTime;
+		//Allgemeine vergangene Zeit (noch nicht verwendet)
 		TIMER += elapsedTime;
-
+		if(TURN > 1 && rowsOfTargetsCreated < TURN){
+                if (targetSack.size() > 0) {
+                    liftBalls();
+                }
+                createTargets();
+        }
 		//Nur schiessen falls Salve noch nicht beendet wurde
 		if (TIMERCOUNTER_BETWEEN_BALLS > TIME_BETWEEN_BALLS
-                && ballsInGame < MAXBALLS
+                && ballsCreated < (MAXBALLS * TURN)
                 && canShoot){
 			//System.out.println(TIMERCOUNTER_BETWEEN_BALLS);
 			TIMERCOUNTER_BETWEEN_BALLS = 0;
@@ -173,11 +171,11 @@ public class MouseInteraction extends SimulationFrame {
 				double y = -(this.POINTSHOOTER.getY() - this.canvas.getHeight() / 2.0) / this.scale;
 
 				// Neuen Schuss erstellen
-				SimulationBody ball = new SimulationBody();
+				TargetBody ball = new TargetBody();
 				BodyFixture fixture = new BodyFixture(Geometry.createCircle(0.3));
 
 				fixture.setDensity(200);
-				fixture.setRestitution(0.9);
+				fixture.setRestitution(0.6);
 				ball.addFixture(fixture);
 				ball.translate(x, y);
 				ball.setLinearVelocity(shootingVector);
@@ -186,8 +184,11 @@ public class MouseInteraction extends SimulationFrame {
 				this.world.addBody(ball);
 				this.world.addListener(new BoundaryCollisionListener(ball, lowerBounds, world));
 				ballsInGame += 1;
-				if (ballsInGame == MAXBALLS){
+				ballsCreated += 1;
+				if (ballsCreated == (MAXBALLS * TURN)){
+				    //Kein Schiessen mehr moeglich nachdem alle Schuesse einer Salve abgefeuert wurden
 				    canShoot = false;
+				    //Mausposition nullen
 				    point = null;
                 }
 			}
@@ -196,13 +197,14 @@ public class MouseInteraction extends SimulationFrame {
 	}
 
 
-	private void createBall(double xKoord, double yKoord)
+	private void createTargetBall(double xKoord, double yKoord)
 	{
 		TargetBody target = new TargetBody();
         BodyFixture fixture = new BodyFixture(Geometry.createCircle(1));
         target.hitNumber =  ThreadLocalRandom.current().nextInt(1,  5);
+        target.isTarget = true;
         target.addFixture(fixture);
-		fixture.setRestitution(0.5);
+		fixture.setRestitution(0.2);
         target.translate(xKoord,yKoord);
 		target.setMass(MassType.INFINITE);
 		this.world.addBody(target);
@@ -213,13 +215,14 @@ public class MouseInteraction extends SimulationFrame {
 	//private SimulationBody ballSack[] = new SimulationBody[20];
 
 	//Zu zerstörende Baelle generieren
-	private void createBalls(){
+    public void createTargets(){
+        rowsOfTargetsCreated += 1;
 		//Zufallsanzahl an Baellen
         int randomPosBallsArr[] = new int[3];
 		int randomNoBalls = ThreadLocalRandom.current().nextInt(MIN_BALLS_TO_CREATE, MAX_BALLS_TO_CREATE );
 		for(int i = 0; i < randomNoBalls + 1; i++){
-            ///createBall(Xebenen[0],Yebenen[3]); //-4|-8
-            createBall(Xebenen[i],Yebenen[3]); //-4|-8
+            ///createTargetBall(Xebenen[0],Yebenen[3]); //-4|-8
+            createTargetBall(Xebenen[i],Yebenen[3]); //-4|-8
         }
 	}
 

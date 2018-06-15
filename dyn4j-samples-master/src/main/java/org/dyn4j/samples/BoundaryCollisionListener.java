@@ -26,6 +26,7 @@ public class BoundaryCollisionListener extends CollisionAdapter {
             MouseInteraction.ballsInGame -= 1;
             if (MouseInteraction.ballsInGame == 0){
                 MouseInteraction.canShoot = true;
+                MouseInteraction.TURN += 1;
             }
             return false;
         }

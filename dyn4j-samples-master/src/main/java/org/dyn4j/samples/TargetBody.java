@@ -13,11 +13,12 @@ public final class TargetBody extends SimulationBody {
      * Body für die Targets
      */
     public int hitNumber;
+    public boolean isTarget = false;
 
     @Override
     protected void renderFixture(Graphics2D g, double scale, BodyFixture fixture, Color color) {
         // Brauchen wir eine Zahl?
-        if (hitNumber != 0) {
+        if (isTarget) {
             // Cirlce fixture holen
             Convex circle = fixture.getShape();
             double radius = circle.getRadius();
@@ -36,6 +37,22 @@ public final class TargetBody extends SimulationBody {
             g.scale(1, -1);
             g.setFont(new Font("Default", Font.PLAIN, 20));
             g.drawString(String.valueOf(hitNumber), -5, 5);
+        }else{
+            // Cirlce fixture holen
+            Convex circle = fixture.getShape();
+            double radius = circle.getRadius();
+            Vector2 center = circle.getCenter();
+
+            double radius2 = 2.0 * radius;
+            Ellipse2D.Double c = new Ellipse2D.Double(
+                    (center.x - radius) * scale,
+                    (center.y - radius) * scale,
+                    radius2 * scale,
+                    radius2 * scale);
+            g.setColor(Color.WHITE);
+            g.fill(c);
+            // Kreis rendern
+            g.draw(c);
         }
     }
 }

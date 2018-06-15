@@ -53,9 +53,6 @@ public class MouseInteraction extends SimulationFrame {
     //private static final long serialVersionUID = -1366264828445805140L;
     static int ballsInGame = 0; //Anzahl an Schuessen die momentan im Spiel vorhanden sind (maximal MAXBALLS)
     static boolean canShoot = true; //Man darf nur schiessen wenn die ballsInGame leer geworden sind
-	static double MAX_BOUNDARY_X = 27;
-	static double MIN_BOUNDARY_X = -27;
-	static double BOUNDARY_Y = 75;
 	static int TURN = 1;
 	static boolean WAIT = false;
 	static double[] Yebenen = {4,0,-4,-8};
@@ -71,7 +68,6 @@ public class MouseInteraction extends SimulationFrame {
 	private List<Body> ballList;
 	//Boundary am unteren Ende
 	private Body lowerBounds;
-	//static ArrayList<SimulationBody> ballSack = new ArrayList<>();
 
 	//Statics für die Gamelogik
 	//private static long SLEEPTIMER = 5; //Zeit bis man eine neue Salve abfeuern kann
@@ -146,7 +142,7 @@ public class MouseInteraction extends SimulationFrame {
 		ceiling.translate(0,17);
 
 		lowerBounds.addFixture(Geometry.createRectangle(50, 10));
-		lowerBounds.translate(0, -17);
+		lowerBounds.translate(0, -50);
 
 	    leftWall.setMass(MassType.INFINITE);
 		rightWall.setMass(MassType.INFINITE);
@@ -259,41 +255,8 @@ public class MouseInteraction extends SimulationFrame {
             }
         }
     }
-    public final class TargetBody extends SimulationBody {
-        /**
-         * The image to use, if required
-         */
-        public int hitNumber;
 
-        /* (non-Javadoc)
-         * @see org.dyn4j.samples.SimulationBody#renderFixture(java.awt.Graphics2D, double, org.dyn4j.dynamics.BodyFixture, java.awt.Color)
-         */
-        @Override
-        protected void renderFixture(Graphics2D g, double scale, BodyFixture fixture, Color color) {
-            // do we need to render an image?
-            if (hitNumber != 0) {
-                // get the shape on the fixture
-                Convex circle = fixture.getShape();
-                // check the shape type
-                double radius = circle.getRadius();
-                Vector2 center = circle.getCenter();
 
-                double radius2 = 2.0 * radius;
-                Ellipse2D.Double c = new Ellipse2D.Double(
-                        (center.x - radius) * scale,
-                        (center.y - radius) * scale,
-                        radius2 * scale,
-                        radius2 * scale);
-                g.setColor(color);
-                // cast the shape to get the radius
-                g.draw(c);
-                // lets us an image instead
-                g.scale(1, -1);
-                g.setFont(new Font("Default", Font.PLAIN, 20));
-                g.drawString(String.valueOf(hitNumber), -5, 5);
-            }
-        }
-    }
 
 
 	public static void main(String[] args) {

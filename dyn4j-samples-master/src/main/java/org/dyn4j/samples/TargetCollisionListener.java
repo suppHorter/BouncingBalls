@@ -8,11 +8,11 @@ import org.dyn4j.dynamics.World;
 import org.dyn4j.samples.framework.SimulationBody;
 
 public class TargetCollisionListener extends CollisionAdapter {
-    private MouseInteraction.TargetBody target;
+    private TargetBody target;
     private World world;
     private int hitCnt;
 
-    TargetCollisionListener(MouseInteraction.TargetBody target, World world, int hits) {
+    TargetCollisionListener(TargetBody target, World world, int hits) {
         this.target = target;
         this.world = world;
         this.hitCnt = hits;

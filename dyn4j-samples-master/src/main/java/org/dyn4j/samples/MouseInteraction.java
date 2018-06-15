@@ -75,11 +75,11 @@ public class MouseInteraction extends SimulationFrame {
 
 	//Statics für die Gamelogik
 	//private static long SLEEPTIMER = 5; //Zeit bis man eine neue Salve abfeuern kann
-	private static double TIME_BETWEEN_BALLS = 0.1; //Zeit zwischen den Schuessen einer Salve
+	private static double TIME_BETWEEN_BALLS = 0.2; //Zeit zwischen den Schuessen einer Salve
     private static double TIMERCOUNTER_BETWEEN_BALLS; //Zaehlt die vergangenen Sekunden - wird zurückgedsetzt
     private static int MIN_BALLS_TO_CREATE = 1;
     private static int MAX_BALLS_TO_CREATE = 3;
-    private static int MAXBALLS = 1; //Anzahl an Schuessen pro Salve
+    private static int MAXBALLS = 5; //Anzahl an Schuessen pro Salve
     private static double TIMER; //Zaehlt die Vergangenen Sekunden
 	private static Point POINTSHOOTER = new Point(250,40); //Punkt an dem Schuesse abgefeuert werden
 

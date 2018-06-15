@@ -40,6 +40,7 @@ import org.dyn4j.geometry.Segment;
 import org.dyn4j.geometry.Shape;
 import org.dyn4j.geometry.Slice;
 import org.dyn4j.geometry.Vector2;
+import org.dyn4j.samples.MouseInteraction;
 
 /**
  * Graphics2D renderer for dyn4j shape types.
@@ -103,10 +104,6 @@ public final class Graphics2DRenderer {
 		g.setColor(color);
 		g.setColor(getOutlineColor(color));
 		g.draw(c);
-
-		g.scale(1,-1);
-		g.setFont(new Font("Default", Font.PLAIN, 20));
-		g.drawString("5",-5,5);
 	}
 
 	/**

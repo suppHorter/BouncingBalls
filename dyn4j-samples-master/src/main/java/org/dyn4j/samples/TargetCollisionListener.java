@@ -8,11 +8,11 @@ import org.dyn4j.dynamics.World;
 import org.dyn4j.samples.framework.SimulationBody;
 
 public class TargetCollisionListener extends CollisionAdapter {
-    private SimulationBody target;
+    private MouseInteraction.TargetBody target;
     private World world;
     private int hitCnt;
 
-    TargetCollisionListener(SimulationBody target, World world, int hits) {
+    TargetCollisionListener(MouseInteraction.TargetBody target, World world, int hits) {
         this.target = target;
         this.world = world;
         this.hitCnt = hits;
@@ -22,12 +22,13 @@ public class TargetCollisionListener extends CollisionAdapter {
     public boolean collision(Body body1, BodyFixture fixture1, Body body2, BodyFixture fixture2) {
         if((body1 == target || body2 == target)) {
             //world.removeBody(target);
-            if (this.hitCnt <= 1)
+            if (this.hitCnt <= 0)
             {
                 target.removeAllFixtures();
                 return false;
             }
             this.hitCnt--;
+            target.hitNumber--;
             System.out.println(this.hitCnt);
         }
         return true;

@@ -25,27 +25,34 @@
 package org.dyn4j.samples;
 
 import java.awt.*;
+import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Ellipse2D;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.List;
 import java.util.*;
 
+import javax.imageio.ImageIO;
 import org.dyn4j.dynamics.Body;
 import org.dyn4j.dynamics.BodyFixture;
-import org.dyn4j.geometry.Geometry;
-import org.dyn4j.geometry.MassType;
-import org.dyn4j.geometry.Vector2;
+import org.dyn4j.dynamics.DetectResult;
+import org.dyn4j.geometry.*;
+import org.dyn4j.geometry.Shape;
 import org.dyn4j.samples.framework.SimulationBody;
 import org.dyn4j.samples.framework.SimulationFrame;
-
+import org.dyn4j.samples.framework.Graphics2DRenderer;
+import org.dyn4j.samples.framework.SimulationBody;
+import org.dyn4j.samples.framework.SimulationFrame;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class MouseInteraction extends SimulationFrame {
-
-	//private static final long serialVersionUID = -1366264828445805140L;
-	static int MIN_BALLS_TO_CREATE = 1;
-	static int MAX_BALLS_TO_CREATE = 3;
+    //private static final long serialVersionUID = -1366264828445805140L;
+    static int ballsInGame = 0; //Anzahl an Schuessen die momentan im Spiel vorhanden sind (maximal MAXBALLS)
+    static boolean canShoot = true; //Man darf nur schiessen wenn die ballsInGame leer geworden sind
 	static double MAX_BOUNDARY_X = 27;
 	static double MIN_BOUNDARY_X = -27;
 	static double BOUNDARY_Y = 75;
@@ -64,14 +71,15 @@ public class MouseInteraction extends SimulationFrame {
 	private List<Body> ballList;
 	//Boundary am unteren Ende
 	private Body lowerBounds;
-	static ArrayList<SimulationBody> ballSack = new ArrayList<>();
+	//static ArrayList<SimulationBody> ballSack = new ArrayList<>();
 
 	//Statics für die Gamelogik
 	//private static long SLEEPTIMER = 5; //Zeit bis man eine neue Salve abfeuern kann
 	private static double TIME_BETWEEN_BALLS = 0.1; //Zeit zwischen den Schuessen einer Salve
     private static double TIMERCOUNTER_BETWEEN_BALLS; //Zaehlt die vergangenen Sekunden - wird zurückgedsetzt
-
-    private static int MAXBALLS = 5; //Anzahl an Schuessen pro Salve
+    private static int MIN_BALLS_TO_CREATE = 1;
+    private static int MAX_BALLS_TO_CREATE = 3;
+    private static int MAXBALLS = 1; //Anzahl an Schuessen pro Salve
     private static double TIMER; //Zaehlt die Vergangenen Sekunden
 	private static Point POINTSHOOTER = new Point(250,40); //Punkt an dem Schuesse abgefeuert werden
 
@@ -81,25 +89,24 @@ public class MouseInteraction extends SimulationFrame {
 		@Override
 
 		public void mousePressed(MouseEvent e) {
-            //Maus Klick Position speichern
-
-            if (targetSack.size()>0)
-            {
-                liftBalls();
+		    //Maus Klick Position speichern
+            if (canShoot) {
+                if (targetSack.size() > 0) {
+                    liftBalls();
+                }
+                createBalls();
+                point = new Point(e.getX(), e.getY());
+                //Neuen Vektor für die Schuesse erstellen
+                shootingVector = new Vector2();
+                double dx = 0.1 * (e.getX() - POINTSHOOTER.getX());
+                double dy = -0.1 * (e.getY() - POINTSHOOTER.getY());
+                System.out.print(dx);
+                System.out.print(" x ");
+                System.out.print(dy);
+                System.out.println("");
+                shootingVector.set(dx, dy);
+                createBalls();
             }
-
-            createBalls();
-            point = new Point(e.getX(), e.getY());
-            //Neuen Vektor für die Schuesse erstellen
-            shootingVector = new Vector2();
-            double dx = 0.1 * (e.getX() - POINTSHOOTER.getX());
-            double dy = -0.1 * (e.getY() - POINTSHOOTER.getY());
-            System.out.print(dx);
-            System.out.print(" x ");
-            System.out.print(dy);
-            System.out.println("");
-            shootingVector.set(dx, dy);
-            createBalls();
 		}
 
 		@Override
@@ -113,7 +120,6 @@ public class MouseInteraction extends SimulationFrame {
 	 */
 	public MouseInteraction() {
 		super("Mouse Interaction", 32.0);
-
 		MouseAdapter ml = new CustomMouseAdapter();
 		this.canvas.addMouseMotionListener(ml);
 		this.canvas.addMouseWheelListener(ml);
@@ -159,7 +165,9 @@ public class MouseInteraction extends SimulationFrame {
 		TIMER += elapsedTime;
 
 		//Nur schiessen falls Salve noch nicht beendet wurde
-		if (TIMERCOUNTER_BETWEEN_BALLS > TIME_BETWEEN_BALLS && this.ballSack.size() < MAXBALLS){
+		if (TIMERCOUNTER_BETWEEN_BALLS > TIME_BETWEEN_BALLS
+                && ballsInGame < MAXBALLS
+                && canShoot){
 			//System.out.println(TIMERCOUNTER_BETWEEN_BALLS);
 			TIMERCOUNTER_BETWEEN_BALLS = 0;
 			//Wurde geklickt und gibt es einen Vektor
@@ -175,16 +183,17 @@ public class MouseInteraction extends SimulationFrame {
 				fixture.setDensity(200);
 				fixture.setRestitution(0.9);
 				ball.addFixture(fixture);
-                ball.hitNumber =  ThreadLocalRandom.current().nextInt(1,  5);
 				ball.translate(x, y);
 				ball.setLinearVelocity(shootingVector);
 				ball.setMass(MassType.NORMAL);
                 //Schuss der Welt hinzufuegen
 				this.world.addBody(ball);
 				this.world.addListener(new BoundaryCollisionListener(ball, lowerBounds, world));
-
-				//Arraylist ballSack befuellen
-				ballSack.add(ball);
+				ballsInGame += 1;
+				if (ballsInGame == MAXBALLS){
+				    canShoot = false;
+				    point = null;
+                }
 			}
 		}
 		super.update(g, elapsedTime);
@@ -193,30 +202,15 @@ public class MouseInteraction extends SimulationFrame {
 
 	private void createBall(double xKoord, double yKoord)
 	{
-		SimulationBody target = new SimulationBody();
-
+		TargetBody target = new TargetBody();
         BodyFixture fixture = new BodyFixture(Geometry.createCircle(1));
-        int rndState = ThreadLocalRandom.current().nextInt(0, 3);
-
-        switch(rndState)
-        {
-            case 0:
-                fixture = new BodyFixture(Geometry.createCircle(1));
-                break;
-            case 1:
-                fixture = new BodyFixture(Geometry.createRightTriangle(1.5,1.5));
-                break;
-            default:
-                fixture = new BodyFixture(Geometry.createIsoscelesTriangle(1.5,1.5));
-                break;
-        }
-
+        target.hitNumber =  ThreadLocalRandom.current().nextInt(1,  5);
         target.addFixture(fixture);
 		fixture.setRestitution(0.5);
         target.translate(xKoord,yKoord);
 		target.setMass(MassType.INFINITE);
 		this.world.addBody(target);
-        this.world.addListener(new TargetCollisionListener(target, world, 5));
+        this.world.addListener(new TargetCollisionListener(target, world, target.hitNumber));
 		targetSack.add(target);
 	}
 
@@ -245,29 +239,62 @@ public class MouseInteraction extends SimulationFrame {
         return true;
     }
 
-	public void liftBalls()
-	{
+	public void liftBalls() {
 
-		for(int i = 0; i < targetSack.size(); i++){
-			if (targetSack.get(i).getTransform().getTranslationY() >= 3)
-			{
-				System.out.println("Verloren!!!");
+        for (int i = 0; i < targetSack.size(); i++) {
+            if (targetSack.get(i).getTransform().getTranslationY() >= 3) {
+                System.out.println("Verloren!!!");
                 targetSack.get(i).removeAllFixtures();
-				//TODO: Game Exit
-			}else
-			{
-				//double tempX = targetSack.get(i).getTransform().getTranslationX();
-				//double tempY = targetSack.get(i).getTransform().getTranslationY();
-				//tempX += 4;
-				//System.out.println("Targetsack: "+tempX + " " +tempY);
+                //TODO: Game Exit
+            } else {
+                //double tempX = targetSack.get(i).getTransform().getTranslationX();
+                //double tempY = targetSack.get(i).getTransform().getTranslationY();
+                //tempX += 4;
+                //System.out.println("Targetsack: "+tempX + " " +tempY);
 
-				targetSack.get(i).translate(0,4);
-				//System.out.println(targetSack.get(i).getTransform().getTranslationX()+" "+targetSack.get(i).getTransform().getTranslationY());
-				//For schleife
-				//Y Koordinaten eine ebene hoch
-			}
-		}
-	}
+                targetSack.get(i).translate(0, 4);
+                //System.out.println(targetSack.get(i).getTransform().getTranslationX()+" "+targetSack.get(i).getTransform().getTranslationY());
+                //For schleife
+                //Y Koordinaten eine ebene hoch
+            }
+        }
+    }
+    public final class TargetBody extends SimulationBody {
+        /**
+         * The image to use, if required
+         */
+        public int hitNumber;
+
+        /* (non-Javadoc)
+         * @see org.dyn4j.samples.SimulationBody#renderFixture(java.awt.Graphics2D, double, org.dyn4j.dynamics.BodyFixture, java.awt.Color)
+         */
+        @Override
+        protected void renderFixture(Graphics2D g, double scale, BodyFixture fixture, Color color) {
+            // do we need to render an image?
+            if (hitNumber != 0) {
+                // get the shape on the fixture
+                Convex circle = fixture.getShape();
+                // check the shape type
+                double radius = circle.getRadius();
+                Vector2 center = circle.getCenter();
+
+                double radius2 = 2.0 * radius;
+                Ellipse2D.Double c = new Ellipse2D.Double(
+                        (center.x - radius) * scale,
+                        (center.y - radius) * scale,
+                        radius2 * scale,
+                        radius2 * scale);
+                g.setColor(color);
+                // cast the shape to get the radius
+                g.draw(c);
+                // lets us an image instead
+                g.scale(1, -1);
+                g.setFont(new Font("Default", Font.PLAIN, 20));
+                g.drawString(String.valueOf(hitNumber), -5, 5);
+            }
+        }
+    }
+
 
 	public static void main(String[] args) {
 		MouseInteraction simulation = new MouseInteraction();

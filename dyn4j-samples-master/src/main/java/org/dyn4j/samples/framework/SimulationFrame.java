@@ -262,7 +262,7 @@ public abstract class SimulationFrame extends JFrame {
 			this.render(g, elapsedTime, body);
 		}
 	}
-	
+
 	/**
 	 * Renders the body.
 	 * @param g the graphics object to render to
@@ -273,7 +273,7 @@ public abstract class SimulationFrame extends JFrame {
 		// draw the object
 		body.render(g, this.scale);
 	}
-	
+
 	/**
 	 * Updates the world.
 	 * @param g the graphics object to render to

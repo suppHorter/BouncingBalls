@@ -68,7 +68,7 @@ public class MouseInteraction extends SimulationFrame {
     private static double TIMERCOUNTER_BETWEEN_BALLS; //Zaehlt die vergangenen Sekunden - wird zurückgedsetzt
     private static int MIN_BALLS_TO_CREATE = 1;
     private static int MAX_BALLS_TO_CREATE = 3;
-    private static int MAXBALLS = 5; //Anzahl an Schuessen pro Salve
+    private static int MAXBALLS = 1; //Anzahl an Schuessen pro Salve
     private static double TIMER; //Zaehlt die Vergangenen Sekunden
 	private static Point POINTSHOOTER = new Point(250,40); //Punkt an dem Schuesse abgefeuert werden
 
@@ -143,7 +143,9 @@ public class MouseInteraction extends SimulationFrame {
 		this.world.addBody(rightWall);
 		this.world.addBody(ceiling);
 		this.world.addBody(lowerBounds);
-        //Ersten Targets erstellen
+		this.world.addListener(new BoundaryCollisionListener(lowerBounds, world));
+
+		//Ersten Targets erstellen
         createTargets();
 	}
 
@@ -171,7 +173,7 @@ public class MouseInteraction extends SimulationFrame {
 				double y = -(this.POINTSHOOTER.getY() - this.canvas.getHeight() / 2.0) / this.scale;
 
 				// Neuen Schuss erstellen
-				TargetBody ball = new TargetBody();
+				ShotBallBody ball = new ShotBallBody();
 				BodyFixture fixture = new BodyFixture(Geometry.createCircle(0.3));
 
 				fixture.setDensity(200);
@@ -182,7 +184,6 @@ public class MouseInteraction extends SimulationFrame {
 				ball.setMass(MassType.NORMAL);
                 //Schuss der Welt hinzufuegen
 				this.world.addBody(ball);
-				this.world.addListener(new BoundaryCollisionListener(ball, lowerBounds, world));
 				ballsInGame += 1;
 				ballsCreated += 1;
 				if (ballsCreated == (MAXBALLS * TURN)){

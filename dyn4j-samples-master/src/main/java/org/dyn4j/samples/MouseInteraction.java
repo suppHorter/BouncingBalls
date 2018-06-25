@@ -50,6 +50,7 @@ public class MouseInteraction extends SimulationFrame {
 	static boolean WAIT = false;
 	static double[] Yebenen = {4,0,-4,-8};
 	static double[] Xebenen = {-5, 0, 5};
+	LvlBoxBody lvlBox = new LvlBoxBody();
 
 	static ArrayList<SimulationBody> targetSack= new ArrayList<>();
 
@@ -68,11 +69,10 @@ public class MouseInteraction extends SimulationFrame {
     private static double TIMERCOUNTER_BETWEEN_BALLS; //Zaehlt die vergangenen Sekunden - wird zurückgedsetzt
     private static int MIN_BALLS_TO_CREATE = 1;
     private static int MAX_BALLS_TO_CREATE = 3;
-    private static int MAXBALLS = 1; //Anzahl an Schuessen pro Salve
+    private static int MAXBALLS = 5; //Anzahl an Schuessen pro Salve
     private static double TIMER; //Zaehlt die Vergangenen Sekunden
 	private static Point POINTSHOOTER = new Point(250,40); //Punkt an dem Schuesse abgefeuert werden
-
-
+	private static int lvlCnt;
 
 	private final class CustomMouseAdapter extends MouseAdapter {
 		@Override
@@ -85,11 +85,14 @@ public class MouseInteraction extends SimulationFrame {
                 shootingVector = new Vector2();
                 double dx = 0.1 * (e.getX() - POINTSHOOTER.getX());
                 double dy = -0.1 * (e.getY() - POINTSHOOTER.getY());
-                System.out.print(dx);
-                System.out.print(" x ");
-                System.out.print(dy);
-                System.out.println("");
+				//System.out.print(dx);
+				//System.out.print(" x ");
+				//System.out.print(dy);
+                //System.out.println("");
+				System.out.println(lvlCnt);
+				updateLvlLbl();
                 shootingVector.set(dx, dy);
+				lvlCnt++;
             }
 		}
 
@@ -108,7 +111,9 @@ public class MouseInteraction extends SimulationFrame {
 	}
 
 	protected void initializeWorld() {
-	    //Gravitation der Welt anpassen
+		lvlCnt = 0;
+		createLvlLbl();
+		//Gravitation der Welt anpassen
         Vector2 gravityVector = new Vector2();
         gravityVector.set(0,-20);
         this.world.setGravity(gravityVector);
@@ -174,7 +179,7 @@ public class MouseInteraction extends SimulationFrame {
 
 				// Neuen Schuss erstellen
 				ShotBallBody ball = new ShotBallBody();
-				BodyFixture fixture = new BodyFixture(Geometry.createCircle(0.3));
+				BodyFixture fixture = new BodyFixture(Geometry.createCircle(0.6));
 
 				fixture.setDensity(200);
 				fixture.setRestitution(0.6);
@@ -197,15 +202,37 @@ public class MouseInteraction extends SimulationFrame {
 		super.update(g, elapsedTime);
 	}
 
+	private void createLvlLbl()
+	{
+		lvlBox = new LvlBoxBody();
+		BodyFixture fixture = new BodyFixture(Geometry.createRectangle(2,2));
+		lvlBox.addFixture(fixture);
+		lvlBox.lvlNumber = this.lvlCnt;
+		fixture.setRestitution(0);
+		lvlBox.setColor(Color.WHITE);
+		lvlBox.translate(7,10);
+		lvlBox.setMass(MassType.INFINITE);
+		this.world.addBody(lvlBox);
+
+		//g.setFont(new Font("Default", Font.PLAIN, 20));
+		//g.drawString(String.valueOf(hitNumber), (int)radius-12, (int)radius+5);
+	}
+
+	public void updateLvlLbl()
+	{
+		lvlBox.incLvl();
+	}
 
 	private void createTargetBall(double xKoord, double yKoord)
 	{
-		TargetBody target = new TargetBody();
-        BodyFixture fixture = new BodyFixture(Geometry.createCircle(1));
-        target.hitNumber =  ThreadLocalRandom.current().nextInt(1,  5);
+		double rad;
+		StopBodyAfterCollision.TargetBody target = new StopBodyAfterCollision.TargetBody();
+		rad =  Math.random()+1;
+        BodyFixture fixture = new BodyFixture(Geometry.createCircle(rad));
+        target.hitNumber =  ThreadLocalRandom.current().nextInt(10,  50);
         target.isTarget = true;
         target.addFixture(fixture);
-		fixture.setRestitution(0.2);
+		fixture.setRestitution(0);
         target.translate(xKoord,yKoord);
 		target.setMass(MassType.INFINITE);
 		this.world.addBody(target);
@@ -243,7 +270,7 @@ public class MouseInteraction extends SimulationFrame {
 
         for (int i = 0; i < targetSack.size(); i++) {
             if (targetSack.get(i).getTransform().getTranslationY() >= 3) {
-                System.out.println("Verloren!!!");
+				//System.out.println("Verloren!!!");
                 targetSack.get(i).removeAllFixtures();
                 //TODO: Game Exit
             } else {

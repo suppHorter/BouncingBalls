@@ -8,12 +8,10 @@ import org.dyn4j.dynamics.World;
 import org.dyn4j.samples.framework.SimulationBody;
 
 public class BoundaryCollisionListener extends CollisionAdapter {
-    private Body ball;
     private Body boundary;
     private World world;
 
-    BoundaryCollisionListener(Body ball, Body boundary, World world) {
-        this.ball = ball;
+    BoundaryCollisionListener(Body boundary, World world) {
         this.boundary = boundary;
         this.world = world;
     }
@@ -21,10 +19,14 @@ public class BoundaryCollisionListener extends CollisionAdapter {
 
     @Override
     public boolean collision(Body body1, BodyFixture fixture1, Body body2, BodyFixture fixture2, Penetration penetration) {
-        if((body1 == ball && body2 == boundary) || (body2 == ball && body1 == boundary)) {
-            world.removeBody(ball);
+        if ((body1 instanceof ShotBallBody && body2 == boundary) || (body2 instanceof ShotBallBody && body1 == boundary)) {
+            if (body1 instanceof ShotBallBody) {
+                world.removeBody(body1);
+            } else {
+                world.removeBody(body2);
+            }
             MouseInteraction.ballsInGame -= 1;
-            if (MouseInteraction.ballsInGame == 0){
+            if (MouseInteraction.ballsInGame == 0) {
                 MouseInteraction.canShoot = true;
                 MouseInteraction.TURN += 1;
             }

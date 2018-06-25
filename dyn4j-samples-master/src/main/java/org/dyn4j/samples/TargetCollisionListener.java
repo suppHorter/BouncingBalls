@@ -19,13 +19,11 @@ public class TargetCollisionListener extends CollisionAdapter {
     }
 
     @Override
-    public boolean collision(Body body1, BodyFixture fixture1, Body body2, BodyFixture fixture2) {
-        if((body1 == target || body2 == target)) {
-            //world.removeBody(target);
-            if (this.hitCnt <= 0)
+    public boolean collision(Body body1, BodyFixture fixture1, Body body2, BodyFixture fixture2, Penetration penetration) {
+        if((body1 == target && body2 instanceof ShotBallBody) || ( body1 instanceof ShotBallBody && body2 == target)) {
+            if (this.hitCnt <= 1)
             {
-                target.removeAllFixtures();
-                return false;
+                world.removeBody(target);
             }
             this.hitCnt--;
             target.hitNumber--;

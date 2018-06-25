@@ -24,8 +24,7 @@
  */
 package org.dyn4j.samples.framework;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
+import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Arc2D;
 import java.awt.geom.Ellipse2D;
@@ -41,6 +40,7 @@ import org.dyn4j.geometry.Segment;
 import org.dyn4j.geometry.Shape;
 import org.dyn4j.geometry.Slice;
 import org.dyn4j.geometry.Vector2;
+import org.dyn4j.samples.MouseInteraction;
 
 /**
  * Graphics2D renderer for dyn4j shape types.
@@ -89,33 +89,23 @@ public final class Graphics2DRenderer {
 	 * @param scale the scale to render the shape (pixels per dyn4j unit (typically meter))
 	 * @param color the color
 	 */
+
+
 	public static final void render(Graphics2D g, Circle circle, double scale, Color color) {
 		double radius = circle.getRadius();
 		Vector2 center = circle.getCenter();
-		
+
 		double radius2 = 2.0 * radius;
 		Ellipse2D.Double c = new Ellipse2D.Double(
-			(center.x - radius) * scale,
-			(center.y - radius) * scale,
-			radius2 * scale,
-			radius2 * scale);
-		
-		// fill the shape
+				(center.x - radius) * scale,
+				(center.y - radius) * scale,
+				radius2 * scale,
+				radius2 * scale);
 		g.setColor(color);
-		g.fill(c);
-		// draw the outline
 		g.setColor(getOutlineColor(color));
 		g.draw(c);
-		
-		// draw a line so that rotation is visible
-		Line2D.Double l = new Line2D.Double(
-				center.x * scale,
-				center.y * scale,
-				(center.x + radius) * scale,
-				center.y * scale);
-		g.draw(l);
 	}
-	
+
 	/**
 	 * Renders the given {@link Polygon} to the given graphics context using the given scale and color.
 	 * @param g the graphics context

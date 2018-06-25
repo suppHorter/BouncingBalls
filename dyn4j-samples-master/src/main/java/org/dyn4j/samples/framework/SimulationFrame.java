@@ -242,7 +242,7 @@ public abstract class SimulationFrame extends JFrame {
 		final int h = this.canvas.getHeight();
 		
 		// lets draw over everything with a white background
-		g.setColor(Color.WHITE);
+		g.setColor(Color.BLACK);
 		g.fillRect(-w / 2, -h / 2, w, h);
 	}
 	
@@ -262,7 +262,7 @@ public abstract class SimulationFrame extends JFrame {
 			this.render(g, elapsedTime, body);
 		}
 	}
-	
+
 	/**
 	 * Renders the body.
 	 * @param g the graphics object to render to
@@ -273,7 +273,7 @@ public abstract class SimulationFrame extends JFrame {
 		// draw the object
 		body.render(g, this.scale);
 	}
-	
+
 	/**
 	 * Updates the world.
 	 * @param g the graphics object to render to

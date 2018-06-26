@@ -7,11 +7,11 @@ import org.dyn4j.dynamics.CollisionAdapter;
 import org.dyn4j.dynamics.World;
 
 public class TargetCollisionListener extends CollisionAdapter {
-    private StopBodyAfterCollision.TargetBody target;
+    private TargetBody target;
     private World world;
     private int hitCnt;
 
-    TargetCollisionListener(StopBodyAfterCollision.TargetBody target, World world, int hits) {
+    TargetCollisionListener(TargetBody target, World world, int hits) {
         this.target = target;
         this.world = world;
         this.hitCnt = hits;

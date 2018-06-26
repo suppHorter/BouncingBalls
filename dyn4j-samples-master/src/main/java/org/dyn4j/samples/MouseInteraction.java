@@ -203,7 +203,6 @@ public class MouseInteraction extends SimulationFrame {
 		TargetBody target = new TargetBody();
         BodyFixture fixture = new BodyFixture(Geometry.createCircle(1));
         target.hitNumber =  ThreadLocalRandom.current().nextInt(1,  5);
-        target.isTarget = true;
         target.addFixture(fixture);
 		fixture.setRestitution(0.2);
         target.translate(xKoord,yKoord);

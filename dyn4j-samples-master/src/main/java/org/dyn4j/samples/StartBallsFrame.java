@@ -1,10 +1,12 @@
 package org.dyn4j.samples;
+
 import java.awt.event.ActionEvent;
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.plaf.basic.BasicBorders;
 import javax.swing.Timer;
 import java.awt.event.ActionListener;
+
 
 
 public class StartBallsFrame implements ActionListener{
@@ -22,47 +24,38 @@ public class StartBallsFrame implements ActionListener{
     public int seconds = 0;
     public JFrame startBalls;
 
-
+    //  Main-Methode zum Erzeugen des Startbildschirms und Starten des für das Blinken verantworlichen Threads
     public static void main(String[] args) {
         StartBallsFrame bf = new StartBallsFrame();
         BlinkingThread bt = new BlinkingThread(bf);
         bt.run();
     }
-
+    // Konstruktor, hier werden alles Felder,Buttons,Fenster erzeugt.
     public StartBallsFrame() {
 
-        startBalls = new JFrame("Start them balls");
+        //Erzeugen des Frames
+        startBalls = new JFrame("Bouncing Balls");
 
+        //Erzeugen der ImageIcons für den blinkenden Titel
         title1 = new ImageIcon("C:\\Users\\RT\\Desktop\\Software Projekt\\bb1klein.png");
         title2 = new ImageIcon("C:\\Users\\RT\\Desktop\\Software Projekt\\bb2klein.png");
         title3 = new ImageIcon("C:\\Users\\RT\\Desktop\\Software Projekt\\bb3klein.png");
         title4 = new ImageIcon("C:\\Users\\RT\\Desktop\\Software Projekt\\bb4klein.png");
 
+        // Array für wechselndes Titelbild
         labellist = new int[]{1, 2, 3, 4};
 
-     //   ActionListener al = new ActionListener()
-     //   {
-     //     public void actionPerformed(ActionEvent ev)
-     //     {
-     //         seconds++;
-     //         if (seconds == 2)
-     //         {
-     //             blinking();
-     //         }
-     //     }
-     //   };
-
-     //   bt = new Timer(timerDelay,al);
-
-        //Icons als Button
-
+        //Erzeugen der ImageIcons als Button
         Icon button1 = new ImageIcon("C:\\Users\\RT\\Desktop\\Software Projekt\\startklein.png");
         Icon button2 = new ImageIcon("C:\\Users\\RT\\Desktop\\Software Projekt\\challengeklein.png");
         Icon button3 = new ImageIcon("C:\\Users\\RT\\Desktop\\Software Projekt\\quitklein.png");
+
+        //Erzeugen der Buttons in Form der ImageIcons
         JButton start = new JButton(button1);
         JButton challenge = new JButton(button2);
         JButton quit = new JButton(button3);
 
+        //Erzeugen des JPanels und hinzufügen der Buttons
         panel = new JPanel();
         panel.setLayout(null);
         panel.setBackground(Color.black);
@@ -70,7 +63,8 @@ public class StartBallsFrame implements ActionListener{
         panel.add(quit);
         panel.add(challenge);
 
-        start.setBounds(171, 300, 158, 50);
+        //Alles für den START Button
+        start.setBounds(175, 300, 158, 50);
         start.setBorder(new BasicBorders.ButtonBorder(Color.BLACK, Color.BLACK, Color.BLACK, Color.BLACK));
         start.setBackground(Color.black);
         start.setForeground(Color.white);
@@ -81,12 +75,14 @@ public class StartBallsFrame implements ActionListener{
             }
         });
 
-        challenge.setBounds(107, 400, 286, 50);
+        //Alles für den CHALLENGE Button
+        challenge.setBounds(111, 400, 286, 50);
         challenge.setBackground(Color.black);
         challenge.setBorder(new BasicBorders.ButtonBorder(Color.BLACK, Color.BLACK, Color.BLACK, Color.BLACK));
         challenge.setForeground(Color.white);
 
-        quit.setBounds(189, 500, 122, 50);
+        //Alles für den QUIT Button
+        quit.setBounds(193, 500, 122, 50);
         quit.setBackground(Color.black);
         quit.setBorder(new BasicBorders.ButtonBorder(Color.BLACK, Color.BLACK, Color.BLACK, Color.BLACK));
         quit.setForeground(Color.white);
@@ -97,13 +93,14 @@ public class StartBallsFrame implements ActionListener{
                                     }
         );
 
-
+        //Einstellen des Fensters und Sichtbar machen sowie aufgebautes Panel hinzufügen
         startBalls.setSize(500, 700);
+        startBalls.setResizable(false);
         startBalls.add(panel);
         startBalls.setVisible(true);
 
     }
-
+    //Funktion die im Thread aufgerufen wird um die verschiedenen LAbels einzublenden
     public void blinking() {
 
         switchPositions();
@@ -115,31 +112,32 @@ public class StartBallsFrame implements ActionListener{
             case 1:
                 label1 = new JLabel(title1);
                 label1.setVisible(true);
-                System.out.println("1");
+
                 break;
             case 2:
                 label1 = new JLabel(title2);
                 label1.setVisible(true);
-                System.out.println("2");
+
                 break;
             case 3:
                 label1 = new JLabel(title3);
                 label1.setVisible(true);
-                System.out.println("3");
+
                 break;
             case 4:
                 label1 = new JLabel(title4);
                 label1.setVisible(true);
-                System.out.println("4");
+
                 break;
         }
 
         label1.setLayout(null);
-        label1.setBounds(4, 50, 479, 150);
+        label1.setBounds(8, 50, 479, 150);
         panel.add(label1);
         startBalls.repaint();
     }
 
+    //Methode um die ArrayPositionen zu switchen und somit die bilder im wechsel durch die BlinkingFunktion aufrufen
     public void switchPositions() {
 
         int temp = labellist[3];

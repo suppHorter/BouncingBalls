@@ -69,6 +69,7 @@ public class StartBallsFrame implements ActionListener{
         start.setBorder(new BasicBorders.ButtonBorder(Color.BLACK, Color.BLACK, Color.BLACK, Color.BLACK));
         start.setBackground(Color.black);
         start.setForeground(Color.white);
+        start.setContentAreaFilled(false);
         start.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -79,12 +80,14 @@ public class StartBallsFrame implements ActionListener{
         //Alles für den CHALLENGE Button
         challenge.setBounds(111, 400, 286, 50);
         challenge.setBackground(Color.black);
+        challenge.setContentAreaFilled(false);
         challenge.setBorder(new BasicBorders.ButtonBorder(Color.BLACK, Color.BLACK, Color.BLACK, Color.BLACK));
         challenge.setForeground(Color.white);
 
         //Alles für den QUIT Button
         quit.setBounds(193, 500, 122, 50);
         quit.setBackground(Color.black);
+        quit.setContentAreaFilled(false);
         quit.setBorder(new BasicBorders.ButtonBorder(Color.BLACK, Color.BLACK, Color.BLACK, Color.BLACK));
         quit.setForeground(Color.white);
         quit.addActionListener(new ActionListener() {
@@ -98,6 +101,7 @@ public class StartBallsFrame implements ActionListener{
         startBalls.setSize(500, 700);
         startBalls.setResizable(false);
         startBalls.setLocationRelativeTo(null);
+        startBalls.setUndecorated(true);
         //startBalls.setSize(size);
         startBalls.add(panel);
         startBalls.setVisible(true);

@@ -224,12 +224,12 @@ public class MouseInteraction extends SimulationFrame {
 
 	private void createTargetBall(double xKoord, double yKoord)
 	{
+		TargetBody target = new TargetBody();
 		double rad;
-		StopBodyAfterCollision.TargetBody target = new StopBodyAfterCollision.TargetBody();
 		rad =  Math.random()+1;
+
         BodyFixture fixture = new BodyFixture(Geometry.createCircle(rad));
         target.hitNumber =  ThreadLocalRandom.current().nextInt(10,  20);
-        target.isTarget = true;
         target.addFixture(fixture);
 		fixture.setRestitution(0);
         target.translate(xKoord,yKoord);

@@ -33,6 +33,6 @@ public final class TargetBody extends SimulationBody {
             // Zahl im Target anzeigen
             g.scale(1, -1);
             g.setFont(new Font("Default", Font.PLAIN, 20));
-            g.drawString(String.valueOf(hitNumber), -5, 5);
+            g.drawString(String.valueOf(hitNumber), (int)radius, (int)radius);
     }
 }

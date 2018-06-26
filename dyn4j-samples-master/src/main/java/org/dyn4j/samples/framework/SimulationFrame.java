@@ -121,6 +121,8 @@ public abstract class SimulationFrame extends JFrame {
 		
 		// size everything
 		this.pack();
+		//position in middle
+		this.setLocationRelativeTo(null);
 		
 		// setup the world
 		this.initializeWorld();

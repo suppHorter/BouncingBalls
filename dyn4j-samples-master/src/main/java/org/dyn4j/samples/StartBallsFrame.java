@@ -96,6 +96,7 @@ public class StartBallsFrame implements ActionListener{
         //Einstellen des Fensters und Sichtbar machen sowie aufgebautes Panel hinzufügen
         startBalls.setSize(500, 700);
         startBalls.setResizable(false);
+        startBalls.setLocationRelativeTo(null);
         startBalls.add(panel);
         startBalls.setVisible(true);
 

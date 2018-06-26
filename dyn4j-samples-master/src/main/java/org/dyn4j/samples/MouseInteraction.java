@@ -191,7 +191,7 @@ public class MouseInteraction extends SimulationFrame {
 				this.world.addBody(ball);
 				ballsInGame += 1;
 				ballsCreated += 1;
-				if (ballsCreated > (MAXBALLS * TURN)){
+				if (ballsCreated == (MAXBALLS * TURN)){
 				    //Kein Schiessen mehr moeglich nachdem alle Schuesse einer Salve abgefeuert wurden
 				    canShoot = false;
 				    //Mausposition nullen

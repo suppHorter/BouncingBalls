@@ -5,14 +5,13 @@ import org.dyn4j.dynamics.Body;
 import org.dyn4j.dynamics.BodyFixture;
 import org.dyn4j.dynamics.CollisionAdapter;
 import org.dyn4j.dynamics.World;
-import org.dyn4j.samples.framework.SimulationBody;
 
 public class TargetCollisionListener extends CollisionAdapter {
-    private TargetBody target;
+    private StopBodyAfterCollision.TargetBody target;
     private World world;
     private int hitCnt;
 
-    TargetCollisionListener(TargetBody target, World world, int hits) {
+    TargetCollisionListener(StopBodyAfterCollision.TargetBody target, World world, int hits) {
         this.target = target;
         this.world = world;
         this.hitCnt = hits;
@@ -27,7 +26,7 @@ public class TargetCollisionListener extends CollisionAdapter {
             }
             this.hitCnt--;
             target.hitNumber--;
-            System.out.println(this.hitCnt);
+            //System.out.println(this.hitCnt);
         }
         return true;
     }

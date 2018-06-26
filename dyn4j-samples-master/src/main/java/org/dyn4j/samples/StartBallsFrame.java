@@ -38,18 +38,18 @@ public class StartBallsFrame implements ActionListener{
         startBalls = new JFrame("Bouncing Balls");
 
         //Erzeugen der ImageIcons für den blinkenden Titel
-        title1 = new ImageIcon("C:\\Users\\RT\\Desktop\\Software Projekt\\bb1klein.png");
-        title2 = new ImageIcon("C:\\Users\\RT\\Desktop\\Software Projekt\\bb2klein.png");
-        title3 = new ImageIcon("C:\\Users\\RT\\Desktop\\Software Projekt\\bb3klein.png");
-        title4 = new ImageIcon("C:\\Users\\RT\\Desktop\\Software Projekt\\bb4klein.png");
+        title1 = new ImageIcon(".\\dyn4j-samples-master\\src\\main\\java\\org\\dyn4j\\samples\\resources\\bb1klein.png");
+        title2 = new ImageIcon(".\\dyn4j-samples-master\\src\\main\\java\\org\\dyn4j\\samples\\resources\\bb2klein.png");
+        title3 = new ImageIcon(".\\dyn4j-samples-master\\src\\main\\java\\org\\dyn4j\\samples\\resources\\bb3klein.png");
+        title4 = new ImageIcon(".\\dyn4j-samples-master\\src\\main\\java\\org\\dyn4j\\samples\\resources\\bb4klein.png");
 
         // Array für wechselndes Titelbild
         labellist = new int[]{1, 2, 3, 4};
 
         //Erzeugen der ImageIcons als Button
-        Icon button1 = new ImageIcon("C:\\Users\\RT\\Desktop\\Software Projekt\\startklein.png");
-        Icon button2 = new ImageIcon("C:\\Users\\RT\\Desktop\\Software Projekt\\challengeklein.png");
-        Icon button3 = new ImageIcon("C:\\Users\\RT\\Desktop\\Software Projekt\\quitklein.png");
+        Icon button1 = new ImageIcon(".\\dyn4j-samples-master\\src\\main\\java\\org\\dyn4j\\samples\\resources\\startklein.png");
+        Icon button2 = new ImageIcon(".\\dyn4j-samples-master\\src\\main\\java\\org\\dyn4j\\samples\\resources\\challengeklein.png");
+        Icon button3 = new ImageIcon(".\\dyn4j-samples-master\\src\\main\\java\\org\\dyn4j\\samples\\resources\\quitklein.png");
 
         //Erzeugen der Buttons in Form der ImageIcons
         JButton start = new JButton(button1);

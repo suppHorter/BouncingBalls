@@ -5,12 +5,12 @@
  * Redistribution and use in source and binary forms, with or without modification, are permitted 
  * provided that the following conditions are met:
  * 
- *   * Redistributions of source code must retain the above copyright notice, this list of conditions 
+ *   * Redistributions of source code must retain the above copyright notice, this list of conditions
  *     and the following disclaimer.
  *   * Redistributions in binary form must reproduce the above copyright notice, this list of conditions 
  *     and the following disclaimer in the documentation and/or other materials provided with the 
  *     distribution.
- *   * Neither the name of dyn4j nor the names of its contributors may be used to endorse or 
+ *   * Neither the name of dyn4j nor the names of its contributors may be used to endorse or
  *     promote products derived from this software without specific prior written permission.
  * 
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR 
@@ -50,7 +50,7 @@ public class MouseInteraction extends SimulationFrame {
 	static boolean WAIT = false;
 	static double[] Yebenen = {4,0,-4,-8};
 	static double[] Xebenen = {-5, 0, 5};
-	LvlBoxBody lvlBox = new LvlBoxBody();
+	LvlBoxBody lvlBox;
 
 	static ArrayList<SimulationBody> targetSack= new ArrayList<>();
 
@@ -80,6 +80,7 @@ public class MouseInteraction extends SimulationFrame {
 		public void mousePressed(MouseEvent e) {
 		    //Maus Klick Position speichern
             if (canShoot) {
+				lvlCnt++;
                 point = new Point(e.getX(), e.getY());
                 //Neuen Vektor für die Schuesse erstellen
                 shootingVector = new Vector2();
@@ -89,10 +90,7 @@ public class MouseInteraction extends SimulationFrame {
 				//System.out.print(" x ");
 				//System.out.print(dy);
                 //System.out.println("");
-				System.out.println(lvlCnt);
-				updateLvlLbl();
                 shootingVector.set(dx, dy);
-				lvlCnt++;
             }
 		}
 
@@ -112,6 +110,7 @@ public class MouseInteraction extends SimulationFrame {
 
 	protected void initializeWorld() {
 		lvlCnt = 0;
+		lvlBox = new LvlBoxBody();
 		createLvlLbl();
 		//Gravitation der Welt anpassen
         Vector2 gravityVector = new Vector2();
@@ -162,6 +161,7 @@ public class MouseInteraction extends SimulationFrame {
 		if(TURN > 1 && rowsOfTargetsCreated < TURN){
                 if (targetSack.size() > 0) {
                     liftBalls();
+					updateLvlLbl();
                 }
                 createTargets();
         }
@@ -191,7 +191,7 @@ public class MouseInteraction extends SimulationFrame {
 				this.world.addBody(ball);
 				ballsInGame += 1;
 				ballsCreated += 1;
-				if (ballsCreated == (MAXBALLS * TURN)){
+				if (ballsCreated > (MAXBALLS * TURN)){
 				    //Kein Schiessen mehr moeglich nachdem alle Schuesse einer Salve abgefeuert wurden
 				    canShoot = false;
 				    //Mausposition nullen
@@ -204,10 +204,9 @@ public class MouseInteraction extends SimulationFrame {
 
 	private void createLvlLbl()
 	{
-		lvlBox = new LvlBoxBody();
 		BodyFixture fixture = new BodyFixture(Geometry.createRectangle(2,2));
 		lvlBox.addFixture(fixture);
-		lvlBox.lvlNumber = this.lvlCnt;
+		lvlBox.lvlNumber = lvlCnt;
 		fixture.setRestitution(0);
 		lvlBox.setColor(Color.WHITE);
 		lvlBox.translate(7,10);
@@ -220,7 +219,7 @@ public class MouseInteraction extends SimulationFrame {
 
 	public void updateLvlLbl()
 	{
-		lvlBox.incLvl();
+		lvlBox.lvlNumber = lvlCnt;
 	}
 
 	private void createTargetBall(double xKoord, double yKoord)
@@ -229,7 +228,7 @@ public class MouseInteraction extends SimulationFrame {
 		StopBodyAfterCollision.TargetBody target = new StopBodyAfterCollision.TargetBody();
 		rad =  Math.random()+1;
         BodyFixture fixture = new BodyFixture(Geometry.createCircle(rad));
-        target.hitNumber =  ThreadLocalRandom.current().nextInt(10,  50);
+        target.hitNumber =  ThreadLocalRandom.current().nextInt(10,  20);
         target.isTarget = true;
         target.addFixture(fixture);
 		fixture.setRestitution(0);

@@ -30,8 +30,16 @@ public final class LvlBoxBody extends SimulationBody {
         g.draw(c);
         g.scale(1, -1);
         g.setFont(new Font("Default", Font.PLAIN, 20));
-        g.drawString(String.valueOf(this.lvlNumber), (int)radius, (int)radius+5);
+        if (this.lvlNumber<10)
+        {
+            g.drawString(String.valueOf(this.lvlNumber), (int)radius-6, (int)radius+5);
+        }
+        else
+        {
+            g.drawString(String.valueOf(this.lvlNumber), (int)radius-9, (int)radius+5);
+        }
     }
+
     public void incLvl()
     {
         this.lvlNumber++;

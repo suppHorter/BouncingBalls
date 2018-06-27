@@ -105,11 +105,11 @@ public class MouseInteraction extends SimulationFrame {
 		    //Maus Klick Position speichern
             if (canShoot) {
 				lvlCnt++;
-                point = new Point(e.getX(), e.getY());
+                point = new Point(canvas.getMousePosition());
                 //Neuen Vektor für die Schuesse erstellen
                 shootingVector = new Vector2();
-                double dx = 0.1 * (e.getX() - POINTSHOOTER.getX());
-                double dy = -0.1 * (e.getY() - POINTSHOOTER.getY());
+                double dx =  0.1 * (point.getX() - POINTSHOOTER.getX());
+                double dy = -0.1 * (point.getY() - POINTSHOOTER.getY());
                 shootingVector.set(dx, dy);
             }
 		}
@@ -133,7 +133,7 @@ public class MouseInteraction extends SimulationFrame {
 		createLvlLbl();
 		//Gravitation der Welt anpassen
         Vector2 gravityVector = new Vector2();
-        gravityVector.set(0,-20);
+        gravityVector.set(0,-40);
         this.world.setGravity(gravityVector);
 
 		//Wände erstellen und Positionieren
@@ -169,12 +169,12 @@ public class MouseInteraction extends SimulationFrame {
 		this.world.addListener(new BoundaryCollisionListener(lowerBounds, world));
 
         //Kanone erstellen
-        cannon.addFixture(Geometry.createRectangle(0.9, 2.7));
+        cannon.addFixture(Geometry.createRectangle(2.7, 0.9));
         cannon.setMass(MassType.INFINITE);
         cannon.translate(0.0, 0.0);
         Transform transform = new Transform();
         cannon.setTransform(transform);
-        cannon.translate(0,10);
+        cannon.translate(0,9.5);
         this.world.addBody(cannon);
 
 		//Ersten Targets erstellen
@@ -192,8 +192,10 @@ public class MouseInteraction extends SimulationFrame {
             g.setColor(Color.WHITE);
             g.draw(new Line2D.Double(shootToVector.x * scale, shootToVector.y * scale, aimLine.x * scale, aimLine.y * scale));
 			//TODO
-			//Rotation der Kanone anhand des Vectors
-            //cannon.getTransform().setRotation();
+			//Rotation der Kanone anhand des Vector
+			Vector2 xAxis = new Vector2(1.0, 0.0);
+			double angle = xAxis.getAngleBetween(shootToVector.to(aimLine));
+            cannon.getTransform().setRotation(angle);
         }
 
 
@@ -219,11 +221,11 @@ public class MouseInteraction extends SimulationFrame {
 				// Neuen Schuss erstellen
 				ShotBallBody ball = new ShotBallBody();
 				BodyFixture fixture = new BodyFixture(Geometry.createCircle(0.6));
-
 				fixture.setDensity(200);
 				fixture.setRestitution(0.6);
 				ball.addFixture(fixture);
 				ball.translate(shootToVector);
+				ball.translate(0,-0.3);
 				ball.setLinearVelocity(shootingVector);
 				ball.setMass(MassType.NORMAL);
                 //Schuss der Welt hinzufuegen
@@ -247,13 +249,10 @@ public class MouseInteraction extends SimulationFrame {
 		lvlBox.addFixture(fixture);
 		lvlBox.lvlNumber = lvlCnt;
 		fixture.setRestitution(0);
-		lvlBox.setColor(Color.WHITE);
+		lvlBox.setColor(Color.LIGHT_GRAY);
 		lvlBox.translate(7,10);
 		lvlBox.setMass(MassType.INFINITE);
 		this.world.addBody(lvlBox);
-
-		//g.setFont(new Font("Default", Font.PLAIN, 20));
-		//g.drawString(String.valueOf(hitNumber), (int)radius-12, (int)radius+5);
 	}
 
 	public void updateLvlLbl()

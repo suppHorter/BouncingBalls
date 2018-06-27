@@ -121,9 +121,9 @@ public class MouseInteraction extends SimulationFrame {
 	protected void initializeWorld() {
 		lvlCnt = 0;
 		lvlBox = new LvlBoxBody();
-		highScoreBox = new LvlBoxBody();
-		currScoreBox = new LvlBoxBody();
-		//createLvlLbl();
+		//highScoreBox = new LvlBoxBody();
+		//currScoreBox = new LvlBoxBody();
+		createLvlLbl();
         //createHighScore();
         //createCurrScore();
 		//Gravitation der Welt anpassen

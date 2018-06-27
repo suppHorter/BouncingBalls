@@ -20,8 +20,6 @@ import org.dyn4j.geometry.Shape;
 public class SimulationBody extends Body {
 	/** The color of the object */
 	protected Color color;
-	public int hitNumber = 0;
-	
 	/**
 	 * Default constructor.
 	 */

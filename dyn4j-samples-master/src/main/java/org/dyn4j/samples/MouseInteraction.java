@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.*;
 
+import org.dyn4j.collision.Collisions;
 import org.dyn4j.dynamics.Body;
 import org.dyn4j.dynamics.BodyFixture;
 import org.dyn4j.geometry.*;
@@ -173,11 +174,13 @@ public class MouseInteraction extends SimulationFrame {
 		this.world.addListener(new BoundaryCollisionListener(lowerBounds, world));
 
         //Kanone erstellen
-        cannon.addFixture(Geometry.createRectangle(2.7, 0.9));
+        BodyFixture fixture = new BodyFixture(Geometry.createRectangle(2.7, 0.9));
+        //Kollision deaktivieren
+        fixture.setSensor(true);
+
+        cannon.addFixture(fixture);
         cannon.setMass(MassType.INFINITE);
         cannon.translate(0.0, 0.0);
-        Transform transform = new Transform();
-        cannon.setTransform(transform);
         cannon.translate(0,9.5);
         this.world.addBody(cannon);
 

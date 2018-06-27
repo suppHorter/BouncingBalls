@@ -35,6 +35,7 @@ import java.util.*;
 import org.dyn4j.dynamics.Body;
 import org.dyn4j.dynamics.BodyFixture;
 import org.dyn4j.geometry.*;
+import org.dyn4j.geometry.Polygon;
 import org.dyn4j.samples.framework.SimulationBody;
 import org.dyn4j.samples.framework.SimulationFrame;
 
@@ -86,7 +87,8 @@ public class MouseInteraction extends SimulationFrame {
 
         @Override
         public void mouseMoved(MouseEvent e) {
-            movedPoint = e.getLocationOnScreen();
+            movedPoint = canvas.getMousePosition();
+
         }
 
 		@Override
@@ -163,31 +165,27 @@ public class MouseInteraction extends SimulationFrame {
 
 	@Override
 	protected void update(Graphics2D g, double elapsedTime) {
-        /*//Umrechnung der Dimensionen Schusspunkt
-        double xPointToShoot =  (this.POINTSHOOTER.getX() - this.canvas.getWidth() / 2.0) / this.scale;
-        double yPointToShoot = -(this.POINTSHOOTER.getY() - this.canvas.getHeight() / 2.0) / this.scale;
+        //Umrechnung der Dimensionen Schusspunkt
+        Vector2 shootToVector = this.toWorldCoordinates(POINTSHOOTER);
+
         //Schusslinie anzeigen
         if (movedPoint != null){
-            double xPointMouse =  this.movedPoint.getX() - this.canvas.getX();// / 2.0)/scale;
-            double yPointMouse = -this.movedPoint.getY() - this.canvas.getY();// / 2.0)/scale;
-            System.out.print("Maus X: "+ this.canvas.getX()+ "\n");
-            System.out.print("Maus Y: "+ this.canvas.getY()+ "\n");
-            g.setColor(Color.ORANGE);
-            Line2D lineToMouse;
-            lineToMouse = new Line2D.Double(xPointToShoot*scale,yPointToShoot*scale,xPointMouse,yPointMouse);
-            g.draw(lineToMouse);
+            Vector2 aimLine = this.toWorldCoordinates(movedPoint);
+            g.setColor(Color.WHITE);
+            g.draw(new Line2D.Double(shootToVector.x * scale, shootToVector.y * scale, aimLine.x * scale, aimLine.y * scale));
         }
 
 		TIMERCOUNTER_BETWEEN_BALLS += elapsedTime;
 		//Allgemeine vergangene Zeit (noch nicht verwendet)
 		timer += elapsedTime;
+
 		if(turn > 1 && rowsOfTargetsCreated < turn){
                 if (targetSack.size() > 0) {
                     liftBalls();
 					updateLvlLbl();
                 }
                 createTargets();
-        }*/
+        }
 		//Nur schiessen falls Salve noch nicht beendet wurde
 		if (TIMERCOUNTER_BETWEEN_BALLS > TIME_BETWEEN_BALLS
                 && ballsCreated < (MAXBALLS * turn)
@@ -203,7 +201,7 @@ public class MouseInteraction extends SimulationFrame {
 				fixture.setDensity(200);
 				fixture.setRestitution(0.6);
 				ball.addFixture(fixture);
-				ball.translate(xPointToShoot, yPointToShoot);
+				ball.translate(shootToVector);
 				ball.setLinearVelocity(shootingVector);
 				ball.setMass(MassType.NORMAL);
                 //Schuss der Welt hinzufuegen
@@ -332,6 +330,12 @@ public class MouseInteraction extends SimulationFrame {
         return Color.WHITE;
     }
 
+    private Vector2 toWorldCoordinates(Point point) {
+	    //Umrechnen von Punktkoordinaten zu Koordinaten des Spielfelds
+        double x =  (point.getX() - this.canvas.getWidth() / 2.0) / this.scale;
+        double y = -(point.getY() - this.canvas.getHeight() / 2.0) / this.scale;
+        return new Vector2(x, y);
+    }
 
 
 	public static void main(String[] args) {

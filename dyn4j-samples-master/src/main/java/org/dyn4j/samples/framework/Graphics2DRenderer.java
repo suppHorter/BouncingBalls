@@ -30,6 +30,8 @@ import java.awt.geom.Arc2D;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Path2D;
+import java.util.Random;
+
 
 import org.dyn4j.geometry.Capsule;
 import org.dyn4j.geometry.Circle;
@@ -101,6 +103,9 @@ public final class Graphics2DRenderer {
 				(center.y - radius) * scale,
 				radius2 * scale,
 				radius2 * scale);
+
+		color = getSemiRandomColor();
+		System.out.print(color);
 		g.setColor(color);
 		g.setColor(getOutlineColor(color));
 		g.draw(c);
@@ -353,5 +358,28 @@ public final class Graphics2DRenderer {
 				(float)Math.random() * 0.5f + 0.5f,
 				(float)Math.random() * 0.5f + 0.5f,
 				(float)Math.random() * 0.5f + 0.5f);
+	}
+	public static final Color getSemiRandomColor() {
+		//Random Color
+
+		Random rand = new Random();
+		// r, g, b, rg, rb, gb
+		// 1, 2, 3,  4,  5,  6
+		int  n = rand.nextInt(6) + 1;
+		switch (n){
+			case 1:
+				return new Color(255,0,0);
+			case 2:
+				return new Color(0,255,0);
+			case 3:
+				return new Color(0,0,255);
+			case 4:
+				return new Color(255,255,0);
+			case 5:
+				return new Color(255,0,255);
+			case 6:
+				return new Color(0,255,255);
+		}
+		return Color.WHITE;
 	}
 }

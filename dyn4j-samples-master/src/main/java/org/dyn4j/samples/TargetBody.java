@@ -61,6 +61,10 @@ public final class TargetBody extends SimulationBody {
             // Zahl im Target anzeigen
             g.scale(1, -1);
             g.setFont(new Font("Default", Font.PLAIN, 20));
-            g.drawString(String.valueOf(hitNumber), (int)radius, (int)radius);
+            //Offset für Beschriftung anhand der hitNumber erstellen
+            //Schriftbreite = 7 also bei zweistelligen zahlen 2 * 7
+            int offsetX = String.valueOf(hitNumber).length() * 7;
+            int offsetY = 7;
+            g.drawString(String.valueOf(hitNumber), (int)center.x-offsetX, (int)center.y+offsetY);
     }
 }

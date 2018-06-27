@@ -5,7 +5,6 @@ import org.dyn4j.dynamics.Body;
 import org.dyn4j.dynamics.BodyFixture;
 import org.dyn4j.dynamics.CollisionAdapter;
 import org.dyn4j.dynamics.World;
-import org.dyn4j.samples.framework.SimulationBody;
 
 public class BoundaryCollisionListener extends CollisionAdapter {
     private Body boundary;
@@ -28,7 +27,7 @@ public class BoundaryCollisionListener extends CollisionAdapter {
             MouseInteraction.ballsInGame -= 1;
             if (MouseInteraction.ballsInGame == 0) {
                 MouseInteraction.canShoot = true;
-                MouseInteraction.TURN += 1;
+                MouseInteraction.turn += 1;
             }
             return false;
         }

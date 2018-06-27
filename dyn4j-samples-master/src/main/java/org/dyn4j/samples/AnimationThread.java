@@ -13,7 +13,7 @@ class AnimationThread extends Thread {
         bB = target.getBouncingBallContr();
         if (target.getTimer()<=1)
         {
-            target.setTimer(2000);
+            target.setTimer(4000);
         }
         bB.getsHitAni(target,true);
 

@@ -347,7 +347,7 @@ public class MouseInteraction extends SimulationFrame {
         target.setGrowed(growed);
         target.setCurrRadius(rad);
         target.addFixture(fixture);
-        fixture.setRestitution(0);
+        fixture.setRestitution(0.6);
         target.translate(xKoord,yKoord);
         target.setMass(MassType.INFINITE);
         this.world.addBody(target);
@@ -414,17 +414,9 @@ public class MouseInteraction extends SimulationFrame {
                 targetSack.get(i).removeAllFixtures();
                 //TODO: Game Exit
             } else {
-                //double tempX = targetSack.get(i).getTransform().getTranslationX();
-                //double tempY = targetSack.get(i).getTransform().getTranslationY();
-                //tempX += 4;
-                //System.out.println("Targetsack: "+tempX + " " +tempY);
-
                 targetSack.get(i).translate(0, 4);
                 targetSack.get(i).setPosX(targetSack.get(i).getPosX());
                 targetSack.get(i).setPosY(targetSack.get(i).getPosY()+4);
-                //System.out.println(targetSack.get(i).getTransform().getTranslationX()+" "+targetSack.get(i).getTransform().getTranslationY());
-                //For schleife
-                //Y Koordinaten eine ebene hoch
             }
         }
     }

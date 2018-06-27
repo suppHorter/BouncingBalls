@@ -29,6 +29,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import java.awt.geom.Line2D;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.List;
 import java.util.*;
 
@@ -39,10 +41,15 @@ import org.dyn4j.geometry.Polygon;
 import org.dyn4j.samples.framework.SimulationBody;
 import org.dyn4j.samples.framework.SimulationFrame;
 
+import javax.imageio.ImageIO;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class MouseInteraction extends SimulationFrame {
-    //private static final long serialVersionUID = -1366264828445805140L;
+    //private static final long serialVersionUID = -1366264828445805140L;#
+
+    // images
+
+
     static int ballsInGame = 0; //Anzahl an Schuessen die momentan im Spiel vorhanden sind (maximal MAXBALLS)
     static int ballsCreated = 0; //Anzahl aller Schuesse die jemals erstellt wurden
     static boolean canShoot = true; //Man darf nur schiessen wenn die ballsInGame leer geworden sind
@@ -63,6 +70,8 @@ public class MouseInteraction extends SimulationFrame {
 	private List<Body> ballList;
 	//Boundary am unteren Ende
 	private Body lowerBounds;
+	//Body fuer Kanone
+	private static CannonBody cannon = new CannonBody();
 	//Points für Mausposition
     private Point movedPoint;
     private Line2D mouseLine;
@@ -159,6 +168,15 @@ public class MouseInteraction extends SimulationFrame {
 		this.world.addBody(lowerBounds);
 		this.world.addListener(new BoundaryCollisionListener(lowerBounds, world));
 
+        //Kanone erstellen
+        cannon.addFixture(Geometry.createRectangle(0.9, 2.7));
+        cannon.setMass(MassType.INFINITE);
+        cannon.translate(0.0, 0.0);
+        Transform transform = new Transform();
+        cannon.setTransform(transform);
+        cannon.translate(0,10);
+        this.world.addBody(cannon);
+
 		//Ersten Targets erstellen
         createTargets();
 	}
@@ -168,12 +186,16 @@ public class MouseInteraction extends SimulationFrame {
         //Umrechnung der Dimensionen Schusspunkt
         Vector2 shootToVector = this.toWorldCoordinates(POINTSHOOTER);
 
-        //Schusslinie anzeigen
+        //Schusslinie anzeigen, drehen und Kanone drehen
         if (movedPoint != null){
             Vector2 aimLine = this.toWorldCoordinates(movedPoint);
             g.setColor(Color.WHITE);
             g.draw(new Line2D.Double(shootToVector.x * scale, shootToVector.y * scale, aimLine.x * scale, aimLine.y * scale));
+			//TODO
+			//Rotation der Kanone anhand des Vectors
+            //cannon.getTransform().setRotation();
         }
+
 
 		TIMERCOUNTER_BETWEEN_BALLS += elapsedTime;
 		//Allgemeine vergangene Zeit (noch nicht verwendet)
@@ -336,6 +358,7 @@ public class MouseInteraction extends SimulationFrame {
         double y = -(point.getY() - this.canvas.getHeight() / 2.0) / this.scale;
         return new Vector2(x, y);
     }
+
 
 
 	public static void main(String[] args) {

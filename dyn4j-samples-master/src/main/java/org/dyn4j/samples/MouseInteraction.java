@@ -204,12 +204,13 @@ public class MouseInteraction extends SimulationFrame {
                     {
                         TargetBody tb = targetSack.get(i);
                         targetSack.get(i).setGrowed(false);
-                        createTargetBall(tb.getPosX(),tb.getPosY(),tb.getCurrRadius()-0.2,tb.getHitNumber(),false);
+                        createTargetBall(tb.getPosX(),tb.getPosY(),tb.getCurrRadius()-0.2,tb.getHitNumber(),targetSack.get(i).getColor(),false);
                         removeTarget(targetSack.get(i));
                     }
                 }
             }
         }
+
 		//Nur schiessen falls Salve noch nicht beendet wurde
 		if (TIMERCOUNTER_BETWEEN_BALLS > TIME_BETWEEN_BALLS
                 && ballsCreated < (MAXBALLS * turn)
@@ -292,6 +293,7 @@ public class MouseInteraction extends SimulationFrame {
     public void removeTarget(TargetBody target)
     {
         world.removeBody(target);
+        targetSack.remove(target);
         target.removeAllFixtures();
     }
 
@@ -304,7 +306,7 @@ public class MouseInteraction extends SimulationFrame {
         rad = target.getCurrRadius();
 
         removeTarget(target);
-        createTargetBall(posX,posY,rad+0.2,hitNo,true);
+        createTargetBall(posX,posY,rad+0.2,hitNo,target.getColor(),true);
 	}
 
     public void destroyedAni(TargetBody target)
@@ -312,7 +314,7 @@ public class MouseInteraction extends SimulationFrame {
         removeTarget(target);
     }
 
-    private TargetBody createTargetBall(double xKoord, double yKoord,double rad,int hitNo,boolean growed)
+    private TargetBody createTargetBall(double xKoord, double yKoord,double rad,int hitNo,Color color,boolean growed)
     {
         TargetBody target = new TargetBody();
         target.setBouncingBallContr(this);
@@ -320,6 +322,7 @@ public class MouseInteraction extends SimulationFrame {
         target.setHitNumber(hitNo);
         target.setPosX(xKoord);
         target.setPosY(yKoord);
+        target.setColor(color);
         target.setGrowed(growed);
         target.setCurrRadius(rad);
         target.addFixture(fixture);

@@ -28,6 +28,7 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
+import java.lang.annotation.Target;
 import java.util.List;
 import java.util.*;
 
@@ -50,9 +51,9 @@ public class MouseInteraction extends SimulationFrame {
 	static boolean WAIT = false;
 	static double[] Yebenen = {4,0,-4,-8};
 	static double[] Xebenen = {-5, 0, 5};
-	LvlBoxBody lvlBox;
+	private LvlBoxBody lvlBox,highScoreBox, currScoreBox;
 
-	static ArrayList<SimulationBody> targetSack= new ArrayList<>();
+	static ArrayList<TargetBody> targetSack= new ArrayList<>();
 
 	//Point um Mauspos. zu speichern
 	private Point point;
@@ -72,7 +73,7 @@ public class MouseInteraction extends SimulationFrame {
     private static int MAXBALLS = 5; //Anzahl an Schuessen pro Salve
     private static double TIMER; //Zaehlt die Vergangenen Sekunden
 	private static Point POINTSHOOTER = new Point(250,40); //Punkt an dem Schuesse abgefeuert werden
-	private static int lvlCnt;
+	private static int lvlCnt,highScore,currScore;
 
 	private final class CustomMouseAdapter extends MouseAdapter {
 		@Override
@@ -111,7 +112,11 @@ public class MouseInteraction extends SimulationFrame {
 	protected void initializeWorld() {
 		lvlCnt = 0;
 		lvlBox = new LvlBoxBody();
+		highScoreBox = new LvlBoxBody();
+		currScoreBox = new LvlBoxBody();
 		createLvlLbl();
+        createHighScore();
+        createCurrScore();
 		//Gravitation der Welt anpassen
         Vector2 gravityVector = new Vector2();
         gravityVector.set(0,-20);
@@ -155,15 +160,36 @@ public class MouseInteraction extends SimulationFrame {
 
 	@Override
 	protected void update(Graphics2D g, double elapsedTime) {
+
 		TIMERCOUNTER_BETWEEN_BALLS += elapsedTime;
 		//Allgemeine vergangene Zeit (noch nicht verwendet)
 		TIMER += elapsedTime;
 		if(TURN > 1 && rowsOfTargetsCreated < TURN){
                 if (targetSack.size() > 0) {
                     liftBalls();
-					updateLvlLbl();
+                    lvlBox.lvlNumber = lvlCnt;
                 }
                 createTargets();
+        }
+        //Animation beenden
+        if (targetSack.size()>0)
+        {
+            for (int i=0;i<targetSack.size();i++)
+            {
+                if (targetSack.get(i).getTimer() > 0)
+                {
+                    targetSack.get(i).setTimer(targetSack.get(i).getTimer()-1);
+                }else
+                {
+                    if (targetSack.get(i).getGrowed()== true)
+                    {
+                        TargetBody tb = targetSack.get(i);
+                        targetSack.get(i).setGrowed(false);
+                        createTargetBall(tb.getPosX(),tb.getPosY(),tb.getCurrRadius()-0.2,tb.getHitNumber(),false);
+                        removeTarget(targetSack.get(i));
+                    }
+                }
+            }
         }
 		//Nur schiessen falls Salve noch nicht beendet wurde
 		if (TIMERCOUNTER_BETWEEN_BALLS > TIME_BETWEEN_BALLS
@@ -217,26 +243,100 @@ public class MouseInteraction extends SimulationFrame {
 		//g.drawString(String.valueOf(hitNumber), (int)radius-12, (int)radius+5);
 	}
 
-	public void updateLvlLbl()
-	{
-		lvlBox.lvlNumber = lvlCnt;
+    private void createCurrScore()
+    {
+        BodyFixture fixture = new BodyFixture(Geometry.createRectangle(2,2));
+        currScoreBox.addFixture(fixture);
+        currScoreBox.lvlNumber = currScore;
+        fixture.setRestitution(0);
+        currScoreBox.setColor(Color.WHITE);
+        currScoreBox.translate(0,10);
+        currScoreBox.setMass(MassType.INFINITE);
+        this.world.addBody(currScoreBox);
+
+        //g.setFont(new Font("Default", Font.PLAIN, 20));
+        //g.drawString(String.valueOf(hitNumber), (int)radius-12, (int)radius+5);
+    }
+
+    private void createHighScore()
+    {
+        BodyFixture fixture = new BodyFixture(Geometry.createRectangle(2,2));
+        highScoreBox.addFixture(fixture);
+        highScoreBox.lvlNumber = highScore;
+        fixture.setRestitution(0);
+        highScoreBox.setColor(Color.WHITE);
+        highScoreBox.translate(-7,10);
+        highScoreBox.setMass(MassType.INFINITE);
+        this.world.addBody(highScoreBox);
+
+        //g.setFont(new Font("Default", Font.PLAIN, 20));
+        //g.drawString(String.valueOf(hitNumber), (int)radius-12, (int)radius+5);
+    }
+
+
+    public void removeTarget(TargetBody target)
+    {
+        world.removeBody(target);
+        target.removeAllFixtures();
+    }
+
+    public void getsHitAni(TargetBody target, boolean grow) {
+        int hitNo;
+        double rad,posX,posY;
+        hitNo = target.getHitNumber();
+        posX = target.getPosX();
+        posY = target.getPosY();
+        rad = target.getCurrRadius();
+
+        removeTarget(target);
+        createTargetBall(posX,posY,rad+0.2,hitNo,true);
 	}
 
-	private void createTargetBall(double xKoord, double yKoord)
-	{
+    public void destroyedAni(TargetBody target)
+    {
+        removeTarget(target);
+    }
+
+    private TargetBody createTargetBall(double xKoord, double yKoord,double rad,int hitNo,boolean growed)
+    {
+        TargetBody target = new TargetBody();
+        target.setBouncingBallContr(this);
+        BodyFixture fixture = new BodyFixture(Geometry.createCircle(rad));
+        target.setHitNumber(hitNo);
+        target.setPosX(xKoord);
+        target.setPosY(yKoord);
+        target.setGrowed(growed);
+        target.setCurrRadius(rad);
+        target.addFixture(fixture);
+        fixture.setRestitution(0);
+        target.translate(xKoord,yKoord);
+        target.setMass(MassType.INFINITE);
+        this.world.addBody(target);
+        this.world.addListener(new TargetCollisionListener(target, world, target.getHitNumber()));
+        targetSack.add(target);
+        return target;
+    }
+
+	private TargetBody createTargetBall(double xKoord, double yKoord)
+    {
 		TargetBody target = new TargetBody();
+        target.setBouncingBallContr(this);
 		double rad;
 		rad =  Math.random()+1;
 
         BodyFixture fixture = new BodyFixture(Geometry.createCircle(rad));
-        target.hitNumber =  ThreadLocalRandom.current().nextInt(10,  20);
+        target.setHitNumber(ThreadLocalRandom.current().nextInt(10,  20));
+        target.setPosX(xKoord);
+        target.setPosY(yKoord);
+        target.setCurrRadius(rad);
         target.addFixture(fixture);
 		fixture.setRestitution(0);
         target.translate(xKoord,yKoord);
 		target.setMass(MassType.INFINITE);
 		this.world.addBody(target);
-        this.world.addListener(new TargetCollisionListener(target, world, target.hitNumber));
+        this.world.addListener(new TargetCollisionListener(target, world, target.getHitNumber()));
 		targetSack.add(target);
+		return target;
 	}
 
 	//private SimulationBody ballSack[] = new SimulationBody[20];
@@ -279,15 +379,14 @@ public class MouseInteraction extends SimulationFrame {
                 //System.out.println("Targetsack: "+tempX + " " +tempY);
 
                 targetSack.get(i).translate(0, 4);
+                targetSack.get(i).setPosX(targetSack.get(i).getPosX());
+                targetSack.get(i).setPosY(targetSack.get(i).getPosY()+4);
                 //System.out.println(targetSack.get(i).getTransform().getTranslationX()+" "+targetSack.get(i).getTransform().getTranslationY());
                 //For schleife
                 //Y Koordinaten eine ebene hoch
             }
         }
     }
-
-
-
 
 	public static void main(String[] args) {
 		MouseInteraction simulation = new MouseInteraction();

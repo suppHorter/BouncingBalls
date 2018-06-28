@@ -1,27 +1,4 @@
-/*
- * Copyright (c) 2010-2016 William Bittle  http://www.dyn4j.org/
- * All rights reserved.
- * 
- * Redistribution and use in source and binary forms, with or without modification, are permitted 
- * provided that the following conditions are met:
- * 
- *   * Redistributions of source code must retain the above copyright notice, this list of conditions
- *     and the following disclaimer.
- *   * Redistributions in binary form must reproduce the above copyright notice, this list of conditions 
- *     and the following disclaimer in the documentation and/or other materials provided with the 
- *     distribution.
- *   * Neither the name of dyn4j nor the names of its contributors may be used to endorse or
- *     promote products derived from this software without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR 
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND 
- * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR 
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL 
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, 
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER 
- * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT 
- * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
+
 package org.dyn4j.samples;
 
 import java.awt.*;
@@ -29,39 +6,33 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import java.awt.geom.Line2D;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.util.List;
 import java.util.*;
 
-import org.dyn4j.collision.Collisions;
-import org.dyn4j.collision.Fixture;
 import org.dyn4j.dynamics.Body;
 import org.dyn4j.dynamics.BodyFixture;
 import org.dyn4j.geometry.*;
-import org.dyn4j.geometry.Polygon;
-import org.dyn4j.geometry.Shape;
 import org.dyn4j.samples.framework.SimulationBody;
 import org.dyn4j.samples.framework.SimulationFrame;
 
-import javax.imageio.ImageIO;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class MouseInteraction extends SimulationFrame {
-    //private static final long serialVersionUID = -1366264828445805140L;#
-
-    // images
-
-
-    static int ballsInGame = 0; //Anzahl an Schuessen die momentan im Spiel vorhanden sind (maximal MAXBALLS)
-    static int ballsCreated = 0; //Anzahl aller Schuesse die jemals erstellt wurden
-    static boolean canShoot = true; //Man darf nur schiessen wenn die ballsInGame leer geworden sind
+public class BouncingBalls extends SimulationFrame {
+    //Anzahl an Schuessen die momentan im Spiel vorhanden sind (maximal MAXBALLS)
+    static int ballsInGame = 0;
+    //Anzahl aller Schuesse die jemals erstellt wurden
+    static int ballsCreated = 0;
+    //Man darf nur schiessen wenn die ballsInGame leer geworden sind
+    static boolean canShoot = true;
+    //Anzahl der erstellten Target Reihen
     static int rowsOfTargetsCreated;
+    //Runden zählen
 	static int turn = 1;
-	static boolean WAIT = false;
+	//Koordinaten für die Target Reihen
 	static double[] Yebenen = {4,0,-4,-8};
 	static double[] Xebenen = {-5, 0, 5};
+	//Anzeigeboxen
 	private LvlBoxBody lvlBox,highScoreBox, currScoreBox;
+    //Liste von Targets für diverse Zwecke
     private SimulationBody boosterTramp;
 
 	static ArrayList<TargetBody> targetSack= new ArrayList<>();
@@ -70,22 +41,19 @@ public class MouseInteraction extends SimulationFrame {
 	private Point point;
 	//Vektor fuer
 	private Vector2 shootingVector;
-	//Liste aller erstellten Baelle
-	private List<Body> ballList;
 	//Boundary am unteren Ende
 	private Body lowerBounds;
 	//Body fuer Kanone
 	private static CannonBody cannon = new CannonBody();
 	//Points für Mausposition
     private Point movedPoint;
-    private Line2D mouseLine;
+    //Zaehlt die Vergangenen Sekunden
+    private static double timer;
+    //Zaehlt die vergangenen Sekunden - wird zurückgedsetzt
+    private static double timercounter_between_balls;
 
-    private static double timer; //Zaehlt die Vergangenen Sekunden
-
-	//Constants für die Gamelogik
-	//private static long SLEEPTIMER = 5; //Zeit bis man eine neue Salve abfeuern kann
+    //Constants für die Gamelogik
 	private static double TIME_BETWEEN_BALLS = 0.5; //Zeit zwischen den Schuessen einer Salve
-    private static double TIMERCOUNTER_BETWEEN_BALLS; //Zaehlt die vergangenen Sekunden - wird zurückgedsetzt
     private static int MIN_BALLS_TO_CREATE = 1;
     private static int MAX_BALLS_TO_CREATE = 3;
     private static int MIN_HIT_NUMBER = 5; //Minimalanzahl Treffer benötigt für zerstörung von targets
@@ -102,7 +70,6 @@ public class MouseInteraction extends SimulationFrame {
         public void mouseMoved(MouseEvent e) {
             movedPoint = canvas.getMousePosition();
         }
-
 		@Override
 		public void mousePressed(MouseEvent e) {
 		    //Maus Klick Position speichern
@@ -110,19 +77,20 @@ public class MouseInteraction extends SimulationFrame {
 				lvlCnt++;
                 point = new Point(canvas.getMousePosition());
                 //Neuen Vektor für die Schuesse erstellen
+                //Faktor 0,15 da sonst Schüsse zu stark
                 shootingVector = new Vector2();
                 double dx =  0.15 * (point.getX() - POINTSHOOTER.getX());
                 double dy = -0.15 * (point.getY() - POINTSHOOTER.getY());
                 shootingVector.set(dx, dy);
             }
 		}
-
 		@Override
 		public void mouseReleased(MouseEvent e) {
+            //Überschrieben mit leer da sonst ungewünschtes verhalten
 		}
 	}
 
-	public MouseInteraction() {
+	public BouncingBalls() {
 		super("Mouse Interaction", 32.0);
 		MouseAdapter ml = new CustomMouseAdapter();
 		this.canvas.addMouseMotionListener(ml);
@@ -225,23 +193,22 @@ public class MouseInteraction extends SimulationFrame {
         //Umrechnung der Dimensionen Schusspunkt
         Vector2 shootToVector = this.toWorldCoordinates(POINTSHOOTER);
 
-        //Schusslinie anzeigen, drehen und Kanone drehen
+        //Schusslinie anzeigen u. drehen / Kanone drehen
         if (movedPoint != null){
             Vector2 aimLine = this.toWorldCoordinates(movedPoint);
             g.setColor(Color.LIGHT_GRAY);
             g.draw(new Line2D.Double(shootToVector.x * scale, shootToVector.y * scale, aimLine.x * scale, aimLine.y * scale));
-			//TODO
-			//Rotation der Kanone anhand des Vector
+            //Rotation Kanone
 			Vector2 xAxis = new Vector2(1.0, 0.0);
 			double angle = xAxis.getAngleBetween(shootToVector.to(aimLine));
             cannon.getTransform().setRotation(angle);
         }
-
-
-		TIMERCOUNTER_BETWEEN_BALLS += elapsedTime;
+        //Zeit zwischen den Schüsen einer Salve messen
+		timercounter_between_balls += elapsedTime;
 		//Allgemeine vergangene Zeit (noch nicht verwendet)
 		timer += elapsedTime;
 
+		//targets erstellen falls momentane Runde abgeschlossen wurde
 		if(turn > 1 && rowsOfTargetsCreated < turn){
                 if (targetSack.size() > 0) {
                     liftBalls();
@@ -252,6 +219,8 @@ public class MouseInteraction extends SimulationFrame {
         }
 
         //Animation beenden
+
+        //Animation für Targetfeedback anhand des Timers beenden
         if (targetSack.size()>0)
         {
             for (int i=0;i<targetSack.size();i++)
@@ -266,22 +235,20 @@ public class MouseInteraction extends SimulationFrame {
                         TargetBody tb = targetSack.get(i);
                         tb.setGrowed(false);
                         getsHitAni(tb, false);
-                        //createTargetBall(tb.getPosX(),tb.getPosY(),tb.getCurrRadius()-0.2,tb.getHitNumber(),targetSack.get(i).getColor(),false);
-                        //removeTarget(targetSack.get(i));
                     }
                 }
             }
         }
 
-		//Nur schiessen falls Salve noch nicht beendet wurde
-		if (TIMERCOUNTER_BETWEEN_BALLS > TIME_BETWEEN_BALLS
+		//Nur schießen falls Salve noch nicht beendet wurde
+		if (timercounter_between_balls > TIME_BETWEEN_BALLS
                 && ballsCreated < (MAXBALLS * turn)
                 && canShoot){
-			//System.out.println(TIMERCOUNTER_BETWEEN_BALLS);
-			TIMERCOUNTER_BETWEEN_BALLS = 0;
+			timercounter_between_balls = 0;
+
 			//Wurde geklickt und gibt es einen Vektor
 			if (this.point != null && this.shootingVector != null) {
-				// Neuen Schuss erstellen
+				//Neuen Schuss erstellen
 				ShotBallBody ball = new ShotBallBody();
 				BodyFixture fixture = new BodyFixture(Geometry.createCircle(0.6));
 				fixture.setDensity(200);
@@ -308,7 +275,9 @@ public class MouseInteraction extends SimulationFrame {
 
 	private void createLvlLbl()
 	{
+	    //Levelzähler anzeigen
 		BodyFixture fixture = new BodyFixture(Geometry.createRectangle(2,2));
+		fixture.setSensor(true);
 		lvlBox.addFixture(fixture);
 		lvlBox.lvlNumber = lvlCnt;
 		fixture.setRestitution(0);
@@ -321,11 +290,12 @@ public class MouseInteraction extends SimulationFrame {
     private void createCurrScore()
     {
         BodyFixture fixture = new BodyFixture(Geometry.createRectangle(2,2));
+        fixture.setSensor(true);
         currScoreBox.addFixture(fixture);
         currScoreBox.lvlNumber = currScore;
         fixture.setRestitution(0);
         currScoreBox.setColor(Color.WHITE);
-        currScoreBox.translate(0,10);
+        currScoreBox.translate(-7,15);
         currScoreBox.setMass(MassType.INFINITE);
         this.world.addBody(currScoreBox);
 
@@ -336,6 +306,7 @@ public class MouseInteraction extends SimulationFrame {
     private void createHighScore()
     {
         BodyFixture fixture = new BodyFixture(Geometry.createRectangle(2,2));
+        fixture.setSensor(true);
         highScoreBox.addFixture(fixture);
         highScoreBox.lvlNumber = highScore;
         fixture.setRestitution(0);
@@ -356,12 +327,9 @@ public class MouseInteraction extends SimulationFrame {
         target.removeAllFixtures();
     }
 
-    public void getsHitAni(TargetBody target,boolean grow) {
-        int hitNo;
-        double rad,posX,posY;
-        hitNo = target.getHitNumber();
-        posX = target.getPosX();
-        posY = target.getPosY();
+    //Animation durchführen oder beenden
+    public void getsHitAni(TargetBody target, boolean grow) {
+        double rad;
         rad = target.getCurrRadius();
         if (grow){
             BodyFixture fixture = new BodyFixture(Geometry.createCircle(rad + 0.2));
@@ -373,9 +341,6 @@ public class MouseInteraction extends SimulationFrame {
             target.removeAllFixtures();
             target.addFixture(fixture);
         }
-
-        //removeTarget(target);
-        //createTargetBall(posX,posY,rad+0.2,hitNo,target.getColor(),true);
 	}
 
     public void destroyedAni(TargetBody target)
@@ -443,17 +408,13 @@ public class MouseInteraction extends SimulationFrame {
 		targetSack.add(target);
 	}
 
-	//private SimulationBody ballSack[] = new SimulationBody[20];
-
 	//Zu zerstörende Baelle generieren
     public void createTargets(){
         rowsOfTargetsCreated += 1;
 		//Zufallsanzahl an Baellen
-        int randomPosBallsArr[] = new int[3];
+		int randomNoBalls = ThreadLocalRandom.current().nextInt(MIN_BALLS_TO_CREATE, MAX_BALLS_TO_CREATE );
         int boosterPosib;
         int boosterTypePosib;
-		int randomNoBalls = ThreadLocalRandom.current().nextInt(MIN_BALLS_TO_CREATE, MAX_BALLS_TO_CREATE );//Create Booster
-
 		for(int i = 0; i < randomNoBalls + 1; i++){
             ///createTargetBall(Xebenen[0],Yebenen[3]); //-4|-8
               boosterPosib = ThreadLocalRandom.current().nextInt(0,  100);
@@ -470,20 +431,8 @@ public class MouseInteraction extends SimulationFrame {
         }
 	}
 
-	private boolean searchInArray(int arr[],int no)
-    {
-        for (int i=0;i<arr.length;i++)
-        {
-            if (arr[i]==no)
-            {
-                return false;
-            }
-        }
-        return true;
-    }
-
+    //Targets eine Reihe nach oben verschieben
 	public void liftBalls() {
-
         for (int i = 0; i < targetSack.size(); i++) {
             if (targetSack.get(i).getTransform().getTranslationY() >= 3) {
 				//System.out.println("Verloren!!!");
@@ -496,8 +445,9 @@ public class MouseInteraction extends SimulationFrame {
             }
         }
     }
+
+    //Farbe anhand der restlichen schritte wählen
     public static final Color getSemiRandomColor(int i) {
-        //Farbe anhand der restlichen schritte wählen
         int diff = MAX_HIT_NUMBER - MIN_HIT_NUMBER;
         int step = 	Math.round(diff/6);
         if(i < MIN_HIT_NUMBER) {
@@ -531,10 +481,8 @@ public class MouseInteraction extends SimulationFrame {
         return new Vector2(x, y);
     }
 
-
-
 	public static void main(String[] args) {
-		MouseInteraction simulation = new MouseInteraction();
+		BouncingBalls simulation = new BouncingBalls();
 		simulation.run();
 	}
 

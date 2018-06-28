@@ -42,7 +42,6 @@ import org.dyn4j.geometry.Segment;
 import org.dyn4j.geometry.Shape;
 import org.dyn4j.geometry.Slice;
 import org.dyn4j.geometry.Vector2;
-import org.dyn4j.samples.MouseInteraction;
 
 /**
  * Graphics2D renderer for dyn4j shape types.

@@ -11,8 +11,7 @@ import java.lang.annotation.Target;
 public class TargetCollisionListener extends CollisionAdapter {
     private TargetBody target;
     private BoosterBody booster;
-
-    private MouseInteraction bB;
+    private BouncingBalls bB;
     private World world;
     private int hitCnt;
 
@@ -50,7 +49,7 @@ public class TargetCollisionListener extends CollisionAdapter {
             {
                 this.hitCnt--;
                 target.setHitNumber(hitCnt);
-                target.setColor(MouseInteraction.getSemiRandomColor(target.getHitNumber()));
+                target.setColor(BouncingBalls.getSemiRandomColor(target.getHitNumber()));
                 aT.run(target,false);
             }
         }

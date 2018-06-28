@@ -1,6 +1,5 @@
 package org.dyn4j.samples;
 
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.*;
 import javax.swing.*;
@@ -73,7 +72,7 @@ public class StartBallsFrame implements ActionListener{
         start.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                MouseInteraction.main(new String[1]);
+                BouncingBalls.main(new String[1]);
             }
         });
 

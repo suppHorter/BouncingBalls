@@ -24,10 +24,10 @@ public class BoundaryCollisionListener extends CollisionAdapter {
             } else {
                 world.removeBody(body2);
             }
-            MouseInteraction.ballsInGame -= 1;
-            if (MouseInteraction.ballsInGame == 0) {
-                MouseInteraction.canShoot = true;
-                MouseInteraction.turn += 1;
+            BouncingBalls.ballsInGame -= 1;
+            if (BouncingBalls.ballsInGame == 0) {
+                BouncingBalls.canShoot = true;
+                BouncingBalls.turn += 1;
             }
             return false;
         }

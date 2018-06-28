@@ -49,11 +49,13 @@ public class StartBallsFrame implements ActionListener{
         Icon button1 = new ImageIcon(".\\dyn4j-samples-master\\src\\main\\java\\org\\dyn4j\\samples\\resources\\startklein.png");
         Icon button2 = new ImageIcon(".\\dyn4j-samples-master\\src\\main\\java\\org\\dyn4j\\samples\\resources\\challengeklein.png");
         Icon button3 = new ImageIcon(".\\dyn4j-samples-master\\src\\main\\java\\org\\dyn4j\\samples\\resources\\quitklein.png");
+        Icon button4 = new ImageIcon(".\\dyn4j-samples-master\\src\\main\\java\\org\\dyn4j\\samples\\resources\\highscoreklein.png");
 
         //Erzeugen der Buttons in Form der ImageIcons
         JButton start = new JButton(button1);
         JButton challenge = new JButton(button2);
         JButton quit = new JButton(button3);
+        JButton highscore = new JButton(button4);
 
         //Erzeugen des JPanels und hinzufügen der Buttons
         panel = new JPanel();
@@ -62,9 +64,10 @@ public class StartBallsFrame implements ActionListener{
         panel.add(start);
         panel.add(quit);
         panel.add(challenge);
+        panel.add(highscore);
 
         //Alles für den START Button
-        start.setBounds(175, 300, 158, 50);
+        start.setBounds(175, 250, 158, 50);
         start.setBorder(new BasicBorders.ButtonBorder(Color.BLACK, Color.BLACK, Color.BLACK, Color.BLACK));
         start.setBackground(Color.black);
         start.setForeground(Color.white);
@@ -77,14 +80,22 @@ public class StartBallsFrame implements ActionListener{
         });
 
         //Alles für den CHALLENGE Button
-        challenge.setBounds(111, 400, 286, 50);
+        challenge.setBounds(111, 350, 286, 50);
         challenge.setBackground(Color.black);
         challenge.setContentAreaFilled(false);
         challenge.setBorder(new BasicBorders.ButtonBorder(Color.BLACK, Color.BLACK, Color.BLACK, Color.BLACK));
         challenge.setForeground(Color.white);
 
+        //Alles für Highscore Button
+        highscore.setBounds(111,450,300,50);
+        highscore.setBackground(Color.black);
+        highscore.setContentAreaFilled(false);
+        highscore.setBorder(new BasicBorders.ButtonBorder(Color.black, Color.black,Color.black, Color.black));
+        highscore.setForeground(Color.WHITE);
+
+
         //Alles für den QUIT Button
-        quit.setBounds(193, 500, 122, 50);
+        quit.setBounds(193, 550, 122, 50);
         quit.setBackground(Color.black);
         quit.setContentAreaFilled(false);
         quit.setBorder(new BasicBorders.ButtonBorder(Color.BLACK, Color.BLACK, Color.BLACK, Color.BLACK));

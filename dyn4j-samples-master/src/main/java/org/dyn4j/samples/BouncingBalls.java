@@ -67,9 +67,7 @@ public class BouncingBalls extends SimulationFrame {
         @Override
         public void mouseMoved(MouseEvent e) {
             movedPoint = canvas.getMousePosition();
-
         }
-
 		@Override
 		public void mousePressed(MouseEvent e) {
 		    //Maus Klick Position speichern
@@ -84,9 +82,9 @@ public class BouncingBalls extends SimulationFrame {
                 shootingVector.set(dx, dy);
             }
 		}
-
 		@Override
 		public void mouseReleased(MouseEvent e) {
+            //Überschrieben mit leer da sonst ungewünschtes verhalten
 		}
 	}
 

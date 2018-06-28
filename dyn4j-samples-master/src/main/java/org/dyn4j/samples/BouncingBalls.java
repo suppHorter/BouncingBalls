@@ -192,16 +192,20 @@ public class BouncingBalls extends SimulationFrame {
                 for (int i=0;i<targetSack.size();i++)
                 {
                     targetSack.get(i).setHitNumber(targetSack.get(i).getHitNumber()-5);
-                    if (targetSack.get(i).getHitNumber()<=0)
+                    if ((targetSack.get(i).getHitNumber()<=0) &&(!(targetSack.get(i) instanceof BoosterBody)))
                     {
                         world.removeBody(targetSack.get(i));
                     }
                 }
                 break;
             case 2: //großere Schüsse
-                    bulletRadius+=0.2;
+                    if (bulletRadius<1.2)
+                    {
+                        bulletRadius+=0.2;
+                    }
+
                 break;
-            case 3:
+            case 3: //rapid Fire
                 break;
         }
 
@@ -398,9 +402,9 @@ public class BouncingBalls extends SimulationFrame {
         BodyFixture fixture = new BodyFixture(Geometry.createCircle(0.7));
         booster.setPosX(xKoord);
         booster.setPosY(yKoord);
-        booster.setColor(Color.GREEN);
         booster.addFixture(fixture);
         booster.setType(type);
+        booster.setColor(booster.getColor());
         fixture.setRestitution(0.6);
         booster.translate(xKoord,yKoord);
         booster.setMass(MassType.INFINITE);
@@ -465,14 +469,13 @@ public class BouncingBalls extends SimulationFrame {
               boosterPosib = ThreadLocalRandom.current().nextInt(0,  100);
               boosterTypePosib = ThreadLocalRandom.current().nextInt(0,  3);
 
-            if ((boosterPosib > 0)&&(boosterPosib < 60))
+            if ((boosterPosib > 45)&&(boosterPosib < 60))
             {
                 createBooster(boosterTypePosib,Xebenen[i],Yebenen[3]);
             }else
             {
                 createTargetBall(Xebenen[i],Yebenen[3]); //-4|-8
             }
-
         }
 	}
 

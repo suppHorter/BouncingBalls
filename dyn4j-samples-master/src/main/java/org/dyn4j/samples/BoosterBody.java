@@ -16,8 +16,37 @@ public class BoosterBody extends TargetBody{
     private Timer aliveTimer;
     private boolean active;
     private static BouncingBalls bB;
+    private Color typeCol;
+    private String description;
+
     public int getType(){return this.type;}
-    public void setType(int type){this.type = type;}
+
+    public Color getColor() {return this.typeCol;}
+    public void setCol(Color col) {this.typeCol = col;}
+
+    public void setType(int type)
+    {
+        this.type = type;
+        switch (type)
+        {
+            case 0:     //Trampolin
+                this.typeCol = Color.GREEN;
+                this.description = "_";
+                break;
+            case 1:     //Bombe
+                this.typeCol = Color.BLUE;
+                this.description = "-5";
+                break;
+            case 2:     //Größere
+                this.typeCol = Color.YELLOW;
+                this.description = "+";
+                break;
+            case 3:
+                this.typeCol = Color.RED;
+                this.description = "---";
+                break;
+        }
+    }
 
     public BoosterBody()
     {
@@ -48,8 +77,8 @@ public class BoosterBody extends TargetBody{
         g.setFont(new Font("Default", Font.PLAIN, 20));
         //Offset für Beschriftung anhand der hitNumber erstellen
         //Schriftbreite = 7 also bei zweistelligen zahlen 2 * 7
-        int offsetX = String.valueOf("Booster").length() * 7;
+        int offsetX = String.valueOf(this.description).length() * 7;
         int offsetY = 7;
-        g.drawString(String.valueOf("Booster"), (int)center.x-offsetX, (int)center.y+offsetY);
+        g.drawString(String.valueOf(this.description), (int)center.x-offsetX, (int)center.y+offsetY);
     }
 }

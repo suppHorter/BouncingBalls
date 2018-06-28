@@ -8,10 +8,6 @@ public class Score {
     private int level;
     private String name;
 
-    public Score() {
-
-    }
-
     public Score(int level, String name) {
         this.level = level;
         this.name = name;
@@ -21,8 +17,8 @@ public class Score {
         ArrayList<ScoreEntry> entries = new ArrayList<>();
 
         try {
-            entries = this.getLeaderboard();
-            this.place = this.checkPlace(entries);
+            entries = getLeaderboard();
+            this.place = this.checkPlace();
         } catch (IOException ex) {
             this.place = 1;
         }
@@ -46,7 +42,15 @@ public class Score {
         }
     }
 
-    public int checkPlace(ArrayList<ScoreEntry> places) {
+    public int checkPlace() {
+        ArrayList<ScoreEntry> places;
+
+        try {
+            places = getLeaderboard();
+        } catch (IOException ex) {
+            return 1;
+        }
+
         int i = 1;
         for (ScoreEntry entry : places) {
             int score = entry.getLevel();
@@ -59,14 +63,14 @@ public class Score {
         return i;
     }
 
-    public static ArrayList<ScoreEntry> getLeaderboard() throws IOException{
+    public static ArrayList<ScoreEntry> getLeaderboard() throws IOException {
         FileInputStream fileReader = new FileInputStream(new File("./highscore"));
         ObjectInputStream objectInputStream = new ObjectInputStream(fileReader);
 
         ArrayList<ScoreEntry> entries = new ArrayList<>();
         ScoreEntry entry;
 
-        while(true) {
+        while (true) {
             try {
                 entry = (ScoreEntry) objectInputStream.readObject();
                 entries.add(entry);

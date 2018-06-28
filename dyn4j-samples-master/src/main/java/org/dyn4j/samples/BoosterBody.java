@@ -14,7 +14,7 @@ public class BoosterBody extends TargetBody{
 
     int type;
     Timer aliveTimer;
-    private static MouseInteraction bB;
+    private static BouncingBalls bB;
     public int getType(){return this.type;}
     public void setType(int type){this.type = type;}
 

@@ -96,6 +96,7 @@ public class StartBallsFrame implements ActionListener{
             @Override
             public void actionPerformed(ActionEvent e) {
 
+                startBalls.setVisible(false);
                 HighscoreFrame.main(new String[1]);
 
             }

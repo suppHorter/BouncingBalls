@@ -4,7 +4,6 @@ package org.dyn4j.samples;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-
 import java.awt.geom.Line2D;
 import java.util.*;
 
@@ -14,6 +13,8 @@ import org.dyn4j.geometry.*;
 import org.dyn4j.samples.framework.SimulationBody;
 import org.dyn4j.samples.framework.SimulationFrame;
 
+import javax.swing.*;
+import javax.swing.plaf.basic.BasicBorders;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class BouncingBalls extends SimulationFrame {
@@ -37,6 +38,8 @@ public class BouncingBalls extends SimulationFrame {
 	private LvlBoxBody lvlBox,highScoreBox, currScoreBox;
     //Liste von Targets für diverse Zwecke
     private SimulationBody boosterTramp;
+
+    private MenuButtonBox menuBox;
 
 	static ArrayList<TargetBody> targetSack= new ArrayList<>();
 
@@ -71,6 +74,10 @@ public class BouncingBalls extends SimulationFrame {
 	//Booster Aktiv:
     private boolean trampActive = false;
     private boolean bombActive = false;
+
+
+
+
 
 
 	private final class CustomMouseAdapter extends MouseAdapter {
@@ -113,10 +120,12 @@ public class BouncingBalls extends SimulationFrame {
         trampActive = false;
 		lvlBox = new LvlBoxBody();
 		//highScoreBox = new LvlBoxBody();
+        menuBox = new MenuButtonBox();
 		//currScoreBox = new LvlBoxBody();
 		createLvlLbl();
         //createHighScore();
         //createCurrScore();
+
 		//Gravitation der Welt anpassen
         Vector2 gravityVector = new Vector2();
         gravityVector.set(0,-30);
@@ -164,6 +173,7 @@ public class BouncingBalls extends SimulationFrame {
 
         //Kanone erstellen
         BodyFixture fixture = new BodyFixture(Geometry.createRectangle(6, 03));
+
         //Kollision deaktivieren
         fixture.setSensor(true);
 
@@ -173,9 +183,24 @@ public class BouncingBalls extends SimulationFrame {
         cannon.translate(0,9.5);
         this.world.addBody(cannon);
 
+
+
+        creatMenuButton();
 		//Ersten Targets erstellen
         createTargets();
 	}
+
+	public void creatMenuButton(){
+        BodyFixture fixture = new BodyFixture(Geometry.createRectangle(6, 03));
+        fixture.setSensor(true);
+        menuBox.addFixture(fixture);
+        menuBox.setMass(MassType.INFINITE);
+        menuBox.translate(-7, 10);
+
+        this.world.addBody(menuBox);
+
+    }
+
 
 	public void activateBooster(int type)
     {
@@ -206,6 +231,7 @@ public class BouncingBalls extends SimulationFrame {
         }
 
     }
+
 
     public void deActivateBooster(int type)
     {

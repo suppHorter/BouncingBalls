@@ -12,14 +12,20 @@ import java.util.Timer;
 
 public class BoosterBody extends TargetBody{
 
-    int type;
-    Timer aliveTimer;
+    private int type;
+    private Timer aliveTimer;
+    private boolean active;
     private static BouncingBalls bB;
     public int getType(){return this.type;}
     public void setType(int type){this.type = type;}
 
     public BoosterBody()
-    {}
+    {
+        this.active = false;
+    }
+
+    public void setActive(boolean active) {this.active = active;}
+    public boolean getActive() {return this.active;}
 
     @Override
     protected void renderFixture(Graphics2D g, double scale, BodyFixture fixture, Color color) {

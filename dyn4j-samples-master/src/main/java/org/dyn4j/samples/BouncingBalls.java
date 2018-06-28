@@ -17,6 +17,8 @@ import org.dyn4j.samples.framework.SimulationFrame;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class BouncingBalls extends SimulationFrame {
+    //Durchmesser der Schüsse
+    static double bulletRadius = 0.6;
     //Anzahl an Schuessen die momentan im Spiel vorhanden sind (maximal MAXBALLS)
     static int ballsInGame = 0;
     //Anzahl aller Schuesse die jemals erstellt wurden
@@ -26,7 +28,8 @@ public class BouncingBalls extends SimulationFrame {
     //Anzahl der erstellten Target Reihen
     static int rowsOfTargetsCreated;
     //Runden zählen
-	static int turn = 1;
+    public static int turn = 1;
+	private static int lvlCnt;
 	//Koordinaten für die Target Reihen
 	static double[] Yebenen = {4,0,-4,-8};
 	static double[] Xebenen = {-5, 0, 5};
@@ -49,19 +52,25 @@ public class BouncingBalls extends SimulationFrame {
     private Point movedPoint;
     //Zaehlt die Vergangenen Sekunden
     private static double timer;
+    //Timer für Trampolin Booster
+    private static double trampBoosterTimer;
     //Zaehlt die vergangenen Sekunden - wird zurückgedsetzt
     private static double timercounter_between_balls;
 
     //Constants für die Gamelogik
-	private static double TIME_BETWEEN_BALLS = 0.5; //Zeit zwischen den Schuessen einer Salve
+	private static double TIME_BETWEEN_BALLS = 0.3; //Zeit zwischen den Schuessen einer Salve
     private static int MIN_BALLS_TO_CREATE = 1;
     private static int MAX_BALLS_TO_CREATE = 3;
     private static int MIN_HIT_NUMBER = 5; //Minimalanzahl Treffer benötigt für zerstörung von targets
 	private static int MAX_HIT_NUMBER = 20;//Maximalanzahl Treffer benötigt für zerstörung von targets
     private static int MAXBALLS = 5; //Anzahl an Schuessen pro Salve
 	private static Point POINTSHOOTER = new Point(250,40); //Punkt an dem Schuesse abgefeuert werden
-	private static int lvlCnt,highScore,currScore;
 
+	private static int highScore,currScore;
+
+	//Booster Aktiv:
+    private boolean trampActive = false;
+    private boolean bombActive = false;
 
 
 	private final class CustomMouseAdapter extends MouseAdapter {
@@ -99,7 +108,9 @@ public class BouncingBalls extends SimulationFrame {
 	}
 
 	protected void initializeWorld() {
-		lvlCnt = 0;
+		lvlCnt = 1;
+        trampBoosterTimer = 0;
+        trampActive = false;
 		lvlBox = new LvlBoxBody();
 		//highScoreBox = new LvlBoxBody();
 		//currScoreBox = new LvlBoxBody();
@@ -130,7 +141,9 @@ public class BouncingBalls extends SimulationFrame {
 		ceiling.setColor(Color.GRAY);
 		ceiling.translate(0,17);
 
-        boosterTramp.addFixture(Geometry.createRectangle(50, 0.5));
+		BodyFixture trampFix = new BodyFixture(Geometry.createRectangle(50, 0.5));
+		trampFix.setRestitution(200);
+        boosterTramp.addFixture(trampFix);
         boosterTramp.setColor(Color.GREEN);
         boosterTramp.translate(0,-10);
 
@@ -150,7 +163,7 @@ public class BouncingBalls extends SimulationFrame {
 		this.world.addListener(new BoundaryCollisionListener(lowerBounds, world));
 
         //Kanone erstellen
-        BodyFixture fixture = new BodyFixture(Geometry.createRectangle(2.7, 0.9));
+        BodyFixture fixture = new BodyFixture(Geometry.createRectangle(6, 03));
         //Kollision deaktivieren
         fixture.setSensor(true);
 
@@ -168,8 +181,40 @@ public class BouncingBalls extends SimulationFrame {
     {
         switch (type)
         {
+            case 0: //Trampolin
+                if (!trampActive)
+                {
+                    this.world.addBody(boosterTramp);
+                    trampActive = true;
+                }
+                break;
+            case 1: //Bombe
+                for (int i=0;i<targetSack.size();i++)
+                {
+                    targetSack.get(i).setHitNumber(targetSack.get(i).getHitNumber()-5);
+                    if (targetSack.get(i).getHitNumber()<=0)
+                    {
+                        world.removeBody(targetSack.get(i));
+                    }
+                }
+                break;
+            case 2: //großere Schüsse
+
+                break;
+            case 3:
+                break;
+        }
+
+    }
+
+    public void deActivateBooster(int type)
+    {
+        //Hier alle Booster löschen (nach Zugende)this.world.removeBody(boosterTramp);
+        switch (type)
+        {
             case 0:
-                this.world.addBody(boosterTramp);
+                this.world.removeBody(boosterTramp);
+                trampActive = false;
                 break;
             case 1:
                 break;
@@ -178,17 +223,9 @@ public class BouncingBalls extends SimulationFrame {
             case 3:
                 break;
         }
-
-    }
-
-    public void deActivateBooster()
-    {
-        //Hier alle Booster löschen (nach Zugende)this.world.removeBody(boosterTramp);
-        this.world.removeBody(boosterTramp);
     }
 	@Override
 	protected void update(Graphics2D g, double elapsedTime) {
-	    int boosterPosib,boosterTypePosib;
 
         //Umrechnung der Dimensionen Schusspunkt
         Vector2 shootToVector = this.toWorldCoordinates(POINTSHOOTER);
@@ -208,12 +245,19 @@ public class BouncingBalls extends SimulationFrame {
 		//Allgemeine vergangene Zeit (noch nicht verwendet)
 		timer += elapsedTime;
 
+        trampBoosterTimer += elapsedTime;
+        //Zeit für Trampolintimer
+        if (trampBoosterTimer>10)
+        {
+            deActivateBooster(0);
+            trampBoosterTimer = 0;
+        }
 		//targets erstellen falls momentane Runde abgeschlossen wurde
 		if(turn > 1 && rowsOfTargetsCreated < turn){
                 if (targetSack.size() > 0) {
                     liftBalls();
+                    lvlCnt++;
                     lvlBox.lvlNumber = lvlCnt;
-                    deActivateBooster();
                 }
                 createTargets();
         }
@@ -250,7 +294,7 @@ public class BouncingBalls extends SimulationFrame {
 			if (this.point != null && this.shootingVector != null) {
 				//Neuen Schuss erstellen
 				ShotBallBody ball = new ShotBallBody();
-				BodyFixture fixture = new BodyFixture(Geometry.createCircle(0.6));
+				BodyFixture fixture = new BodyFixture(Geometry.createCircle(bulletRadius));
 				fixture.setDensity(200);
 				fixture.setRestitution(0.6);
 				ball.addFixture(fixture);
@@ -332,12 +376,12 @@ public class BouncingBalls extends SimulationFrame {
         double rad;
         rad = target.getCurrRadius();
         if (grow){
-            BodyFixture fixture = new BodyFixture(Geometry.createCircle(rad + 0.2));
+            BodyFixture fixture = new BodyFixture(Geometry.createCircle(rad - 0.2));
             target.removeAllFixtures();
             target.addFixture(fixture);
             target.setGrowed(true);
         }else{
-            BodyFixture fixture = new BodyFixture(Geometry.createCircle(rad - 0.2));
+            BodyFixture fixture = new BodyFixture(Geometry.createCircle(rad + 0.2));
             target.removeAllFixtures();
             target.addFixture(fixture);
         }
@@ -351,16 +395,17 @@ public class BouncingBalls extends SimulationFrame {
     private void createBooster(int type, double xKoord, double yKoord)
     {
         BoosterBody booster = new BoosterBody();
-        BodyFixture fixture = new BodyFixture(Geometry.createCircle(0.3));
+        BodyFixture fixture = new BodyFixture(Geometry.createCircle(0.7));
         booster.setPosX(xKoord);
         booster.setPosY(yKoord);
         booster.setColor(Color.GREEN);
         booster.addFixture(fixture);
+        booster.setType(type);
         fixture.setRestitution(0.6);
         booster.translate(xKoord,yKoord);
         booster.setMass(MassType.INFINITE);
         this.world.addBody(booster);
-        this.world.addListener(new TargetCollisionListener(booster, world, booster.getHitNumber()));
+        this.world.addListener(new TargetCollisionListener(booster, world, this));
         targetSack.add(booster);
     }
 
@@ -420,9 +465,10 @@ public class BouncingBalls extends SimulationFrame {
               boosterPosib = ThreadLocalRandom.current().nextInt(0,  100);
               boosterTypePosib = ThreadLocalRandom.current().nextInt(0,  3);
 
-            if ((boosterPosib > 30)&&(boosterPosib < 80))
+            if ((boosterPosib > 0)&&(boosterPosib < 60))
             {
-                createBooster(boosterTypePosib,Xebenen[i],Yebenen[3]);
+                //createBooster(boosterTypePosib,Xebenen[i],Yebenen[3]);
+                createBooster(1,Xebenen[i],Yebenen[3]);
             }else
             {
                 createTargetBall(Xebenen[i],Yebenen[3]); //-4|-8
@@ -446,7 +492,7 @@ public class BouncingBalls extends SimulationFrame {
         }
     }
 
-    //Farbe anhand der restlichen schritte wählen
+    //Farbe anhand der restlichen HitNumbers für die Targets wählen
     public static final Color getSemiRandomColor(int i) {
         int diff = MAX_HIT_NUMBER - MIN_HIT_NUMBER;
         int step = 	Math.round(diff/6);

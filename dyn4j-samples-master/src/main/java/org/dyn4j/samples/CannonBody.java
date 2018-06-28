@@ -16,7 +16,7 @@ import java.io.IOException;
 
 final class CannonBody extends SimulationBody {
 
-    public BufferedImage image = getImageSuppressExceptions("/org/dyn4j/samples/resources/cannontest.png");;
+    public BufferedImage image = getImageSuppressExceptions("/org/dyn4j/samples/resources/canon.png");;
 
     @Override
     protected void renderFixture(Graphics2D g, double scale, BodyFixture fixture, Color color) {
@@ -27,7 +27,7 @@ final class CannonBody extends SimulationBody {
         double h = r.getHeight();
         g.drawImage(image,
                 (int) Math.ceil((c.x - w / 2.0) * scale),
-                (int) Math.ceil((c.y - h / 2.0) * scale),
+                (int) Math.ceil((c.y - h / 2.0) * scale)-5,
                 (int) Math.ceil(w * scale),
                 (int) Math.ceil(h * scale),
                 null);

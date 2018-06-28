@@ -8,7 +8,7 @@ import org.dyn4j.samples.framework.SimulationBody;
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
 
-public final class TargetBody extends SimulationBody {
+public class TargetBody extends SimulationBody {
     /**
      * Body für die Targets
      */

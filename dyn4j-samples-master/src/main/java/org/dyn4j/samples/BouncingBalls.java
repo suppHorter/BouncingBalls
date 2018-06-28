@@ -17,6 +17,8 @@ import org.dyn4j.samples.framework.SimulationFrame;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class BouncingBalls extends SimulationFrame {
+    //Durchmesser der Schüsse
+    static double bulletRadius = 0.6;
     //Anzahl an Schuessen die momentan im Spiel vorhanden sind (maximal MAXBALLS)
     static int ballsInGame = 0;
     //Anzahl aller Schuesse die jemals erstellt wurden
@@ -51,7 +53,7 @@ public class BouncingBalls extends SimulationFrame {
     private static double timercounter_between_balls;
 
     //Constants für die Gamelogik
-	private static double TIME_BETWEEN_BALLS = 0.5; //Zeit zwischen den Schuessen einer Salve
+	private static double TIME_BETWEEN_BALLS = 0.3; //Zeit zwischen den Schuessen einer Salve
     private static int MIN_BALLS_TO_CREATE = 1;
     private static int MAX_BALLS_TO_CREATE = 3;
     private static int MIN_HIT_NUMBER = 5; //Minimalanzahl Treffer benötigt für zerstörung von targets
@@ -216,7 +218,7 @@ public class BouncingBalls extends SimulationFrame {
 			if (this.point != null && this.shootingVector != null) {
 				//Neuen Schuss erstellen
 				ShotBallBody ball = new ShotBallBody();
-				BodyFixture fixture = new BodyFixture(Geometry.createCircle(0.6));
+				BodyFixture fixture = new BodyFixture(Geometry.createCircle(bulletRadius));
 				fixture.setDensity(200);
 				fixture.setRestitution(0.6);
 				ball.addFixture(fixture);
@@ -298,12 +300,12 @@ public class BouncingBalls extends SimulationFrame {
         double rad;
         rad = target.getCurrRadius();
         if (grow){
-            BodyFixture fixture = new BodyFixture(Geometry.createCircle(rad + 0.2));
+            BodyFixture fixture = new BodyFixture(Geometry.createCircle(rad - 0.2));
             target.removeAllFixtures();
             target.addFixture(fixture);
             target.setGrowed(true);
         }else{
-            BodyFixture fixture = new BodyFixture(Geometry.createCircle(rad - 0.2));
+            BodyFixture fixture = new BodyFixture(Geometry.createCircle(rad + 0.2));
             target.removeAllFixtures();
             target.addFixture(fixture);
         }

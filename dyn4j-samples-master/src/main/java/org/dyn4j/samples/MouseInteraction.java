@@ -29,20 +29,30 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import java.awt.geom.Line2D;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.List;
 import java.util.*;
 
+import org.dyn4j.collision.Collisions;
+import org.dyn4j.collision.Fixture;
 import org.dyn4j.dynamics.Body;
 import org.dyn4j.dynamics.BodyFixture;
 import org.dyn4j.geometry.*;
 import org.dyn4j.geometry.Polygon;
+import org.dyn4j.geometry.Shape;
 import org.dyn4j.samples.framework.SimulationBody;
 import org.dyn4j.samples.framework.SimulationFrame;
 
+import javax.imageio.ImageIO;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class MouseInteraction extends SimulationFrame {
-    //private static final long serialVersionUID = -1366264828445805140L;
+    //private static final long serialVersionUID = -1366264828445805140L;#
+
+    // images
+
+
     static int ballsInGame = 0; //Anzahl an Schuessen die momentan im Spiel vorhanden sind (maximal MAXBALLS)
     static int ballsCreated = 0; //Anzahl aller Schuesse die jemals erstellt wurden
     static boolean canShoot = true; //Man darf nur schiessen wenn die ballsInGame leer geworden sind
@@ -63,6 +73,8 @@ public class MouseInteraction extends SimulationFrame {
 	private List<Body> ballList;
 	//Boundary am unteren Ende
 	private Body lowerBounds;
+	//Body fuer Kanone
+	private static CannonBody cannon = new CannonBody();
 	//Points für Mausposition
     private Point movedPoint;
     private Line2D mouseLine;
@@ -96,11 +108,11 @@ public class MouseInteraction extends SimulationFrame {
 		    //Maus Klick Position speichern
             if (canShoot) {
 				lvlCnt++;
-                point = new Point(e.getX(), e.getY());
+                point = new Point(canvas.getMousePosition());
                 //Neuen Vektor für die Schuesse erstellen
                 shootingVector = new Vector2();
-                double dx = 0.1 * (e.getX() - POINTSHOOTER.getX());
-                double dy = -0.1 * (e.getY() - POINTSHOOTER.getY());
+                double dx =  0.15 * (point.getX() - POINTSHOOTER.getX());
+                double dy = -0.15 * (point.getY() - POINTSHOOTER.getY());
                 shootingVector.set(dx, dy);
             }
 		}
@@ -128,7 +140,7 @@ public class MouseInteraction extends SimulationFrame {
         //createCurrScore();
 		//Gravitation der Welt anpassen
         Vector2 gravityVector = new Vector2();
-        gravityVector.set(0,-20);
+        gravityVector.set(0,-30);
         this.world.setGravity(gravityVector);
 
 		//Wände erstellen und Positionieren
@@ -163,6 +175,17 @@ public class MouseInteraction extends SimulationFrame {
 		this.world.addBody(lowerBounds);
 		this.world.addListener(new BoundaryCollisionListener(lowerBounds, world));
 
+        //Kanone erstellen
+        BodyFixture fixture = new BodyFixture(Geometry.createRectangle(2.7, 0.9));
+        //Kollision deaktivieren
+        fixture.setSensor(true);
+
+        cannon.addFixture(fixture);
+        cannon.setMass(MassType.INFINITE);
+        cannon.translate(0.0, 0.0);
+        cannon.translate(0,9.5);
+        this.world.addBody(cannon);
+
 		//Ersten Targets erstellen
         createTargets();
 	}
@@ -172,12 +195,18 @@ public class MouseInteraction extends SimulationFrame {
         //Umrechnung der Dimensionen Schusspunkt
         Vector2 shootToVector = this.toWorldCoordinates(POINTSHOOTER);
 
-        //Schusslinie anzeigen
+        //Schusslinie anzeigen, drehen und Kanone drehen
         if (movedPoint != null){
             Vector2 aimLine = this.toWorldCoordinates(movedPoint);
-            g.setColor(Color.WHITE);
+            g.setColor(Color.LIGHT_GRAY);
             g.draw(new Line2D.Double(shootToVector.x * scale, shootToVector.y * scale, aimLine.x * scale, aimLine.y * scale));
+			//TODO
+			//Rotation der Kanone anhand des Vector
+			Vector2 xAxis = new Vector2(1.0, 0.0);
+			double angle = xAxis.getAngleBetween(shootToVector.to(aimLine));
+            cannon.getTransform().setRotation(angle);
         }
+
 
 		TIMERCOUNTER_BETWEEN_BALLS += elapsedTime;
 		//Allgemeine vergangene Zeit (noch nicht verwendet)
@@ -200,12 +229,13 @@ public class MouseInteraction extends SimulationFrame {
                     targetSack.get(i).setTimer(targetSack.get(i).getTimer()-1);
                 }else
                 {
-                    if (targetSack.get(i).getGrowed()== true)
+                    if (targetSack.get(i).getGrowed())
                     {
                         TargetBody tb = targetSack.get(i);
-                        targetSack.get(i).setGrowed(false);
-                        createTargetBall(tb.getPosX(),tb.getPosY(),tb.getCurrRadius()-0.2,tb.getHitNumber(),targetSack.get(i).getColor(),false);
-                        removeTarget(targetSack.get(i));
+                        tb.setGrowed(false);
+                        getsHitAni(tb, false);
+                        //createTargetBall(tb.getPosX(),tb.getPosY(),tb.getCurrRadius()-0.2,tb.getHitNumber(),targetSack.get(i).getColor(),false);
+                        //removeTarget(targetSack.get(i));
                     }
                 }
             }
@@ -222,11 +252,11 @@ public class MouseInteraction extends SimulationFrame {
 				// Neuen Schuss erstellen
 				ShotBallBody ball = new ShotBallBody();
 				BodyFixture fixture = new BodyFixture(Geometry.createCircle(0.6));
-
 				fixture.setDensity(200);
 				fixture.setRestitution(0.6);
 				ball.addFixture(fixture);
 				ball.translate(shootToVector);
+				ball.translate(0,-0.2);
 				ball.setLinearVelocity(shootingVector);
 				ball.setMass(MassType.NORMAL);
                 //Schuss der Welt hinzufuegen
@@ -250,13 +280,10 @@ public class MouseInteraction extends SimulationFrame {
 		lvlBox.addFixture(fixture);
 		lvlBox.lvlNumber = lvlCnt;
 		fixture.setRestitution(0);
-		lvlBox.setColor(Color.WHITE);
+		lvlBox.setColor(Color.LIGHT_GRAY);
 		lvlBox.translate(7,10);
 		lvlBox.setMass(MassType.INFINITE);
 		this.world.addBody(lvlBox);
-
-		//g.setFont(new Font("Default", Font.PLAIN, 20));
-		//g.drawString(String.valueOf(hitNumber), (int)radius-12, (int)radius+5);
 	}
 
     private void createCurrScore()
@@ -304,9 +331,19 @@ public class MouseInteraction extends SimulationFrame {
         posX = target.getPosX();
         posY = target.getPosY();
         rad = target.getCurrRadius();
+        if (grow){
+            BodyFixture fixture = new BodyFixture(Geometry.createCircle(rad + 0.2));
+            target.removeAllFixtures();
+            target.addFixture(fixture);
+            target.setGrowed(true);
+        }else{
+            BodyFixture fixture = new BodyFixture(Geometry.createCircle(rad - 0.2));
+            target.removeAllFixtures();
+            target.addFixture(fixture);
+        }
 
-        removeTarget(target);
-        createTargetBall(posX,posY,rad+0.2,hitNo,target.getColor(),true);
+        //removeTarget(target);
+        //createTargetBall(posX,posY,rad+0.2,hitNo,target.getColor(),true);
 	}
 
     public void destroyedAni(TargetBody target)
@@ -326,7 +363,7 @@ public class MouseInteraction extends SimulationFrame {
         target.setGrowed(growed);
         target.setCurrRadius(rad);
         target.addFixture(fixture);
-        fixture.setRestitution(0);
+        fixture.setRestitution(0.6);
         target.translate(xKoord,yKoord);
         target.setMass(MassType.INFINITE);
         this.world.addBody(target);
@@ -393,17 +430,9 @@ public class MouseInteraction extends SimulationFrame {
                 targetSack.get(i).removeAllFixtures();
                 //TODO: Game Exit
             } else {
-                //double tempX = targetSack.get(i).getTransform().getTranslationX();
-                //double tempY = targetSack.get(i).getTransform().getTranslationY();
-                //tempX += 4;
-                //System.out.println("Targetsack: "+tempX + " " +tempY);
-
                 targetSack.get(i).translate(0, 4);
                 targetSack.get(i).setPosX(targetSack.get(i).getPosX());
                 targetSack.get(i).setPosY(targetSack.get(i).getPosY()+4);
-                //System.out.println(targetSack.get(i).getTransform().getTranslationX()+" "+targetSack.get(i).getTransform().getTranslationY());
-                //For schleife
-                //Y Koordinaten eine ebene hoch
             }
         }
     }
@@ -441,6 +470,7 @@ public class MouseInteraction extends SimulationFrame {
         double y = -(point.getY() - this.canvas.getHeight() / 2.0) / this.scale;
         return new Vector2(x, y);
     }
+
 
 
 	public static void main(String[] args) {

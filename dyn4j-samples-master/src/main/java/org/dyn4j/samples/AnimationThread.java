@@ -1,10 +1,9 @@
 package org.dyn4j.samples;
 
-import java.util.Timer;
-import java.util.concurrent.TimeUnit;
+//Setzt Timer und erstellt Animation für den Treffer Feedback  von Targets
 
 class AnimationThread extends Thread {
-    private MouseInteraction bB;
+    private BouncingBalls bB;
 
     AnimationThread() {
         super();
@@ -16,10 +15,5 @@ class AnimationThread extends Thread {
             target.setTimer(5);
         }
         bB.getsHitAni(target,true);
-
-        if (dead)
-        {
-            bB.destroyedAni(target);
-        }
     }
 }

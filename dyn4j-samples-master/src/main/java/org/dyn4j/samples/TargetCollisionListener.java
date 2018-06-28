@@ -8,7 +8,7 @@ import org.dyn4j.dynamics.World;
 
 public class TargetCollisionListener extends CollisionAdapter {
     private TargetBody target;
-    private MouseInteraction bB;
+    private BouncingBalls bB;
     private World world;
     private int hitCnt;
 
@@ -30,7 +30,7 @@ public class TargetCollisionListener extends CollisionAdapter {
             {
                 this.hitCnt--;
                 target.setHitNumber(hitCnt);
-                target.setColor(MouseInteraction.getSemiRandomColor(target.getHitNumber()));
+                target.setColor(BouncingBalls.getSemiRandomColor(target.getHitNumber()));
                 aT.run(target,false);
             }
         }

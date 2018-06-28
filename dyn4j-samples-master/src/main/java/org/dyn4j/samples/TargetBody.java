@@ -1,22 +1,19 @@
 package org.dyn4j.samples;
 
 import org.dyn4j.dynamics.BodyFixture;
-import org.dyn4j.dynamics.World;
 import org.dyn4j.geometry.Convex;
-import org.dyn4j.geometry.Transform;
 import org.dyn4j.geometry.Vector2;
 import org.dyn4j.samples.framework.SimulationBody;
 
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
-import java.util.Timer;
 
 public final class TargetBody extends SimulationBody {
     /**
      * Body für die Targets
      */
     private int hitNumber;
-    private static MouseInteraction bB;
+    private static BouncingBalls bB;
     private double currRadius, posX,posY;
     public boolean isTarget = false;
     private boolean growed = false;
@@ -30,8 +27,8 @@ public final class TargetBody extends SimulationBody {
     public void setHitNumber(int hitNo){this.hitNumber = hitNo;}
     public double getCurrRadius(){return this.currRadius;}
     public void setCurrRadius(double rad){this.currRadius = rad;}
-    public void setBouncingBallContr(MouseInteraction tBB){this.bB = tBB;}
-    public static MouseInteraction getBouncingBallContr() {return bB;}
+    public void setBouncingBallContr(BouncingBalls tBB){this.bB = tBB;}
+    public static BouncingBalls getBouncingBallContr() {return bB;}
     public void setGrowed(boolean stat){this.growed = stat;}
     public boolean getGrowed(){return this.growed;}
     public void setTimer(int timer){this.timerForAni = timer;}

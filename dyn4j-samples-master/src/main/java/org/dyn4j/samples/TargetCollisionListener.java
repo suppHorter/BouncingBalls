@@ -33,9 +33,8 @@ public class TargetCollisionListener extends CollisionAdapter {
         {
             if (!booster.getActive())
             {
-                System.out.println("Booster");
                 booster.setActive(true);
-                bB.activateBooster(0);
+                bB.activateBooster(booster.getType());
                 world.removeBody(booster);
             }
         }
@@ -45,12 +44,9 @@ public class TargetCollisionListener extends CollisionAdapter {
             if ((this.hitCnt <= 1)||(target.getHitNumber()<=1))
             {
                 world.removeBody(target);
-                //bB.activateBooster(1);
-                //aT.run(target,true);
             }else
             {
-                this.hitCnt--;
-                target.setHitNumber(hitCnt);
+                target.setHitNumber(target.getHitNumber()-1);
                 target.setColor(BouncingBalls.getSemiRandomColor(target.getHitNumber()));
                 aT.run(target,false);
             }

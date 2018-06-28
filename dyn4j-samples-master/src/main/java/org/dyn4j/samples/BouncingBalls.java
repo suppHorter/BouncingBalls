@@ -184,16 +184,25 @@ public class BouncingBalls extends SimulationFrame {
     {
         switch (type)
         {
-            case 0:
+            case 0: //Trampolin
                 if (!trampActive)
                 {
                     this.world.addBody(boosterTramp);
                     trampActive = true;
                 }
                 break;
-            case 1:
+            case 1: //Bombe
+                for (int i=0;i<targetSack.size();i++)
+                {
+                    targetSack.get(i).setHitNumber(targetSack.get(i).getHitNumber()-5);
+                    if (targetSack.get(i).getHitNumber()<=0)
+                    {
+                        world.removeBody(targetSack.get(i));
+                    }
+                }
                 break;
-            case 2:
+            case 2: //großere Schüsse
+
                 break;
             case 3:
                 break;
@@ -394,6 +403,7 @@ public class BouncingBalls extends SimulationFrame {
         booster.setPosY(yKoord);
         booster.setColor(Color.GREEN);
         booster.addFixture(fixture);
+        booster.setType(type);
         fixture.setRestitution(0.6);
         booster.translate(xKoord,yKoord);
         booster.setMass(MassType.INFINITE);
@@ -458,9 +468,10 @@ public class BouncingBalls extends SimulationFrame {
               boosterPosib = ThreadLocalRandom.current().nextInt(0,  100);
               boosterTypePosib = ThreadLocalRandom.current().nextInt(0,  3);
 
-            if ((boosterPosib > 50)&&(boosterPosib < 60))
+            if ((boosterPosib > 0)&&(boosterPosib < 60))
             {
-                createBooster(boosterTypePosib,Xebenen[i],Yebenen[3]);
+                //createBooster(boosterTypePosib,Xebenen[i],Yebenen[3]);
+                createBooster(1,Xebenen[i],Yebenen[3]);
             }else
             {
                 createTargetBall(Xebenen[i],Yebenen[3]); //-4|-8

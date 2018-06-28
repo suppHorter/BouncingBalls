@@ -57,7 +57,7 @@ public class BouncingBalls extends SimulationFrame {
     private static int MIN_HIT_NUMBER = 5; //Minimalanzahl Treffer benötigt für zerstörung von targets
 	private static int MAX_HIT_NUMBER = 20;//Maximalanzahl Treffer benötigt für zerstörung von targets
     private static int MAXBALLS = 5; //Anzahl an Schuessen pro Salve
-	private static Point POINTSHOOTER = new Point(250,40); //Punkt an dem Schuesse abgefeuert werden
+	private static Point POINTSHOOTER = new Point(260,40); //Punkt an dem Schuesse abgefeuert werden
 	private static int lvlCnt,highScore,currScore;
 
 
@@ -142,7 +142,7 @@ public class BouncingBalls extends SimulationFrame {
 		this.world.addListener(new BoundaryCollisionListener(lowerBounds, world));
 
         //Kanone erstellen
-        BodyFixture fixture = new BodyFixture(Geometry.createRectangle(2.7, 0.9));
+        BodyFixture fixture = new BodyFixture(Geometry.createRectangle(6, 03));
         //Kollision deaktivieren
         fixture.setSensor(true);
 
@@ -359,7 +359,7 @@ public class BouncingBalls extends SimulationFrame {
         }
     }
 
-    //Farbe anhand der restlichen schritte wählen
+    //Farbe anhand der restlichen HitNumbers für die Targets wählen
     public static final Color getSemiRandomColor(int i) {
         int diff = MAX_HIT_NUMBER - MIN_HIT_NUMBER;
         int step = 	Math.round(diff/6);
@@ -381,10 +381,9 @@ public class BouncingBalls extends SimulationFrame {
         if (i < MIN_HIT_NUMBER + step * 5) {
             return new Color(255,0,0);
         }
-        if (i <= MAX_HIT_NUMBER) {
+        else {
             return new Color(138,0,0);
         }
-        return Color.WHITE;
     }
 
     private Vector2 toWorldCoordinates(Point point) {

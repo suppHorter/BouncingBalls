@@ -63,7 +63,7 @@ public class BouncingBalls extends SimulationFrame {
     private static int MAX_BALLS_TO_CREATE = 3;
     private static int MIN_HIT_NUMBER = 5; //Minimalanzahl Treffer benötigt für zerstörung von targets
 	private static int MAX_HIT_NUMBER = 20;//Maximalanzahl Treffer benötigt für zerstörung von targets
-    private static int MAXBALLS = 5; //Anzahl an Schuessen pro Salve
+    private static int maxBalls = 5; //Anzahl an Schuessen pro Salve
 	private static Point POINTSHOOTER = new Point(250,40); //Punkt an dem Schuesse abgefeuert werden
 
 	private static int highScore,currScore;
@@ -199,7 +199,7 @@ public class BouncingBalls extends SimulationFrame {
                 }
                 break;
             case 2: //großere Schüsse
-
+                    bulletRadius+=0.2;
                 break;
             case 3:
                 break;
@@ -286,7 +286,7 @@ public class BouncingBalls extends SimulationFrame {
 
 		//Nur schießen falls Salve noch nicht beendet wurde
 		if (timercounter_between_balls > TIME_BETWEEN_BALLS
-                && ballsCreated < (MAXBALLS * turn)
+                && ballsCreated < (maxBalls * turn)
                 && canShoot){
 			timercounter_between_balls = 0;
 
@@ -306,7 +306,7 @@ public class BouncingBalls extends SimulationFrame {
 				this.world.addBody(ball);
 				ballsInGame += 1;
 				ballsCreated += 1;
-				if (ballsCreated == (MAXBALLS * turn)){
+				if (ballsCreated == (maxBalls * turn)){
 				    //Kein Schiessen mehr moeglich nachdem alle Schuesse einer Salve abgefeuert wurden
 				    canShoot = false;
 				    //Mausposition nullen
@@ -467,8 +467,7 @@ public class BouncingBalls extends SimulationFrame {
 
             if ((boosterPosib > 0)&&(boosterPosib < 60))
             {
-                //createBooster(boosterTypePosib,Xebenen[i],Yebenen[3]);
-                createBooster(1,Xebenen[i],Yebenen[3]);
+                createBooster(boosterTypePosib,Xebenen[i],Yebenen[3]);
             }else
             {
                 createTargetBall(Xebenen[i],Yebenen[3]); //-4|-8

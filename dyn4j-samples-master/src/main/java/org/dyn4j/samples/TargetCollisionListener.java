@@ -31,7 +31,6 @@ public class TargetCollisionListener extends CollisionAdapter {
                 this.hitCnt--;
                 target.setHitNumber(hitCnt);
                 target.setColor(MouseInteraction.getSemiRandomColor(target.getHitNumber()));
-                world.removeBody(target);
                 aT.run(target,false);
             }
         }

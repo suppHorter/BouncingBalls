@@ -35,10 +35,12 @@ import java.util.List;
 import java.util.*;
 
 import org.dyn4j.collision.Collisions;
+import org.dyn4j.collision.Fixture;
 import org.dyn4j.dynamics.Body;
 import org.dyn4j.dynamics.BodyFixture;
 import org.dyn4j.geometry.*;
 import org.dyn4j.geometry.Polygon;
+import org.dyn4j.geometry.Shape;
 import org.dyn4j.samples.framework.SimulationBody;
 import org.dyn4j.samples.framework.SimulationFrame;
 
@@ -227,12 +229,13 @@ public class MouseInteraction extends SimulationFrame {
                     targetSack.get(i).setTimer(targetSack.get(i).getTimer()-1);
                 }else
                 {
-                    if (targetSack.get(i).getGrowed()== true)
+                    if (targetSack.get(i).getGrowed())
                     {
                         TargetBody tb = targetSack.get(i);
-                        targetSack.get(i).setGrowed(false);
-                        createTargetBall(tb.getPosX(),tb.getPosY(),tb.getCurrRadius()-0.2,tb.getHitNumber(),targetSack.get(i).getColor(),false);
-                        removeTarget(targetSack.get(i));
+                        tb.setGrowed(false);
+                        getsHitAni(tb, false);
+                        //createTargetBall(tb.getPosX(),tb.getPosY(),tb.getCurrRadius()-0.2,tb.getHitNumber(),targetSack.get(i).getColor(),false);
+                        //removeTarget(targetSack.get(i));
                     }
                 }
             }
@@ -328,9 +331,19 @@ public class MouseInteraction extends SimulationFrame {
         posX = target.getPosX();
         posY = target.getPosY();
         rad = target.getCurrRadius();
+        if (grow){
+            BodyFixture fixture = new BodyFixture(Geometry.createCircle(rad + 0.2));
+            target.removeAllFixtures();
+            target.addFixture(fixture);
+            target.setGrowed(true);
+        }else{
+            BodyFixture fixture = new BodyFixture(Geometry.createCircle(rad - 0.2));
+            target.removeAllFixtures();
+            target.addFixture(fixture);
+        }
 
-        removeTarget(target);
-        createTargetBall(posX,posY,rad+0.2,hitNo,target.getColor(),true);
+        //removeTarget(target);
+        //createTargetBall(posX,posY,rad+0.2,hitNo,target.getColor(),true);
 	}
 
     public void destroyedAni(TargetBody target)

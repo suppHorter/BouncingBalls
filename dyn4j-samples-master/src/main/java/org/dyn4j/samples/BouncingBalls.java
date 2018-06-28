@@ -156,6 +156,7 @@ public class BouncingBalls extends SimulationFrame {
         createTargets();
 	}
 
+	//Update wird jede Millisekunde ausgeführt und enthält einen Großteil Gamelogik
 	@Override
 	protected void update(Graphics2D g, double elapsedTime) {
         //Umrechnung der Dimensionen Schusspunkt
@@ -260,7 +261,7 @@ public class BouncingBalls extends SimulationFrame {
         currScoreBox.lvlNumber = currScore;
         fixture.setRestitution(0);
         currScoreBox.setColor(Color.WHITE);
-        currScoreBox.translate(0,10);
+        currScoreBox.translate(-7,15);
         currScoreBox.setMass(MassType.INFINITE);
         this.world.addBody(currScoreBox);
 

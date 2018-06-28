@@ -66,7 +66,7 @@ public class BouncingBalls extends SimulationFrame {
     private static int MAXBALLS = 5; //Anzahl an Schuessen pro Salve
 	private static Point POINTSHOOTER = new Point(250,40); //Punkt an dem Schuesse abgefeuert werden
 
-	private static int lvlCnt,highScore,currScore;
+	private static int highScore,currScore;
 
 	//Booster Aktiv:
     private boolean trampActive = false;
@@ -129,11 +129,14 @@ public class BouncingBalls extends SimulationFrame {
         boosterTramp = new SimulationBody();
 		lowerBounds = new SimulationBody();
 
-		leftWall.addFixture(Geometry.createRectangle(12, 100));
+		BodyFixture wallFixture = new BodyFixture(Geometry.createRectangle(12, 100));
+		wallFixture.setRestitution(1);
+
+		leftWall.addFixture(wallFixture);
 		leftWall.setColor(Color.GRAY);
 		leftWall.translate(-13.9,0);
 
-		rightWall.addFixture(Geometry.createRectangle(12, 100));
+		rightWall.addFixture(wallFixture);
 		rightWall.setColor(Color.GRAY);
 		rightWall.translate(13.9,0);
 
@@ -411,7 +414,7 @@ public class BouncingBalls extends SimulationFrame {
         target.setGrowed(growed);
         target.setCurrRadius(rad);
         target.addFixture(fixture);
-        fixture.setRestitution(0.6);
+        fixture.setRestitution(1);
         target.translate(xKoord,yKoord);
         target.setMass(MassType.INFINITE);
         this.world.addBody(target);

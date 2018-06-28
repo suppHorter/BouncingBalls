@@ -23,6 +23,8 @@ public class BouncingBalls extends SimulationFrame {
     static int ballsInGame = 0;
     //Anzahl aller Schuesse die jemals erstellt wurden
     static int ballsCreated = 0;
+    //Automatik oder Einzelschuss
+    static boolean shootStyle;
     //Man darf nur schiessen wenn die ballsInGame leer geworden sind
     static boolean canShoot = true;
     //Anzahl der erstellten Target Reihen
@@ -44,6 +46,7 @@ public class BouncingBalls extends SimulationFrame {
 	private Point point;
 	//Vektor fuer
 	private Vector2 shootingVector;
+    private Vector2 rapidShootingVector;
 	//Boundary am unteren Ende
 	private Body lowerBounds;
 	//Body fuer Kanone
@@ -78,12 +81,18 @@ public class BouncingBalls extends SimulationFrame {
         @Override
         public void mouseMoved(MouseEvent e) {
             movedPoint = canvas.getMousePosition();
+            Point rapidPoint = new Point(canvas.getMousePosition());
+            //Neuen Vektor für die Schuesse erstellen
+            //Faktor 0,15 da sonst Schüsse zu stark
+            rapidShootingVector = new Vector2();
+            double dx =  0.15 * (rapidPoint.getX() - POINTSHOOTER.getX());
+            double dy = -0.15 * (rapidPoint.getY() - POINTSHOOTER.getY());
+            rapidShootingVector.set(dx, dy);
         }
 		@Override
 		public void mousePressed(MouseEvent e) {
 		    //Maus Klick Position speichern
             if (canShoot) {
-				lvlCnt++;
                 point = new Point(canvas.getMousePosition());
                 //Neuen Vektor für die Schuesse erstellen
                 //Faktor 0,15 da sonst Schüsse zu stark
@@ -109,6 +118,7 @@ public class BouncingBalls extends SimulationFrame {
 
 	protected void initializeWorld() {
 		lvlCnt = 1;
+        shootStyle = false;
         trampBoosterTimer = 0;
         trampActive = false;
 		lvlBox = new LvlBoxBody();
@@ -199,13 +209,15 @@ public class BouncingBalls extends SimulationFrame {
                 }
                 break;
             case 2: //großere Schüsse
-                    if (bulletRadius<1.2)
-                    {
-                        bulletRadius+=0.2;
-                    }
-
+                if (bulletRadius<1.2)
+                {
+                    bulletRadius+=0.2;
+                }
                 break;
-            case 3: //rapid Fire
+            case 3:
+                maxBalls = 50;
+                TIME_BETWEEN_BALLS = 0.1;
+                shootStyle = true;
                 break;
         }
 
@@ -225,12 +237,14 @@ public class BouncingBalls extends SimulationFrame {
             case 2:
                 break;
             case 3:
+                shootStyle = false;
+                maxBalls = 5;
+                TIME_BETWEEN_BALLS = 0.3;
                 break;
         }
     }
 	@Override
 	protected void update(Graphics2D g, double elapsedTime) {
-
         //Umrechnung der Dimensionen Schusspunkt
         Vector2 shootToVector = this.toWorldCoordinates(POINTSHOOTER);
 
@@ -251,10 +265,10 @@ public class BouncingBalls extends SimulationFrame {
 
         trampBoosterTimer += elapsedTime;
         //Zeit für Trampolintimer
-        if (trampBoosterTimer>10)
+        if (trampBoosterTimer>=10)
         {
-            deActivateBooster(0);
             trampBoosterTimer = 0;
+            deActivateBooster(0);
         }
 		//targets erstellen falls momentane Runde abgeschlossen wurde
 		if(turn > 1 && rowsOfTargetsCreated < turn){
@@ -287,15 +301,19 @@ public class BouncingBalls extends SimulationFrame {
                 }
             }
         }
+        else
+        {
+            deActivateBooster(3);
+        }
 
 		//Nur schießen falls Salve noch nicht beendet wurde
 		if (timercounter_between_balls > TIME_BETWEEN_BALLS
-                && ballsCreated < (maxBalls * turn)
+                //&& ballsCreated < (maxBalls * turn)
                 && canShoot){
 			timercounter_between_balls = 0;
 
 			//Wurde geklickt und gibt es einen Vektor
-			if (this.point != null && this.shootingVector != null) {
+			if (this.point != null && this.shootingVector != null && this.rapidShootingVector != null) {
 				//Neuen Schuss erstellen
 				ShotBallBody ball = new ShotBallBody();
 				BodyFixture fixture = new BodyFixture(Geometry.createCircle(bulletRadius));
@@ -304,18 +322,38 @@ public class BouncingBalls extends SimulationFrame {
 				ball.addFixture(fixture);
 				ball.translate(shootToVector);
 				ball.translate(0,-0.2);
-				ball.setLinearVelocity(shootingVector);
-				ball.setMass(MassType.NORMAL);
+
+                if (!shootStyle)
+                {
+                    ball.setLinearVelocity(shootingVector);
+                }
+				else
+                {
+                    ball.setLinearVelocity(rapidShootingVector);
+                }
+
+                ball.setMass(MassType.NORMAL);
                 //Schuss der Welt hinzufuegen
 				this.world.addBody(ball);
 				ballsInGame += 1;
 				ballsCreated += 1;
-				if (ballsCreated == (maxBalls * turn)){
+				System.out.println(ballsCreated);
+                if ((ballsCreated >= maxBalls)&&shootStyle==true)
+                {
+                    rapidShootingVector = null;
+                    canShoot = false;
+                    point = null;
+                    ballsCreated = 0;
+                    deActivateBooster(3);
+                    maxBalls = 5;
+                }
+				if ((ballsCreated == (maxBalls * turn))&& !shootStyle){
 				    //Kein Schiessen mehr moeglich nachdem alle Schuesse einer Salve abgefeuert wurden
 				    canShoot = false;
 				    //Mausposition nullen
 				    point = null;
                 }
+
 			}
 		}
 		super.update(g, elapsedTime);
@@ -467,11 +505,12 @@ public class BouncingBalls extends SimulationFrame {
 		for(int i = 0; i < randomNoBalls + 1; i++){
             ///createTargetBall(Xebenen[0],Yebenen[3]); //-4|-8
               boosterPosib = ThreadLocalRandom.current().nextInt(0,  100);
-              boosterTypePosib = ThreadLocalRandom.current().nextInt(0,  3);
+              boosterTypePosib = ThreadLocalRandom.current().nextInt(0,  4);
 
             if ((boosterPosib > 45)&&(boosterPosib < 60))
             {
                 createBooster(boosterTypePosib,Xebenen[i],Yebenen[3]);
+                //createBooster(3,Xebenen[i],Yebenen[3]);
             }else
             {
                 createTargetBall(Xebenen[i],Yebenen[3]); //-4|-8

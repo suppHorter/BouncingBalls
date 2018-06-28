@@ -11,7 +11,7 @@ import java.awt.*;
 import java.awt.geom.Ellipse2D;
 import java.util.Timer;
 
-public final class TargetBody extends SimulationBody {
+public class TargetBody extends SimulationBody {
     /**
      * Body für die Targets
      */

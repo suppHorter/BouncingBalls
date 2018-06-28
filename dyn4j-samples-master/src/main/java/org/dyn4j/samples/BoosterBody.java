@@ -1,5 +1,6 @@
 package org.dyn4j.samples;
 
+import netscape.security.Target;
 import org.dyn4j.dynamics.BodyFixture;
 import org.dyn4j.geometry.Convex;
 import org.dyn4j.geometry.Vector2;
@@ -7,27 +8,19 @@ import org.dyn4j.samples.framework.SimulationBody;
 
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
+import java.util.Timer;
 
-public class BoosterBody extends SimulationBody{
+public class BoosterBody extends TargetBody{
 
     int type;
+    Timer aliveTimer;
+    private static MouseInteraction bB;
+    public int getType(){return this.type;}
+    public void setType(int type){this.type = type;}
 
-    public BoosterBody(int type)
-    {
-        this.type = type;
+    public BoosterBody()
+    {}
 
-        switch (this.type)
-        {
-            case 0:
-                break;
-            case 1:
-                break;
-            case 2:
-                break;
-            case 3:
-                break;
-        }
-    }
     @Override
     protected void renderFixture(Graphics2D g, double scale, BodyFixture fixture, Color color) {
         // Cirlce fixture holen
@@ -47,5 +40,10 @@ public class BoosterBody extends SimulationBody{
         // Zahl im Target anzeigen
         g.scale(1, -1);
         g.setFont(new Font("Default", Font.PLAIN, 20));
+        //Offset für Beschriftung anhand der hitNumber erstellen
+        //Schriftbreite = 7 also bei zweistelligen zahlen 2 * 7
+        int offsetX = String.valueOf("Booster").length() * 7;
+        int offsetY = 7;
+        g.drawString(String.valueOf("Booster"), (int)center.x-offsetX, (int)center.y+offsetY);
     }
 }

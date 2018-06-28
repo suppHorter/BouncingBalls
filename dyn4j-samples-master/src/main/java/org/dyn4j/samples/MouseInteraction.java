@@ -62,6 +62,7 @@ public class MouseInteraction extends SimulationFrame {
 	static double[] Yebenen = {4,0,-4,-8};
 	static double[] Xebenen = {-5, 0, 5};
 	private LvlBoxBody lvlBox,highScoreBox, currScoreBox;
+    private SimulationBody boosterTramp;
 
 	static ArrayList<TargetBody> targetSack= new ArrayList<>();
 
@@ -100,7 +101,6 @@ public class MouseInteraction extends SimulationFrame {
         @Override
         public void mouseMoved(MouseEvent e) {
             movedPoint = canvas.getMousePosition();
-
         }
 
 		@Override
@@ -147,6 +147,7 @@ public class MouseInteraction extends SimulationFrame {
 		SimulationBody leftWall = new SimulationBody();
 		SimulationBody rightWall = new SimulationBody();
 		SimulationBody ceiling = new SimulationBody();
+        boosterTramp = new SimulationBody();
 		lowerBounds = new SimulationBody();
 
 		leftWall.addFixture(Geometry.createRectangle(12, 100));
@@ -161,12 +162,17 @@ public class MouseInteraction extends SimulationFrame {
 		ceiling.setColor(Color.GRAY);
 		ceiling.translate(0,17);
 
+        boosterTramp.addFixture(Geometry.createRectangle(50, 0.5));
+        boosterTramp.setColor(Color.GREEN);
+        boosterTramp.translate(0,-10);
+
 		lowerBounds.addFixture(Geometry.createRectangle(50, 10));
 		lowerBounds.translate(0, -40);
 
 	    leftWall.setMass(MassType.INFINITE);
 		rightWall.setMass(MassType.INFINITE);
 		ceiling.setMass(MassType.INFINITE);
+        boosterTramp.setMass(MassType.INFINITE);
 		lowerBounds.setMass(MassType.INFINITE);
 
 	    this.world.addBody(leftWall);
@@ -190,8 +196,32 @@ public class MouseInteraction extends SimulationFrame {
         createTargets();
 	}
 
+	public void activateBooster(int type)
+    {
+        switch (type)
+        {
+            case 0:
+                this.world.addBody(boosterTramp);
+                break;
+            case 1:
+                break;
+            case 2:
+                break;
+            case 3:
+                break;
+        }
+
+    }
+
+    public void deActivateBooster()
+    {
+        //Hier alle Booster löschen (nach Zugende)this.world.removeBody(boosterTramp);
+        this.world.removeBody(boosterTramp);
+    }
 	@Override
 	protected void update(Graphics2D g, double elapsedTime) {
+	    int boosterPosib,boosterTypePosib;
+
         //Umrechnung der Dimensionen Schusspunkt
         Vector2 shootToVector = this.toWorldCoordinates(POINTSHOOTER);
 
@@ -216,9 +246,11 @@ public class MouseInteraction extends SimulationFrame {
                 if (targetSack.size() > 0) {
                     liftBalls();
                     lvlBox.lvlNumber = lvlCnt;
+                    deActivateBooster();
                 }
                 createTargets();
         }
+
         //Animation beenden
         if (targetSack.size()>0)
         {
@@ -324,7 +356,7 @@ public class MouseInteraction extends SimulationFrame {
         target.removeAllFixtures();
     }
 
-    public void getsHitAni(TargetBody target, boolean grow) {
+    public void getsHitAni(TargetBody target,boolean grow) {
         int hitNo;
         double rad,posX,posY;
         hitNo = target.getHitNumber();
@@ -351,7 +383,23 @@ public class MouseInteraction extends SimulationFrame {
         removeTarget(target);
     }
 
-    private TargetBody createTargetBall(double xKoord, double yKoord,double rad,int hitNo,Color color,boolean growed)
+    private void createBooster(int type, double xKoord, double yKoord)
+    {
+        BoosterBody booster = new BoosterBody();
+        BodyFixture fixture = new BodyFixture(Geometry.createCircle(0.3));
+        booster.setPosX(xKoord);
+        booster.setPosY(yKoord);
+        booster.setColor(Color.GREEN);
+        booster.addFixture(fixture);
+        fixture.setRestitution(0.6);
+        booster.translate(xKoord,yKoord);
+        booster.setMass(MassType.INFINITE);
+        this.world.addBody(booster);
+        this.world.addListener(new TargetCollisionListener(booster, world, booster.getHitNumber()));
+        targetSack.add(booster);
+    }
+
+    private void createTargetBall(double xKoord, double yKoord,double rad,int hitNo,Color color,boolean growed)
     {
         TargetBody target = new TargetBody();
         target.setBouncingBallContr(this);
@@ -369,7 +417,6 @@ public class MouseInteraction extends SimulationFrame {
         this.world.addBody(target);
         this.world.addListener(new TargetCollisionListener(target, world, target.getHitNumber()));
         targetSack.add(target);
-        return target;
     }
 
 	private void createTargetBall(double xKoord, double yKoord)
@@ -403,10 +450,23 @@ public class MouseInteraction extends SimulationFrame {
         rowsOfTargetsCreated += 1;
 		//Zufallsanzahl an Baellen
         int randomPosBallsArr[] = new int[3];
-		int randomNoBalls = ThreadLocalRandom.current().nextInt(MIN_BALLS_TO_CREATE, MAX_BALLS_TO_CREATE );
+        int boosterPosib;
+        int boosterTypePosib;
+		int randomNoBalls = ThreadLocalRandom.current().nextInt(MIN_BALLS_TO_CREATE, MAX_BALLS_TO_CREATE );//Create Booster
+
 		for(int i = 0; i < randomNoBalls + 1; i++){
             ///createTargetBall(Xebenen[0],Yebenen[3]); //-4|-8
-            createTargetBall(Xebenen[i],Yebenen[3]); //-4|-8
+              boosterPosib = ThreadLocalRandom.current().nextInt(0,  100);
+              boosterTypePosib = ThreadLocalRandom.current().nextInt(0,  3);
+
+            if ((boosterPosib > 30)&&(boosterPosib < 80))
+            {
+                createBooster(boosterTypePosib,Xebenen[i],Yebenen[3]);
+            }else
+            {
+                createTargetBall(Xebenen[i],Yebenen[3]); //-4|-8
+            }
+
         }
 	}
 

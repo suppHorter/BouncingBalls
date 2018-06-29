@@ -39,11 +39,15 @@ public class BoosterBody extends TargetBody{
                 break;
             case 2:     //Größere
                 this.typeCol = Color.YELLOW;
-                this.description = "+";
+                this.description = "O";
                 break;
             case 3:
                 this.typeCol = Color.RED;
                 this.description = "---";
+                break;
+            case 4:
+                this.typeCol = new Color(18,255,70);
+                this.description = "+";
                 break;
         }
     }

@@ -36,7 +36,7 @@ public class BouncingBalls extends SimulationFrame {
 	static double[] Yebenen = {4,0,-4,-8};
 	static double[] Xebenen = {-5, 0, 5};
 	//Anzeigeboxen
-	private LvlBoxBody lvlBox,highScoreBox, currScoreBox;
+	private LvlBoxBody lvlBox,highScoreBox, currScoreBox,currShotsBox;
     //Liste von Targets für diverse Zwecke
     private SimulationBody boosterTramp;
 
@@ -59,23 +59,26 @@ public class BouncingBalls extends SimulationFrame {
     private static double trampBoosterTimer;
     //Zaehlt die vergangenen Sekunden - wird zurückgedsetzt
     private static double timercounter_between_balls;
+    private static int min_hit_number = 0; //Minimalanzahl Treffer benötigt für zerstörung von targets
+    private static int max_hit_number = 20;//Maximalanzahl Treffer benötigt für zerstörung von targets
 
     //Constants für die Gamelogik
 	private static double TIME_BETWEEN_BALLS = 0.3; //Zeit zwischen den Schuessen einer Salve
     private static int MIN_BALLS_TO_CREATE = 1;
     private static int MAX_BALLS_TO_CREATE = 3;
-    private static int MIN_HIT_NUMBER = 5; //Minimalanzahl Treffer benötigt für zerstörung von targets
-	private static int MAX_HIT_NUMBER = 20;//Maximalanzahl Treffer benötigt für zerstörung von targets
     private static int maxBalls = 5; //Anzahl an Schuessen pro Salve
 	private static Point POINTSHOOTER = new Point(250,40); //Punkt an dem Schuesse abgefeuert werden
-
-	private static int highScore,currScore;
+    private static boolean allowedBoosters = true;
 
 	//Booster Aktiv:
     private boolean trampActive = false;
     private boolean bombActive = false;
 
 
+    private int highScore,currScore;
+
+    public void setCurrScore(int score){this.currScore = score;}
+    public int getCurrScore(){return this.currScore;}
 	private final class CustomMouseAdapter extends MouseAdapter {
 
         @Override
@@ -116,17 +119,20 @@ public class BouncingBalls extends SimulationFrame {
 		this.canvas.addMouseListener(ml);
 	}
 
+
 	protected void initializeWorld() {
 		lvlCnt = 1;
         shootStyle = false;
         trampBoosterTimer = 0;
         trampActive = false;
 		lvlBox = new LvlBoxBody();
-		//highScoreBox = new LvlBoxBody();
-		//currScoreBox = new LvlBoxBody();
+		highScoreBox = new LvlBoxBody();
+		currScoreBox = new LvlBoxBody();
+        currShotsBox = new LvlBoxBody();
 		createLvlLbl();
-        //createHighScore();
-        //createCurrScore();
+        createHighScore();
+        createCurrScore();
+        createCurrShotsBox();
 		//Gravitation der Welt anpassen
         Vector2 gravityVector = new Vector2();
         gravityVector.set(0,-30);
@@ -211,13 +217,19 @@ public class BouncingBalls extends SimulationFrame {
             case 2: //großere Schüsse
                 if (bulletRadius<1.2)
                 {
-                    bulletRadius+=0.2;
+                    bulletRadius+=0.1;
                 }
                 break;
-            case 3:
-                maxBalls = 50;
-                TIME_BETWEEN_BALLS = 0.1;
-                shootStyle = true;
+            case 3: //Rapid Fire
+                if (!shootStyle)
+                {
+                    maxBalls += 20;
+                    TIME_BETWEEN_BALLS = 0.1;
+                    shootStyle = true;
+                }
+                break;
+            case 4: // Zusatzschuss
+                maxBalls++;
                 break;
         }
 
@@ -231,6 +243,7 @@ public class BouncingBalls extends SimulationFrame {
             case 0:
                 this.world.removeBody(boosterTramp);
                 trampActive = false;
+                trampBoosterTimer = 0;
                 break;
             case 1:
                 break;
@@ -238,11 +251,15 @@ public class BouncingBalls extends SimulationFrame {
                 break;
             case 3:
                 shootStyle = false;
-                maxBalls = 5;
+                maxBalls -= 20;
                 TIME_BETWEEN_BALLS = 0.3;
+                ballsCreated = 0;
+                break;
+            case 4:
                 break;
         }
     }
+
 	@Override
 	protected void update(Graphics2D g, double elapsedTime) {
         //Umrechnung der Dimensionen Schusspunkt
@@ -270,6 +287,15 @@ public class BouncingBalls extends SimulationFrame {
             trampBoosterTimer = 0;
             deActivateBooster(0);
         }
+        highScoreBox.lvlNumber = currScore;
+        if (maxBalls-ballsInGame>0)
+        {
+            currShotsBox.lvlNumber = maxBalls-ballsInGame;
+        } else
+        {
+            currShotsBox.lvlNumber = 0;
+        }
+
 		//targets erstellen falls momentane Runde abgeschlossen wurde
 		if(turn > 1 && rowsOfTargetsCreated < turn){
                 if (targetSack.size() > 0) {
@@ -279,8 +305,6 @@ public class BouncingBalls extends SimulationFrame {
                 }
                 createTargets();
         }
-
-        //Animation beenden
 
         //Animation für Targetfeedback anhand des Timers beenden
         if (targetSack.size()>0)
@@ -301,10 +325,6 @@ public class BouncingBalls extends SimulationFrame {
                 }
             }
         }
-        else
-        {
-            deActivateBooster(3);
-        }
 
 		//Nur schießen falls Salve noch nicht beendet wurde
 		if (timercounter_between_balls > TIME_BETWEEN_BALLS
@@ -322,7 +342,6 @@ public class BouncingBalls extends SimulationFrame {
 				ball.addFixture(fixture);
 				ball.translate(shootToVector);
 				ball.translate(0,-0.2);
-
                 if (!shootStyle)
                 {
                     ball.setLinearVelocity(shootingVector);
@@ -337,19 +356,17 @@ public class BouncingBalls extends SimulationFrame {
 				this.world.addBody(ball);
 				ballsInGame += 1;
 				ballsCreated += 1;
-				System.out.println(ballsCreated);
                 if ((ballsCreated >= maxBalls)&&shootStyle==true)
                 {
                     rapidShootingVector = null;
                     canShoot = false;
                     point = null;
-                    ballsCreated = 0;
                     deActivateBooster(3);
-                    maxBalls = 5;
                 }
-				if ((ballsCreated == (maxBalls * turn))&& !shootStyle){
+				else if ((ballsCreated == maxBalls)&& !shootStyle){
 				    //Kein Schiessen mehr moeglich nachdem alle Schuesse einer Salve abgefeuert wurden
 				    canShoot = false;
+                    ballsCreated = 0;
 				    //Mausposition nullen
 				    point = null;
                 }
@@ -362,7 +379,7 @@ public class BouncingBalls extends SimulationFrame {
 	private void createLvlLbl()
 	{
 	    //Levelzähler anzeigen
-		BodyFixture fixture = new BodyFixture(Geometry.createRectangle(2,2));
+		BodyFixture fixture = new BodyFixture(Geometry.createRectangle(0.5,0.5));
 		fixture.setSensor(true);
 		lvlBox.addFixture(fixture);
 		lvlBox.lvlNumber = lvlCnt;
@@ -372,7 +389,18 @@ public class BouncingBalls extends SimulationFrame {
 		lvlBox.setMass(MassType.INFINITE);
 		this.world.addBody(lvlBox);
 	}
-
+    private void createCurrShotsBox()
+    {
+        BodyFixture fixture = new BodyFixture(Geometry.createRectangle(2,2));
+        fixture.setSensor(true);
+        currShotsBox.addFixture(fixture);
+        currShotsBox.lvlNumber = currScore;
+        fixture.setRestitution(0);
+        currShotsBox.setColor(Color.GREEN);
+        currShotsBox.translate(2,8.5);
+        currShotsBox.setMass(MassType.INFINITE);
+        this.world.addBody(currShotsBox);
+    }
     private void createCurrScore()
     {
         BodyFixture fixture = new BodyFixture(Geometry.createRectangle(2,2));
@@ -381,7 +409,7 @@ public class BouncingBalls extends SimulationFrame {
         currScoreBox.lvlNumber = currScore;
         fixture.setRestitution(0);
         currScoreBox.setColor(Color.WHITE);
-        currScoreBox.translate(-7,15);
+        currScoreBox.translate(7,9);
         currScoreBox.setMass(MassType.INFINITE);
         this.world.addBody(currScoreBox);
 
@@ -397,7 +425,7 @@ public class BouncingBalls extends SimulationFrame {
         highScoreBox.lvlNumber = highScore;
         fixture.setRestitution(0);
         highScoreBox.setColor(Color.WHITE);
-        highScoreBox.translate(-7,10);
+        highScoreBox.translate(7,8);
         highScoreBox.setMass(MassType.INFINITE);
         this.world.addBody(highScoreBox);
 
@@ -467,7 +495,7 @@ public class BouncingBalls extends SimulationFrame {
         target.translate(xKoord,yKoord);
         target.setMass(MassType.INFINITE);
         this.world.addBody(target);
-        this.world.addListener(new TargetCollisionListener(target, world, target.getHitNumber()));
+        this.world.addListener(new TargetCollisionListener(target, world, target.getHitNumber(),this));
         targetSack.add(target);
     }
 
@@ -479,10 +507,9 @@ public class BouncingBalls extends SimulationFrame {
 		int hitNo;
 		rad =  Math.random()+1;
         BodyFixture fixture = new BodyFixture(Geometry.createCircle(rad));
-        hitNo = ThreadLocalRandom.current().nextInt(10,  20);
+        hitNo = ThreadLocalRandom.current().nextInt(lvlCnt+10,  lvlCnt+20);
         target.setHitNumber(hitNo);
         target.setColor(getSemiRandomColor(target.getHitNumber()));
-        target.setHitNumber(ThreadLocalRandom.current().nextInt(10,  20));
         target.setPosX(xKoord);
         target.setPosY(yKoord);
         target.setCurrRadius(rad);
@@ -491,7 +518,7 @@ public class BouncingBalls extends SimulationFrame {
         target.translate(xKoord,yKoord);
 		target.setMass(MassType.INFINITE);
 		this.world.addBody(target);
-        this.world.addListener(new TargetCollisionListener(target, world, target.getHitNumber()));
+        this.world.addListener(new TargetCollisionListener(target, world, target.getHitNumber(),this));
 		targetSack.add(target);
 	}
 
@@ -505,17 +532,24 @@ public class BouncingBalls extends SimulationFrame {
 		for(int i = 0; i < randomNoBalls + 1; i++){
             ///createTargetBall(Xebenen[0],Yebenen[3]); //-4|-8
               boosterPosib = ThreadLocalRandom.current().nextInt(0,  100);
-              boosterTypePosib = ThreadLocalRandom.current().nextInt(0,  4);
+              boosterTypePosib = ThreadLocalRandom.current().nextInt(0,  5);
 
-            if ((boosterPosib > 45)&&(boosterPosib < 60))
+            if ((boosterPosib > 0)&&(boosterPosib < 40)&&allowedBoosters)
             {
+                //Prüfung ob schon groß genug
+                while ((bulletRadius>=1.2)&&(boosterTypePosib==2))
+                {
+                    //Wenn ja dann solange random bis keine 2 mehr
+                    boosterTypePosib = ThreadLocalRandom.current().nextInt(0,  4);
+                }
                 createBooster(boosterTypePosib,Xebenen[i],Yebenen[3]);
-                //createBooster(3,Xebenen[i],Yebenen[3]);
+                allowedBoosters = false;
             }else
             {
                 createTargetBall(Xebenen[i],Yebenen[3]); //-4|-8
             }
         }
+        allowedBoosters = true;
 	}
 
     //Targets eine Reihe nach oben verschieben
@@ -535,27 +569,28 @@ public class BouncingBalls extends SimulationFrame {
 
     //Farbe anhand der restlichen HitNumbers für die Targets wählen
     public static final Color getSemiRandomColor(int i) {
-        int diff = MAX_HIT_NUMBER - MIN_HIT_NUMBER;
+        int diff = max_hit_number - min_hit_number;
         int step = 	Math.round(diff/6);
-        if(i < MIN_HIT_NUMBER) {
+
+        if(i < min_hit_number) {
             return new Color(0,255,0);
         }
-        if (i < MIN_HIT_NUMBER + step) {
+        if (i < min_hit_number + step) {
             return new Color(81,124,14);
         }
-        if (i < MIN_HIT_NUMBER + step * 2) {
+        if (i < min_hit_number + step * 2) {
             return new Color(166,215,31);
         }
-        if (i < MIN_HIT_NUMBER + step * 3) {
+        if (i < min_hit_number + step * 3) {
             return new Color(255,255,0);
         }
-        if (i < MIN_HIT_NUMBER + step * 4) {
+        if (i < min_hit_number + step * 4) {
             return new Color(255,160,62);
         }
-        if (i < MIN_HIT_NUMBER + step * 5) {
+        if (i < min_hit_number + step * 5) {
             return new Color(255,0,0);
         }
-        if (i <= MAX_HIT_NUMBER) {
+        if (i <= max_hit_number) {
             return new Color(138,0,0);
         }
         return Color.WHITE;

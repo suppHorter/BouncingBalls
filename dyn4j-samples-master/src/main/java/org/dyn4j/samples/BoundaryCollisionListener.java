@@ -27,6 +27,7 @@ public class BoundaryCollisionListener extends CollisionAdapter {
             BouncingBalls.ballsInGame -= 1;
             if (BouncingBalls.ballsInGame == 0) {
                 BouncingBalls.canShoot = true;
+                //BouncingBalls.
                 BouncingBalls.turn += 1;
             }
             return false;

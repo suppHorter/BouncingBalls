@@ -75,6 +75,7 @@ public class StartBallsFrame implements ActionListener{
         start.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                startBalls.setVisible(false);
                 BouncingBalls.main(new String[1]);
             }
         });

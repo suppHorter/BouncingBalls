@@ -42,8 +42,9 @@ public class BouncingBalls extends SimulationFrame {
 
 	//Point um Mauspos. zu speichern
 	private Point point;
-	//Vektor fuer
+	//Vektor fuer Schüsse
 	private Vector2 shootingVector;
+    private Vector2 rapidShootingVector;
 	//Boundary am unteren Ende
 	private Body lowerBounds;
 	//Body fuer Kanone
@@ -78,6 +79,13 @@ public class BouncingBalls extends SimulationFrame {
         @Override
         public void mouseMoved(MouseEvent e) {
             movedPoint = canvas.getMousePosition();
+            Point point1 = new Point(canvas.getMousePosition());
+            //Neuen Vektor für die Schuesse erstellen
+            //Faktor 0,15 da sonst Schüsse zu stark
+            rapidShootingVector = new Vector2();
+            double dx =  0.15 * (point1.getX() - POINTSHOOTER.getX());
+            double dy = -0.15 * (point1.getY() - POINTSHOOTER.getY());
+            rapidShootingVector.set(dx, dy);
         }
 		@Override
 		public void mousePressed(MouseEvent e) {

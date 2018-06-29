@@ -4,7 +4,6 @@ package org.dyn4j.samples;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-
 import java.awt.geom.Line2D;
 import java.util.*;
 
@@ -14,6 +13,8 @@ import org.dyn4j.geometry.*;
 import org.dyn4j.samples.framework.SimulationBody;
 import org.dyn4j.samples.framework.SimulationFrame;
 
+import javax.swing.*;
+import javax.swing.plaf.basic.BasicBorders;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class BouncingBalls extends SimulationFrame {
@@ -39,6 +40,8 @@ public class BouncingBalls extends SimulationFrame {
 	private LvlBoxBody lvlBox,highScoreBox, currScoreBox,currShotsBox;
     //Liste von Targets für diverse Zwecke
     private SimulationBody boosterTramp;
+
+    private MenuButtonBox menuBox;
 
 	static ArrayList<TargetBody> targetSack= new ArrayList<>();
 
@@ -133,6 +136,7 @@ public class BouncingBalls extends SimulationFrame {
         createHighScore();
         createCurrScore();
         createCurrShotsBox();
+        menuBox = new MenuButtonBox();
 		//Gravitation der Welt anpassen
         Vector2 gravityVector = new Vector2();
         gravityVector.set(0,-30);
@@ -180,6 +184,7 @@ public class BouncingBalls extends SimulationFrame {
 
         //Kanone erstellen
         BodyFixture fixture = new BodyFixture(Geometry.createRectangle(6, 03));
+
         //Kollision deaktivieren
         fixture.setSensor(true);
 
@@ -189,9 +194,24 @@ public class BouncingBalls extends SimulationFrame {
         cannon.translate(0,9.5);
         this.world.addBody(cannon);
 
+
+
+        creatMenuButton();
 		//Ersten Targets erstellen
         createTargets();
 	}
+
+	public void creatMenuButton(){
+        BodyFixture fixture = new BodyFixture(Geometry.createRectangle(6, 03));
+        fixture.setSensor(true);
+        menuBox.addFixture(fixture);
+        menuBox.setMass(MassType.INFINITE);
+        menuBox.translate(-7.05, 10.2);
+
+        this.world.addBody(menuBox);
+
+    }
+
 
 	public void activateBooster(int type)
     {
@@ -234,6 +254,7 @@ public class BouncingBalls extends SimulationFrame {
         }
 
     }
+
 
     public void deActivateBooster(int type)
     {
@@ -569,28 +590,27 @@ public class BouncingBalls extends SimulationFrame {
 
     //Farbe anhand der restlichen HitNumbers für die Targets wählen
     public static final Color getSemiRandomColor(int i) {
-        int diff = max_hit_number - min_hit_number;
+        int diff = MAX_HIT_NUMBER - MIN_HIT_NUMBER;
         int step = 	Math.round(diff/6);
-
-        if(i < min_hit_number) {
+        if(i < MIN_HIT_NUMBER) {
             return new Color(0,255,0);
         }
-        if (i < min_hit_number + step) {
+        if (i < MIN_HIT_NUMBER + step) {
             return new Color(81,124,14);
         }
-        if (i < min_hit_number + step * 2) {
+        if (i < MIN_HIT_NUMBER + step * 2) {
             return new Color(166,215,31);
         }
-        if (i < min_hit_number + step * 3) {
+        if (i < MIN_HIT_NUMBER + step * 3) {
             return new Color(255,255,0);
         }
-        if (i < min_hit_number + step * 4) {
+        if (i < MIN_HIT_NUMBER + step * 4) {
             return new Color(255,160,62);
         }
-        if (i < min_hit_number + step * 5) {
+        if (i < MIN_HIT_NUMBER + step * 5) {
             return new Color(255,0,0);
         }
-        if (i <= max_hit_number) {
+        if (i <= MAX_HIT_NUMBER) {
             return new Color(138,0,0);
         }
         return Color.WHITE;

@@ -56,7 +56,8 @@ public abstract class SimulationFrame extends JFrame {
 	 */
 	public SimulationFrame(String name, double scale) {
 		super(name);
-		
+
+		this.setUndecorated(true);
 		// set the scale
 		this.scale = scale;
 		

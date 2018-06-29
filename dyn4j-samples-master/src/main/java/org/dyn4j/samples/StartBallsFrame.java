@@ -19,15 +19,15 @@ public class StartBallsFrame implements ActionListener{
     public Icon title2;
     public Icon title3;
     public Icon title4;
-    public Timer bt;
     public int timerDelay = 1000;
     public int seconds = 0;
-    public JFrame startBalls;
+    public static JFrame startBalls;
+    private static BlinkingThread bt;
 
     //  Main-Methode zum Erzeugen des Startbildschirms und Starten des für das Blinken verantworlichen Threads
     public static void main(String[] args) {
         StartBallsFrame bf = new StartBallsFrame();
-        BlinkingThread bt = new BlinkingThread(bf);
+        bt = new BlinkingThread(bf);
         bt.run();
     }
     // Konstruktor, hier werden alles Felder,Buttons,Fenster erzeugt.
@@ -92,6 +92,15 @@ public class StartBallsFrame implements ActionListener{
         highscore.setContentAreaFilled(false);
         highscore.setBorder(new BasicBorders.ButtonBorder(Color.black, Color.black,Color.black, Color.black));
         highscore.setForeground(Color.WHITE);
+        highscore.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                startBalls.setVisible(false);
+                HighscoreFrame.main(new String[1]);
+
+            }
+        });
 
 
         //Alles für den QUIT Button
@@ -112,7 +121,7 @@ public class StartBallsFrame implements ActionListener{
         startBalls.setResizable(false);
         startBalls.setLocationRelativeTo(null);
         startBalls.setUndecorated(true);
-        //startBalls.setSize(size);
+
         startBalls.add(panel);
         startBalls.setVisible(true);
 

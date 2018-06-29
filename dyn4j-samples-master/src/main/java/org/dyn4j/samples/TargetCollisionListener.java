@@ -6,6 +6,7 @@ import org.dyn4j.dynamics.BodyFixture;
 import org.dyn4j.dynamics.CollisionAdapter;
 import org.dyn4j.dynamics.World;
 
+import java.awt.*;
 import java.lang.annotation.Target;
 
 public class TargetCollisionListener extends CollisionAdapter {

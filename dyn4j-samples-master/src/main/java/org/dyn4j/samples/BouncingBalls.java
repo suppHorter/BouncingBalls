@@ -205,7 +205,7 @@ public class BouncingBalls extends SimulationFrame {
         fixture.setSensor(true);
         menuBox.addFixture(fixture);
         menuBox.setMass(MassType.INFINITE);
-        menuBox.translate(-7, 10);
+        menuBox.translate(-7.05, 10.2);
 
         this.world.addBody(menuBox);
 

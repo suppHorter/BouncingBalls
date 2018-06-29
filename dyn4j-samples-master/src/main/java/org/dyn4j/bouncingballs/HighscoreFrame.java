@@ -1,12 +1,9 @@
-package org.dyn4j.samples;
+package org.dyn4j.bouncingballs;
 import java.awt.event.ActionEvent;
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.plaf.basic.BasicBorders;
-import javax.swing.Timer;
 import java.awt.event.ActionListener;
-
-import javax.swing.*;
 
 public class HighscoreFrame {
 
@@ -32,7 +29,7 @@ public class HighscoreFrame {
         highscoreFrame.setLocationRelativeTo(null);
         highscoreFrame.setUndecorated(true);
 
-        menuIcon = new ImageIcon(".\\dyn4j-samples-master\\src\\main\\java\\org\\dyn4j\\samples\\resources\\menu klein.png");
+        menuIcon = new ImageIcon(".\\dyn4j-bouncingballs-master\\src\\main\\java\\org\\dyn4j\\bouncingballs\\resources\\menu klein.png");
 
         menu = new JButton(menuIcon);
         menu.setBounds(10,10,100,50);

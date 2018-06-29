@@ -1,4 +1,4 @@
-package org.dyn4j.samples;
+package org.dyn4j.bouncingballs;
 
 import javax.swing.*;
 import java.awt.*;

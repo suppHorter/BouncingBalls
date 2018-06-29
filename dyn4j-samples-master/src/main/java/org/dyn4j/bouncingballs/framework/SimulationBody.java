@@ -1,15 +1,13 @@
-package org.dyn4j.samples.framework;
+package org.dyn4j.bouncingballs.framework;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
-import java.util.concurrent.ThreadLocalRandom;
 
 import org.dyn4j.dynamics.Body;
 import org.dyn4j.dynamics.BodyFixture;
 import org.dyn4j.geometry.Convex;
-import org.dyn4j.geometry.Shape;
 
 /**
  * Custom Body class to add drawing functionality.

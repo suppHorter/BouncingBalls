@@ -1,4 +1,4 @@
-package org.dyn4j.samples.framework;
+package org.dyn4j.bouncingballs.framework;
 
 import java.awt.Canvas;
 import java.awt.Color;
@@ -18,7 +18,7 @@ import javax.swing.UnsupportedLookAndFeelException;
 import org.dyn4j.dynamics.World;
 
 /**
- * A very VERY simple framework for building samples.
+ * A very VERY simple framework for building bouncingballs.
  * @since 3.2.0
  * @version 3.2.0
  */

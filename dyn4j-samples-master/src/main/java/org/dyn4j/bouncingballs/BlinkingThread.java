@@ -1,4 +1,4 @@
-package org.dyn4j.samples;
+package org.dyn4j.bouncingballs;
 
 public class BlinkingThread extends Thread {
 

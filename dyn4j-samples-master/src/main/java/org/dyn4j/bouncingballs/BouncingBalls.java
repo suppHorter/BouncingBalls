@@ -1,5 +1,5 @@
 
-package org.dyn4j.samples;
+package org.dyn4j.bouncingballs;
 
 import java.awt.*;
 import java.awt.event.MouseAdapter;
@@ -10,11 +10,9 @@ import java.util.*;
 import org.dyn4j.dynamics.Body;
 import org.dyn4j.dynamics.BodyFixture;
 import org.dyn4j.geometry.*;
-import org.dyn4j.samples.framework.SimulationBody;
-import org.dyn4j.samples.framework.SimulationFrame;
+import org.dyn4j.bouncingballs.framework.SimulationBody;
+import org.dyn4j.bouncingballs.framework.SimulationFrame;
 
-import javax.swing.*;
-import javax.swing.plaf.basic.BasicBorders;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class BouncingBalls extends SimulationFrame {

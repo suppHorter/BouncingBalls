@@ -1,10 +1,8 @@
-package org.dyn4j.samples;
+package org.dyn4j.bouncingballs;
 
-import netscape.security.Target;
 import org.dyn4j.dynamics.BodyFixture;
 import org.dyn4j.geometry.Convex;
 import org.dyn4j.geometry.Vector2;
-import org.dyn4j.samples.framework.SimulationBody;
 
 import java.awt.*;
 import java.awt.geom.Ellipse2D;

@@ -1,14 +1,11 @@
-package org.dyn4j.samples;
+package org.dyn4j.bouncingballs;
 
 import org.dyn4j.collision.narrowphase.Penetration;
 import org.dyn4j.dynamics.Body;
 import org.dyn4j.dynamics.BodyFixture;
 import org.dyn4j.dynamics.CollisionAdapter;
 import org.dyn4j.dynamics.World;
-import org.dyn4j.samples.framework.SimulationBody;
 
-import java.awt.*;
-import java.lang.annotation.Target;
 import java.util.ArrayList;
 
 public class TargetCollisionListener extends CollisionAdapter {

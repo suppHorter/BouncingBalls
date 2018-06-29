@@ -14,6 +14,7 @@ import org.dyn4j.geometry.*;
 import org.dyn4j.samples.framework.SimulationBody;
 import org.dyn4j.samples.framework.SimulationFrame;
 
+import javax.swing.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class BouncingBalls extends SimulationFrame {
@@ -429,7 +430,7 @@ public class BouncingBalls extends SimulationFrame {
         target.translate(xKoord,yKoord);
         target.setMass(MassType.INFINITE);
         this.world.addBody(target);
-        this.world.addListener(new TargetCollisionListener(target, world, target.getHitNumber()));
+        this.world.addListener(new TargetCollisionListener(target, world, target.getHitNumber(), targetSack));
         targetSack.add(target);
     }
 
@@ -453,7 +454,7 @@ public class BouncingBalls extends SimulationFrame {
         target.translate(xKoord,yKoord);
 		target.setMass(MassType.INFINITE);
 		this.world.addBody(target);
-        this.world.addListener(new TargetCollisionListener(target, world, target.getHitNumber()));
+        this.world.addListener(new TargetCollisionListener(target, world, target.getHitNumber(), targetSack));
 		targetSack.add(target);
 	}
 
@@ -485,7 +486,7 @@ public class BouncingBalls extends SimulationFrame {
             if (targetSack.get(i).getTransform().getTranslationY() >= 3) {
 				//System.out.println("Verloren!!!");
                 targetSack.get(i).removeAllFixtures();
-                //TODO: Game Exit
+                this.endGame();
             } else {
                 targetSack.get(i).translate(0, 4);
                 targetSack.get(i).setPosX(targetSack.get(i).getPosX());
@@ -527,6 +528,17 @@ public class BouncingBalls extends SimulationFrame {
         double x =  (point.getX() - this.canvas.getWidth() / 2.0) / this.scale;
         double y = -(point.getY() - this.canvas.getHeight() / 2.0) / this.scale;
         return new Vector2(x, y);
+    }
+
+    public void endGame() {
+	    this.stop();
+        if (ScoreEntry.checkPlace(lvlCnt) <= 10) {
+            //Neuer Leaderboard Eintrag
+            ScoreDialog scoreDialog = new ScoreDialog(this);
+        }
+        else {
+            //Kein neuer Leaderboardeintrag
+        }
     }
 
 	public static void main(String[] args) {

@@ -5,9 +5,11 @@ import org.dyn4j.dynamics.Body;
 import org.dyn4j.dynamics.BodyFixture;
 import org.dyn4j.dynamics.CollisionAdapter;
 import org.dyn4j.dynamics.World;
+import org.dyn4j.samples.framework.SimulationBody;
 
 import java.awt.*;
 import java.lang.annotation.Target;
+import java.util.ArrayList;
 
 public class TargetCollisionListener extends CollisionAdapter {
     private TargetBody target;
@@ -15,11 +17,13 @@ public class TargetCollisionListener extends CollisionAdapter {
     private BouncingBalls bB;
     private World world;
     private int hitCnt;
+    private ArrayList<TargetBody> targetSack;
 
-    TargetCollisionListener(TargetBody target, World world, int hits) {
+    TargetCollisionListener(TargetBody target, World world, int hits, ArrayList<TargetBody> targetSack) {
         this.target = target;
         this.world = world;
         this.hitCnt = hits;
+        this.targetSack = targetSack;
     }
     TargetCollisionListener(BoosterBody booster, World world, BouncingBalls bB) {
         this.booster = booster;
@@ -45,6 +49,7 @@ public class TargetCollisionListener extends CollisionAdapter {
             if ((this.hitCnt <= 1)||(target.getHitNumber()<=1))
             {
                 world.removeBody(target);
+                targetSack.remove(target);
             }else
             {
                 target.setHitNumber(target.getHitNumber()-1);

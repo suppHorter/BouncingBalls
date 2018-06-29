@@ -19,10 +19,11 @@ public class TargetCollisionListener extends CollisionAdapter {
     private int hitCnt;
     private ArrayList<TargetBody> targetSack;
 
-    TargetCollisionListener(TargetBody target, World world, int hits, ArrayList<TargetBody> targetSack) {
+    TargetCollisionListener(TargetBody target, World world, int hits, BouncingBalls bB, ArrayList<TargetBody> targetSack) {
         this.target = target;
         this.world = world;
         this.hitCnt = hits;
+        this.bB = bB;
         this.targetSack = targetSack;
     }
     TargetCollisionListener(BoosterBody booster, World world, BouncingBalls bB) {
@@ -50,6 +51,7 @@ public class TargetCollisionListener extends CollisionAdapter {
             {
                 world.removeBody(target);
                 targetSack.remove(target);
+                bB.setCurrScore(bB.getCurrScore()+1);
             }else
             {
                 target.setHitNumber(target.getHitNumber()-1);

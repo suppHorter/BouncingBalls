@@ -140,12 +140,15 @@ public class BouncingBalls extends SimulationFrame {
 		highScoreBox = new LvlBoxBody();
 		currScoreBox = new LvlBoxBody();
         currShotsBox = new LvlBoxBody();
-		createLvlLbl();
+
+        createLvlLbl();
         createHighScore();
         createCurrScore();
         createCurrShotsBox();
+
         menuBox = new MenuButtonBox();
-		//Gravitation der Welt anpassen
+
+        //Gravitation der Welt anpassen
         Vector2 gravityVector = new Vector2();
         gravityVector.set(0,-30);
         this.world.setGravity(gravityVector);
@@ -302,6 +305,7 @@ public class BouncingBalls extends SimulationFrame {
         if (movedPoint != null){
             Vector2 aimLine = this.toWorldCoordinates(movedPoint);
             g.setColor(Color.LIGHT_GRAY);
+            //TODO: Linienfarbe je nach Schussstärke setzen
             g.draw(new Line2D.Double(shootToVector.x * scale, shootToVector.y * scale, aimLine.x * scale, aimLine.y * scale));
             //Rotation Kanone
 			Vector2 xAxis = new Vector2(1.0, 0.0);
@@ -382,7 +386,7 @@ public class BouncingBalls extends SimulationFrame {
 				ballsInGame += 1;
 				ballsCreated += 1;
                 currShotsBox.lvlNumber = maxBalls - ballsCreated;
-                if ((ballsCreated >= maxBalls)&&shootStyle==true)
+                if ((ballsCreated >= maxBalls)&&shootStyle)
                 {
                     rapidShootingVector = null;
                     canShoot = false;
@@ -632,9 +636,10 @@ public class BouncingBalls extends SimulationFrame {
 
     public void endGame() {
 	    this.stop();
-        if (ScoreEntry.checkPlace(lvlCnt) <= 10) {
+	    int place = ScoreEntry.checkPlace(lvlCnt);
+        if (place <= 10) {
             //Neuer Leaderboard Eintrag
-            ScoreDialog scoreDialog = new ScoreDialog(this);
+            ScoreDialog scoreDialog = new ScoreDialog(this, lvlCnt, place);
         }
         else {
             //Kein neuer Leaderboardeintrag

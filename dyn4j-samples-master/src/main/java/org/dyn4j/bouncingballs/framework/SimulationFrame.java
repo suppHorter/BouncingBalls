@@ -1,4 +1,4 @@
-package org.dyn4j.samples.framework;
+package org.dyn4j.bouncingballs.framework;
 
 import java.awt.Canvas;
 import java.awt.Color;
@@ -18,7 +18,7 @@ import javax.swing.UnsupportedLookAndFeelException;
 import org.dyn4j.dynamics.World;
 
 /**
- * A very VERY simple framework for building samples.
+ * A very VERY simple framework for building bouncingballs.
  * @since 3.2.0
  * @version 3.2.0
  */
@@ -123,6 +123,7 @@ public abstract class SimulationFrame extends JFrame {
 		// enable double buffering (the JFrame has to be
 		// visible before this can be done)
 		this.canvas.createBufferStrategy(2);
+		this.stopped = false;
 		// run a separate thread to do active rendering
 		// because we don't want to do it on the EDT
 		Thread thread = new Thread() {
@@ -267,7 +268,7 @@ public abstract class SimulationFrame extends JFrame {
 	 * Stops the simulation.
 	 */
 	public synchronized void stop() {
-		this.stopped = true;
+			this.stopped = true;
 	}
 	
 	/**

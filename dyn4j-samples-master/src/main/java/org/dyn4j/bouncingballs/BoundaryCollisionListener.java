@@ -1,4 +1,4 @@
-package org.dyn4j.samples;
+package org.dyn4j.bouncingballs;
 
 import org.dyn4j.collision.narrowphase.Penetration;
 import org.dyn4j.dynamics.Body;

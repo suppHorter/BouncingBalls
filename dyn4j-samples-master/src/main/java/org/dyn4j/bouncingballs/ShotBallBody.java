@@ -1,19 +1,18 @@
-package org.dyn4j.samples;
+package org.dyn4j.bouncingballs;
 
 import org.dyn4j.dynamics.BodyFixture;
 import org.dyn4j.geometry.Convex;
 import org.dyn4j.geometry.Vector2;
-import org.dyn4j.samples.framework.SimulationBody;
+import org.dyn4j.bouncingballs.framework.SimulationBody;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
-import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
 public class ShotBallBody extends SimulationBody {
 
-    public BufferedImage image = getImageSuppressExceptions("/org/dyn4j/samples/resources/shot.png");
+    public BufferedImage image = getImageSuppressExceptions("/org/dyn4j/bouncingballs/resources/shot.png");
 
     @Override
     protected void renderFixture(Graphics2D g, double scale, BodyFixture fixture, Color color) {

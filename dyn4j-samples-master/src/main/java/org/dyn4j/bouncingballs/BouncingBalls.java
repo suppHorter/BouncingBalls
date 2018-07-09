@@ -1,5 +1,5 @@
 
-package org.dyn4j.samples;
+package org.dyn4j.bouncingballs;
 
 import java.awt.*;
 import java.awt.event.MouseAdapter;
@@ -10,14 +10,16 @@ import java.util.*;
 import org.dyn4j.dynamics.Body;
 import org.dyn4j.dynamics.BodyFixture;
 import org.dyn4j.geometry.*;
-import org.dyn4j.samples.framework.SimulationBody;
-import org.dyn4j.samples.framework.SimulationFrame;
+import org.dyn4j.bouncingballs.framework.SimulationBody;
+import org.dyn4j.bouncingballs.framework.SimulationFrame;
 
 import javax.swing.*;
-import javax.swing.plaf.basic.BasicBorders;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class BouncingBalls extends SimulationFrame {
+    public JFrame parentFrame;
+
+    private int eg;
     //Durchmesser der Schüsse
     static double bulletRadius = 0.6;
     //Anzahl an Schuessen die momentan im Spiel vorhanden sind (maximal MAXBALLS)
@@ -43,20 +45,21 @@ public class BouncingBalls extends SimulationFrame {
     private LvlBoxBody currShotsBox;
     //Liste von Targets für diverse Zwecke
     private SimulationBody boosterTramp;
-
+    //Menubutton
     private MenuButtonBox menuBox;
-
+    // Zweidimensionales array 3 spalten 4 zeilen
+    static  boolean targetPresent[][] = new boolean[4][3];
 	static ArrayList<TargetBody> targetSack= new ArrayList<>();
-
 	//Point um Mauspos. zu speichern
 	private Point point;
 	//Vektor fuer Schüsse
+
 	private Vector2 shootingVector;
     private Vector2 rapidShootingVector;
 	//Boundary am unteren Ende
 	private Body lowerBounds;
 	//Body fuer Kanone
-	private static CannonBody cannon = new CannonBody();
+	private CannonBody cannon;
 	//Points für Mausposition
     private Point movedPoint;
     //Zaehlt die Vergangenen Sekunden
@@ -67,7 +70,6 @@ public class BouncingBalls extends SimulationFrame {
     private static double timercounter_between_balls;
     private static int min_hit_number = 5; //Minimalanzahl Treffer benötigt für zerstörung von targets
     private static int max_hit_number = 20;//Maximalanzahl Treffer benötigt für zerstörung von targets
-
     //Constants für die Gamelogik
 	private static double TIME_BETWEEN_BALLS = 0.3; //Zeit zwischen den Schuessen einer Salve
     private static int MIN_BALLS_TO_CREATE = 1;
@@ -88,8 +90,13 @@ public class BouncingBalls extends SimulationFrame {
     private int highScore,currScore;
     public void setCurrScore(int score){this.currScore = score;}
     public int getCurrScore(){return this.currScore;}
-	private final class CustomMouseAdapter extends MouseAdapter {
 
+	private final class CustomMouseAdapter extends MouseAdapter {
+        private BouncingBalls bouncingBalls;
+
+        public CustomMouseAdapter(BouncingBalls bouncingBalls) {
+            this.bouncingBalls = bouncingBalls;
+        }
         @Override
         public void mouseMoved(MouseEvent e) {
             movedPoint = canvas.getMousePosition();
@@ -104,12 +111,19 @@ public class BouncingBalls extends SimulationFrame {
 		@Override
 		public void mousePressed(MouseEvent e) {
 		    //Maus Klick Position speichern
-            if (canShoot) {
+            point = new Point(canvas.getMousePosition());
+            if ((point.getX()>23 && point.getX()<96)&&(point.getY()>22 && point.getY()<45))
+            {
+                this.bouncingBalls.stop();
+                this.bouncingBalls.setVisible(false);
+                this.bouncingBalls.parentFrame.setVisible(true);
+                setStandard();
+
+            }else if (canShoot) {
 				lvlCnt++;
 				//Benötigte Schuesse für Ziele in abhängigkeitd es Levels hochsetzen
 				min_hit_number = Math.round((1+lvlCnt/100)*min_hit_number);
                 max_hit_number = Math.round((1+lvlCnt/100)*max_hit_number);
-                point = new Point(canvas.getMousePosition());
                 //Neuen Vektor für die Schuesse erstellen
                 //Faktor 0,15 da sonst Schüsse zu stark
                 shootingVector = new Vector2();
@@ -117,6 +131,7 @@ public class BouncingBalls extends SimulationFrame {
                 double dy = -0.15 * (point.getY() - POINTSHOOTER.getY());
                 shootingVector.set(dx, dy);
             }
+
 		}
 		@Override
 		public void mouseReleased(MouseEvent e) {
@@ -124,14 +139,15 @@ public class BouncingBalls extends SimulationFrame {
 		}
 	}
 
-	public BouncingBalls() {
-		super("Mouse Interaction", 32.0);
-		MouseAdapter ml = new CustomMouseAdapter();
+	public BouncingBalls(JFrame parentFrame) {
+		super("Bouncing Balls", 32.0);
+		this.parentFrame = parentFrame;
+		MouseAdapter ml = new CustomMouseAdapter(this);
 		this.canvas.addMouseMotionListener(ml);
 		this.canvas.addMouseWheelListener(ml);
 		this.canvas.addMouseListener(ml);
+		this.run();
 	}
-
 
 	protected void initializeWorld() {
 		lvlCnt = 1;
@@ -165,28 +181,29 @@ public class BouncingBalls extends SimulationFrame {
 		leftWall.addFixture(wallFixture);
 		leftWall.setColor(Color.GRAY);
 		leftWall.translate(-13.9,0);
+        leftWall.setMass(MassType.INFINITE);
 
 		rightWall.addFixture(wallFixture);
 		rightWall.setColor(Color.GRAY);
 		rightWall.translate(13.9,0);
+        rightWall.setMass(MassType.INFINITE);
 
-		ceiling.addFixture(Geometry.createRectangle(50, 10));
+
+        ceiling.addFixture(Geometry.createRectangle(50, 10));
 		ceiling.setColor(Color.GRAY);
 		ceiling.translate(0,17);
+        ceiling.setMass(MassType.INFINITE);
 
-		BodyFixture trampFix = new BodyFixture(Geometry.createRectangle(50, 0.5));
+
+        BodyFixture trampFix = new BodyFixture(Geometry.createRectangle(50, 0.5));
 		trampFix.setRestitution(200);
         boosterTramp.addFixture(trampFix);
         boosterTramp.setColor(Color.GREEN);
         boosterTramp.translate(0,-10);
+        boosterTramp.setMass(MassType.INFINITE);
 
 		lowerBounds.addFixture(Geometry.createRectangle(50, 10));
 		lowerBounds.translate(0, -40);
-
-	    leftWall.setMass(MassType.INFINITE);
-		rightWall.setMass(MassType.INFINITE);
-		ceiling.setMass(MassType.INFINITE);
-        boosterTramp.setMass(MassType.INFINITE);
 		lowerBounds.setMass(MassType.INFINITE);
 
 	    this.world.addBody(leftWall);
@@ -201,6 +218,7 @@ public class BouncingBalls extends SimulationFrame {
         //Kollision deaktivieren
         fixture.setSensor(true);
 
+        cannon = new CannonBody();
         cannon.addFixture(fixture);
         cannon.setMass(MassType.INFINITE);
         cannon.translate(0.0, 0.0);
@@ -209,12 +227,12 @@ public class BouncingBalls extends SimulationFrame {
 
 
 
-        creatMenuButton();
+        createMenuButton();
 		//Ersten Targets erstellen
         createTargets();
 	}
 
-	public void creatMenuButton(){
+	public void createMenuButton(){
         BodyFixture fixture = new BodyFixture(Geometry.createRectangle(6, 03));
         fixture.setSensor(true);
         menuBox.addFixture(fixture);
@@ -224,7 +242,6 @@ public class BouncingBalls extends SimulationFrame {
         this.world.addBody(menuBox);
 
     }
-
 
 	public void activateBooster(int type)
     {
@@ -243,7 +260,7 @@ public class BouncingBalls extends SimulationFrame {
                     targetSack.get(i).setHitNumber(targetSack.get(i).getHitNumber()-5);
                     if ((targetSack.get(i).getHitNumber()<=0) &&(!(targetSack.get(i) instanceof BoosterBody)))
                     {
-                        world.removeBody(targetSack.get(i));
+                        this.removeTarget(targetSack.get(i));
                     }
                 }
                 break;
@@ -267,7 +284,6 @@ public class BouncingBalls extends SimulationFrame {
         }
 
     }
-
 
     public void deActivateBooster(int type)
     {
@@ -461,12 +477,46 @@ public class BouncingBalls extends SimulationFrame {
         //g.drawString(String.valueOf(hitNumber), (int)radius-12, (int)radius+5);
     }
 
-
     public void removeTarget(TargetBody target)
-    {
-        world.removeBody(target);
-        targetSack.remove(target);
-        target.removeAllFixtures();
+            {
+                world.removeBody(target);
+                targetSack.remove(target);
+                target.removeAllFixtures();
+
+                int j;
+                switch((int)target.getPosX()){
+                    case -5:
+                        j=0;
+                        break;
+                    case 0:
+                        j=1;
+                        break;
+                    case 5:
+                        j=2;
+                        break;
+                    default:
+                        throw new IllegalArgumentException("Das Setzen der X-Koordinate auf einen ungültigen Wert ist nicht erlaubt");
+                }
+                int i;
+                switch((int)target.getPosY()){
+                    case -8:
+                        i=3;
+                        break;
+                    case -4:
+                        i=2;
+                        break;
+                    case 0:
+                        i=1;
+                        break;
+            case 4:
+                i=0;
+                break;
+            default:
+                throw new IllegalArgumentException("Das Setzen der Y-Koordinate auf einen ungültigen Wert ist nicht erlaubt");
+
+
+        }
+        targetPresent[i][j]= false;
     }
 
     //Animation durchführen oder beenden
@@ -490,8 +540,10 @@ public class BouncingBalls extends SimulationFrame {
         removeTarget(target);
     }
 
-    private void createBooster(int type, double xKoord, double yKoord)
+    protected void createBooster(int type, double xKoord, double yKoord)
+
     {
+
         BoosterBody booster = new BoosterBody();
         BodyFixture fixture = new BodyFixture(Geometry.createCircle(0.7));
         booster.setPosX(xKoord);
@@ -500,13 +552,15 @@ public class BouncingBalls extends SimulationFrame {
         booster.setType(type);
         booster.setColor(booster.getColor());
         fixture.setRestitution(0.6);
-        booster.translate(xKoord,yKoord);
+        booster.translate(xKoord, yKoord);
         booster.setMass(MassType.INFINITE);
         this.world.addBody(booster);
         this.world.addListener(new TargetCollisionListener(booster, world, this));
         targetSack.add(booster);
     }
 
+/*
+UNUSED
     private void createTargetBall(double xKoord, double yKoord,double rad,int hitNo,Color color,boolean growed)
     {
         TargetBody target = new TargetBody();
@@ -524,8 +578,9 @@ public class BouncingBalls extends SimulationFrame {
         target.setMass(MassType.INFINITE);
         this.world.addBody(target);
         targetSack.add(target);
-        this.world.addListener(new TargetCollisionListener(target, world, target.getHitNumber(), this, targetSack));
+        this.world.addListener(new TargetCollisionListener(target, world, target.getHitNumber(), this));
     }
+*/
 
 	private void createTargetBall(double xKoord, double yKoord)
     {
@@ -540,14 +595,51 @@ public class BouncingBalls extends SimulationFrame {
         target.setColor(getSemiRandomColor(target.getHitNumber()));
         target.setPosX(xKoord);
         target.setPosY(yKoord);
+        int j;
+        switch((int)xKoord){
+            case -5:
+                j=0;
+                break;
+            case 0:
+                j=1;
+                break;
+            case 5:
+                j=2;
+                break;
+            default:
+                throw new IllegalArgumentException("Das Setzen der X-Koordinate auf einen ungültigen Wert ist nicht erlaubt");
+
+
+
+        }
+        int i;
+        switch((int)yKoord){
+            case -8:
+                i=3;
+                break;
+            case -4:
+                i=2;
+                break;
+            case 0:
+                i=1;
+                break;
+            case 4:
+                i=0;
+                break;
+            default:
+                throw new IllegalArgumentException("Das Setzen der Y-Koordinate auf einen ungültigen Wert ist nicht erlaubt");
+        }
+        targetPresent[i][j]= true;
+
         target.setCurrRadius(rad);
         target.addFixture(fixture);
 		fixture.setRestitution(10);
         target.translate(xKoord,yKoord);
 		target.setMass(MassType.INFINITE);
 		this.world.addBody(target);
+        this.world.addListener(new TargetCollisionListener(target, world, target.getHitNumber(), this));
 		targetSack.add(target);
-        this.world.addListener(new TargetCollisionListener(target, world, target.getHitNumber(), this, targetSack));
+
 	}
 
 	//Zu zerstörende Baelle generieren
@@ -584,17 +676,49 @@ public class BouncingBalls extends SimulationFrame {
 
     //Targets eine Reihe nach oben verschieben
 	public void liftBalls() {
-        for (int i = 0; i < targetSack.size(); i++) {
-            if (targetSack.get(i).getTransform().getTranslationY() >= 3) {
-				//System.out.println("Verloren!!!");
-                targetSack.get(i).removeAllFixtures();
-                this.endGame();
-            } else {
-                targetSack.get(i).translate(0, 4);
-                targetSack.get(i).setPosX(targetSack.get(i).getPosX());
-                targetSack.get(i).setPosY(targetSack.get(i).getPosY()+4);
+
+        for(int i=0; i<=3; i++){
+            for(int j = 0; j <= 2; j++){
+                System.out.print(targetPresent[i][j] + ", ");
             }
+            System.out.println();
         }
+
+        for (eg = 0; eg < targetSack.size(); eg++) {
+                boolean save0 = targetPresent[0][0];
+                boolean save1 = targetPresent[0][1];
+                boolean save2 = targetPresent[0][2];
+                if (save0== true ||save1== true||save2== true) {
+                    this.endGame();
+            } else {
+                targetSack.get(eg).translate(0, 4);
+                targetSack.get(eg).setPosX(targetSack.get(eg).getPosX());
+                targetSack.get(eg).setPosY(targetSack.get(eg).getPosY()+4);
+            }
+
+        }
+        for(int i = 0; i<=2; i++){
+            for(int j=0; j<=2; j++){
+                targetPresent[i][j] = targetPresent[i+1][j];
+            }
+
+        }
+        int k;
+        for(k=0; k<=2; k++){
+
+            targetPresent[3][k] = false;
+
+        }
+
+        System.out.println();
+        System.out.println("Nach LiftBalls");
+        for(int i=0; i<=3; i++){
+            for(int j=0; j<=2; j++){
+                System.out.print(targetPresent[i][j] + ", ");
+            }
+            System.out.println();
+        }
+
     }
 
     //Farbe anhand der restlichen HitNumbers für die Targets wählen
@@ -637,15 +761,33 @@ public class BouncingBalls extends SimulationFrame {
         if (ScoreEntry.checkPlace(lvlCnt) <= 10) {
             //Neuer Leaderboard Eintrag
             ScoreDialog scoreDialog = new ScoreDialog(this);
+            setStandard();
         }
         else {
+            setStandard();
             //Kein neuer Leaderboardeintrag
         }
     }
-
+    public void setStandard(){
+        for(int i = 0; i<=3; i++){
+            for(int j=0; j<=2; j++){
+                targetPresent[i][j] = false;
+            }
+        }
+        maxBalls = 5;
+        shootStyle = true;
+        ballsCreated = 0;
+        canShoot = true;
+        targetSack.clear();
+        turn = 1;
+        rowsOfTargetsCreated = 0;
+        ballsInGame = 0;
+        bulletRadius = 0.6;
+	}
+/*
 	public static void main(String[] args) {
 		BouncingBalls simulation = new BouncingBalls();
 		simulation.run();
 	}
-
+*/
 }

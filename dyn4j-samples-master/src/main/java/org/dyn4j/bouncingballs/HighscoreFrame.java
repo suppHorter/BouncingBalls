@@ -1,38 +1,29 @@
-package org.dyn4j.samples;
+package org.dyn4j.bouncingballs;
 import java.awt.event.ActionEvent;
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.plaf.basic.BasicBorders;
-import javax.swing.Timer;
 import java.awt.event.ActionListener;
-
-import javax.swing.*;
 
 public class HighscoreFrame {
 
-    public JPanel panel;
+    public JFrame parentFrame;
     public JFrame highscoreFrame;
-    public JList scoreList;
     public JButton menu;
     public Icon menuIcon;
+    public JPanel panel;
+    public JList scoreList;
 
-    public static void main(String[] args){
-       HighscoreFrame hf = new HighscoreFrame();
 
-    }
-
-    public HighscoreFrame(){
-
-        scoreList = new JList();
-        scoreList.setLayout(null);
-
+    public HighscoreFrame(JFrame parentFrame){
         highscoreFrame = new JFrame("Highscore");
         highscoreFrame.setSize(500, 700);
         highscoreFrame.setResizable(false);
         highscoreFrame.setLocationRelativeTo(null);
         highscoreFrame.setUndecorated(true);
+        this.parentFrame = parentFrame;
 
-        menuIcon = new ImageIcon(".\\dyn4j-samples-master\\src\\main\\java\\org\\dyn4j\\samples\\resources\\menu klein.png");
+        menuIcon = new ImageIcon(".\\dyn4j-samples-master\\src\\main\\java\\org\\dyn4j\\bouncingballs\\resources\\menu klein.png");
 
         menu = new JButton(menuIcon);
         menu.setBounds(10,10,100,50);
@@ -43,26 +34,23 @@ public class HighscoreFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 highscoreFrame.setVisible(false);
-                StartBallsFrame.startBalls.setVisible(true);
-
+                parentFrame.setVisible(true);
 
             }
         });
 
-
         panel = new JPanel();
         panel.setLayout(null);
         panel.setBackground(Color.black);
-        //panel.add(scoreList);
+        panel.setBounds(100,100,100,100);
         panel.add(menu);
+
+
+        scoreList = new JList();
+        scoreList.setLayout(null);
 
         highscoreFrame.add(panel);
         highscoreFrame.setVisible(true);
-
-
-
-
-
 
     }
 

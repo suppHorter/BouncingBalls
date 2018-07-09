@@ -22,7 +22,7 @@
  * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT 
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.dyn4j.samples;
+package org.dyn4j.bouncingballs;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -38,8 +38,8 @@ import org.dyn4j.geometry.Geometry;
 import org.dyn4j.geometry.MassType;
 import org.dyn4j.geometry.Rectangle;
 import org.dyn4j.geometry.Vector2;
-import org.dyn4j.samples.framework.SimulationBody;
-import org.dyn4j.samples.framework.SimulationFrame;
+import org.dyn4j.bouncingballs.framework.SimulationBody;
+import org.dyn4j.bouncingballs.framework.SimulationFrame;
 
 /**
  * A simple scene illustrating the mapping of images to bodies.
@@ -54,10 +54,10 @@ public class RenderingImagesOnBodies extends SimulationFrame {
 	// images
 
 	/** The basketball image */
-	private static final BufferedImage BASKETBALL = getImageSuppressExceptions("/org/dyn4j/samples/resources/Basketball.png");
+	private static final BufferedImage BASKETBALL = getImageSuppressExceptions("/org/dyn4j/bouncingballs/resources/Basketball.png");
 	
 	/** The create image */
-	private static final BufferedImage CRATE = getImageSuppressExceptions("/org/dyn4j/samples/resources/Crate.png");
+	private static final BufferedImage CRATE = getImageSuppressExceptions("/org/dyn4j/bouncingballs/resources/Crate.png");
 	
 	/** Helper function to read the images from the class path */
 	private static final BufferedImage getImageSuppressExceptions(String pathOnClasspath) {
@@ -79,7 +79,7 @@ public class RenderingImagesOnBodies extends SimulationFrame {
 		public BufferedImage image;
 		
 		/* (non-Javadoc)
-		 * @see org.dyn4j.samples.SimulationBody#renderFixture(java.awt.Graphics2D, double, org.dyn4j.dynamics.BodyFixture, java.awt.Color)
+		 * @see org.dyn4j.bouncingballs.SimulationBody#renderFixture(java.awt.Graphics2D, double, org.dyn4j.dynamics.BodyFixture, java.awt.Color)
 		 */
 		@Override
 		protected void renderFixture(Graphics2D g, double scale, BodyFixture fixture, Color color) {

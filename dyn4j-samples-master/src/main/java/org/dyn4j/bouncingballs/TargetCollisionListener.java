@@ -1,14 +1,11 @@
-package org.dyn4j.samples;
+package org.dyn4j.bouncingballs;
 
 import org.dyn4j.collision.narrowphase.Penetration;
 import org.dyn4j.dynamics.Body;
 import org.dyn4j.dynamics.BodyFixture;
 import org.dyn4j.dynamics.CollisionAdapter;
 import org.dyn4j.dynamics.World;
-import org.dyn4j.samples.framework.SimulationBody;
 
-import java.awt.*;
-import java.lang.annotation.Target;
 import java.util.ArrayList;
 
 public class TargetCollisionListener extends CollisionAdapter {
@@ -19,7 +16,7 @@ public class TargetCollisionListener extends CollisionAdapter {
     private int hitCnt;
     private ArrayList<TargetBody> targetSack;
 
-    TargetCollisionListener(TargetBody target, World world, int hits, BouncingBalls bB, ArrayList<TargetBody> targetSack) {
+    TargetCollisionListener(TargetBody target, World world, int hits, BouncingBalls bB) {
         this.target = target;
         this.world = world;
         this.hitCnt = hits;
@@ -41,6 +38,7 @@ public class TargetCollisionListener extends CollisionAdapter {
             {
                 booster.setActive(true);
                 bB.activateBooster(booster.getType());
+
                 world.removeBody(booster);
             }
         }
@@ -49,14 +47,14 @@ public class TargetCollisionListener extends CollisionAdapter {
             AnimationThread aT = new AnimationThread();
             if ((this.hitCnt <= 1)||(target.getHitNumber()<=1))
             {
-                world.removeBody(target);
-                targetSack.remove(target);
+                bB.removeTarget(target);
                 bB.setCurrScore(bB.getCurrScore()+1);
             }else
             {
                 target.setHitNumber(target.getHitNumber()-1);
                 target.setColor(BouncingBalls.getSemiRandomColor(target.getHitNumber()));
                 aT.run(target,false);
+
             }
         }
         return true;

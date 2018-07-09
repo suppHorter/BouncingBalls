@@ -1,4 +1,4 @@
-package org.dyn4j.samples;
+package org.dyn4j.bouncingballs;
 
 //Setzt Timer und erstellt Animation für den Treffer Feedback  von Targets
 

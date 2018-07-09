@@ -22,7 +22,7 @@
  * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT 
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.dyn4j.samples.framework;
+package org.dyn4j.bouncingballs.framework;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;

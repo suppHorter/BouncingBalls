@@ -1,4 +1,4 @@
-package org.dyn4j.samples;
+package org.dyn4j.bouncingballs;
 
 public class BlinkingThread extends Thread {
 
@@ -13,10 +13,9 @@ public class BlinkingThread extends Thread {
 
         while(true) {
             try {
-               // StartBallsFrame.switchPositions();
+                // StartBallsFrame.switchPositions();
                 sf.blinking();
-                sleep(100);
-
+                sleep(200);
             }
             catch(InterruptedException e) {
             }

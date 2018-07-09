@@ -21,7 +21,7 @@ public class StartBallsFrame implements ActionListener{
     public Icon title4;
     public int timerDelay = 1000;
     public int seconds = 0;
-    public static JFrame startBalls;
+    public JFrame startBalls;
     private static BlinkingThread bt;
 
     //  Main-Methode zum Erzeugen des Startbildschirms und Starten des für das Blinken verantworlichen Threads
@@ -30,26 +30,26 @@ public class StartBallsFrame implements ActionListener{
         bt = new BlinkingThread(bf);
         bt.run();
     }
+
     // Konstruktor, hier werden alles Felder,Buttons,Fenster erzeugt.
     public StartBallsFrame() {
-
         //Erzeugen des Frames
         startBalls = new JFrame("Bouncing Balls");
 
         //Erzeugen der ImageIcons für den blinkenden Titel
-        title1 = new ImageIcon(".\\dyn4j-bouncingballs-master\\src\\main\\java\\org\\dyn4j\\bouncingballs\\resources\\bb1klein.png");
-        title2 = new ImageIcon(".\\dyn4j-bouncingballs-master\\src\\main\\java\\org\\dyn4j\\bouncingballs\\resources\\bb2klein.png");
-        title3 = new ImageIcon(".\\dyn4j-bouncingballs-master\\src\\main\\java\\org\\dyn4j\\bouncingballs\\resources\\bb3klein.png");
-        title4 = new ImageIcon(".\\dyn4j-bouncingballs-master\\src\\main\\java\\org\\dyn4j\\bouncingballs\\resources\\bb4klein.png");
+        title1 = new ImageIcon(".\\bouncingballs\\src\\main\\java\\org\\dyn4j\\bouncingballs\\resources\\bb1klein.png");
+        title2 = new ImageIcon(".\\bouncingballs\\src\\main\\java\\org\\dyn4j\\bouncingballs\\resources\\bb2klein.png");
+        title3 = new ImageIcon(".\\bouncingballs\\src\\main\\java\\org\\dyn4j\\bouncingballs\\resources\\bb3klein.png");
+        title4 = new ImageIcon(".\\ybouncingballs\\src\\main\\java\\org\\dyn4j\\bouncingballs\\resources\\bb4klein.png");
 
         // Array für wechselndes Titelbild
         labellist = new int[]{1, 2, 3, 4};
 
         //Erzeugen der ImageIcons als Button
-        Icon button1 = new ImageIcon(".\\dyn4j-bouncingballs-master\\src\\main\\java\\org\\dyn4j\\bouncingballs\\resources\\startklein.png");
-        Icon button2 = new ImageIcon(".\\dyn4j-bouncingballs-master\\src\\main\\java\\org\\dyn4j\\bouncingballs\\resources\\challengeklein.png");
-        Icon button3 = new ImageIcon(".\\dyn4j-bouncingballs-master\\src\\main\\java\\org\\dyn4j\\bouncingballs\\resources\\quitklein.png");
-        Icon button4 = new ImageIcon(".\\dyn4j-bouncingballs-master\\src\\main\\java\\org\\dyn4j\\bouncingballs\\resources\\highscoreklein.png");
+        Icon button1 = new ImageIcon(".\\bouncingballs\\src\\main\\java\\org\\dyn4j\\bouncingballs\\resources\\startklein.png");
+        Icon button2 = new ImageIcon(".\\bouncingballs\\src\\main\\java\\org\\dyn4j\\bouncingballs\\resources\\challengeklein.png");
+        Icon button3 = new ImageIcon(".\\bouncingballs\\src\\main\\java\\org\\dyn4j\\bouncingballs\\resources\\quitklein.png");
+        Icon button4 = new ImageIcon(".\\bouncingballs\\src\\main\\java\\org\\dyn4j\\bouncingballs\\resources\\highscoreklein.png");
 
         //Erzeugen der Buttons in Form der ImageIcons
         JButton start = new JButton(button1);
@@ -76,7 +76,8 @@ public class StartBallsFrame implements ActionListener{
             @Override
             public void actionPerformed(ActionEvent e) {
                 startBalls.setVisible(false);
-                BouncingBalls.main(new String[1]);
+                BouncingBalls bB = new BouncingBalls(startBalls);
+                bB.setVisible(true);
             }
         });
 
@@ -98,7 +99,7 @@ public class StartBallsFrame implements ActionListener{
             public void actionPerformed(ActionEvent e) {
 
                 startBalls.setVisible(false);
-                HighscoreFrame.main(new String[1]);
+                HighscoreFrame highscoreFrame = new HighscoreFrame(startBalls);
 
             }
         });

@@ -7,18 +7,15 @@ import java.awt.event.ActionListener;
 
 public class HighscoreFrame {
 
+    public JFrame parentFrame;
     public JPanel panel;
     public JFrame highscoreFrame;
     public JList scoreList;
     public JButton menu;
     public Icon menuIcon;
 
-    public static void main(String[] args){
-       HighscoreFrame hf = new HighscoreFrame();
-
-    }
-
-    public HighscoreFrame(){
+    public HighscoreFrame(JFrame parentFrame){
+        this.parentFrame = parentFrame;
 
         scoreList = new JList();
         scoreList.setLayout(null);
@@ -40,9 +37,7 @@ public class HighscoreFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 highscoreFrame.setVisible(false);
-                StartBallsFrame.startBalls.setVisible(true);
-
-
+                parentFrame.setVisible(true);
             }
         });
 

@@ -16,7 +16,7 @@ public class TargetCollisionListener extends CollisionAdapter {
     private int hitCnt;
     private ArrayList<TargetBody> targetSack;
 
-    TargetCollisionListener(TargetBody target, World world, int hits, BouncingBalls bB, ArrayList<TargetBody> targetSack) {
+    TargetCollisionListener(TargetBody target, World world, int hits, BouncingBalls bB) {
         this.target = target;
         this.world = world;
         this.hitCnt = hits;
@@ -46,8 +46,7 @@ public class TargetCollisionListener extends CollisionAdapter {
             AnimationThread aT = new AnimationThread();
             if ((this.hitCnt <= 1)||(target.getHitNumber()<=1))
             {
-                world.removeBody(target);
-                targetSack.remove(target);
+                bB.removeTarget(target);
                 bB.setCurrScore(bB.getCurrScore()+1);
             }else
             {

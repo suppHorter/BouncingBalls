@@ -36,6 +36,7 @@ public abstract class SimulationFrame extends JFrame {
 		super(name);
 
 		this.setUndecorated(true);
+
 		this.scale = scale;
 		this.world = new World();
 

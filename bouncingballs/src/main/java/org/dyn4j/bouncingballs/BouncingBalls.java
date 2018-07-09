@@ -13,9 +13,11 @@ import org.dyn4j.geometry.*;
 import org.dyn4j.bouncingballs.framework.SimulationBody;
 import org.dyn4j.bouncingballs.framework.SimulationFrame;
 
+import javax.swing.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class BouncingBalls extends SimulationFrame {
+    JFrame parentFrame;
     //Durchmesser der Schüsse
     static double bulletRadius = 0.6;
     //Anzahl an Schuessen die momentan im Spiel vorhanden sind (maximal MAXBALLS)
@@ -54,7 +56,7 @@ public class BouncingBalls extends SimulationFrame {
 	//Boundary am unteren Ende
 	private Body lowerBounds;
 	//Body fuer Kanone
-	private static CannonBody cannon = new CannonBody();
+	private CannonBody cannon;
 	//Points für Mausposition
     private Point movedPoint;
     //Zaehlt die Vergangenen Sekunden
@@ -86,8 +88,13 @@ public class BouncingBalls extends SimulationFrame {
     private int highScore,currScore;
     public void setCurrScore(int score){this.currScore = score;}
     public int getCurrScore(){return this.currScore;}
-	private final class CustomMouseAdapter extends MouseAdapter {
 
+	private final class CustomMouseAdapter extends MouseAdapter {
+        private BouncingBalls bouncingBalls;
+
+        public CustomMouseAdapter(BouncingBalls bouncingBalls) {
+            this.bouncingBalls = bouncingBalls;
+        }
         @Override
         public void mouseMoved(MouseEvent e) {
             movedPoint = canvas.getMousePosition();
@@ -102,12 +109,17 @@ public class BouncingBalls extends SimulationFrame {
 		@Override
 		public void mousePressed(MouseEvent e) {
 		    //Maus Klick Position speichern
-            if (canShoot) {
+            point = new Point(canvas.getMousePosition());
+            if ((point.getX()>23 && point.getX()<96)&&(point.getY()>22 && point.getY()<45))
+            {
+                this.bouncingBalls.stop();
+                this.bouncingBalls.setVisible(false);
+                this.bouncingBalls.parentFrame.setVisible(true);
+            }else if (canShoot) {
 				lvlCnt++;
 				//Benötigte Schuesse für Ziele in abhängigkeitd es Levels hochsetzen
 				min_hit_number = Math.round((1+lvlCnt/100)*min_hit_number);
                 max_hit_number = Math.round((1+lvlCnt/100)*max_hit_number);
-                point = new Point(canvas.getMousePosition());
                 //Neuen Vektor für die Schuesse erstellen
                 //Faktor 0,15 da sonst Schüsse zu stark
                 shootingVector = new Vector2();
@@ -115,6 +127,7 @@ public class BouncingBalls extends SimulationFrame {
                 double dy = -0.15 * (point.getY() - POINTSHOOTER.getY());
                 shootingVector.set(dx, dy);
             }
+
 		}
 		@Override
 		public void mouseReleased(MouseEvent e) {
@@ -122,12 +135,14 @@ public class BouncingBalls extends SimulationFrame {
 		}
 	}
 
-	public BouncingBalls() {
+	public BouncingBalls(JFrame parentFrame) {
 		super("Mouse Interaction", 32.0);
-		MouseAdapter ml = new CustomMouseAdapter();
+		this.parentFrame = parentFrame;
+		MouseAdapter ml = new CustomMouseAdapter(this);
 		this.canvas.addMouseMotionListener(ml);
 		this.canvas.addMouseWheelListener(ml);
 		this.canvas.addMouseListener(ml);
+		this.run();
 	}
 
 
@@ -202,6 +217,7 @@ public class BouncingBalls extends SimulationFrame {
         //Kollision deaktivieren
         fixture.setSensor(true);
 
+        cannon = new CannonBody();
         cannon.addFixture(fixture);
         cannon.setMass(MassType.INFINITE);
         cannon.translate(0.0, 0.0);
@@ -526,7 +542,7 @@ public class BouncingBalls extends SimulationFrame {
         target.setMass(MassType.INFINITE);
         this.world.addBody(target);
         targetSack.add(target);
-        this.world.addListener(new TargetCollisionListener(target, world, target.getHitNumber(), this, targetSack));
+        this.world.addListener(new TargetCollisionListener(target, world, target.getHitNumber(), this));
     }
 
 	private void createTargetBall(double xKoord, double yKoord)
@@ -548,8 +564,8 @@ public class BouncingBalls extends SimulationFrame {
         target.translate(xKoord,yKoord);
 		target.setMass(MassType.INFINITE);
 		this.world.addBody(target);
+        this.world.addListener(new TargetCollisionListener(target, world, target.getHitNumber(), this));
 		targetSack.add(target);
-        this.world.addListener(new TargetCollisionListener(target, world, target.getHitNumber(), this, targetSack));
 	}
 
 	//Zu zerstörende Baelle generieren
@@ -645,10 +661,10 @@ public class BouncingBalls extends SimulationFrame {
             //Kein neuer Leaderboardeintrag
         }
     }
-
+/*
 	public static void main(String[] args) {
 		BouncingBalls simulation = new BouncingBalls();
 		simulation.run();
 	}
-
+*/
 }

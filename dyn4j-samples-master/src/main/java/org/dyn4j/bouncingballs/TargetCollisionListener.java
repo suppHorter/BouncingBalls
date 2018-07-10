@@ -38,8 +38,7 @@ public class TargetCollisionListener extends CollisionAdapter {
             {
                 booster.setActive(true);
                 bB.activateBooster(booster.getType());
-
-                world.removeBody(booster);
+                bB.removeTarget(booster);
             }
         }
 
@@ -54,7 +53,6 @@ public class TargetCollisionListener extends CollisionAdapter {
                 target.setHitNumber(target.getHitNumber()-1);
                 target.setColor(BouncingBalls.getSemiRandomColor(target.getHitNumber()));
                 aT.run(target,false);
-
             }
         }
         return true;

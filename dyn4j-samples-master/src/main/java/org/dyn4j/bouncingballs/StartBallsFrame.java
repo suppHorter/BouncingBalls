@@ -8,25 +8,17 @@ import java.awt.event.ActionListener;
 
 public class StartBallsFrame implements ActionListener{
 
-    public JFrame startBalls;
-    public JPanel panel;
-    public JLabel label;
+    private JFrame startBalls;
+    private JPanel panel;
+    private JLabel label;
 
-    public int[] labellist;
-    public int labelPosistion;
+    private int[] labellist;
+    private int labelPosistion;
 
-    public Icon title1;
-    public Icon title2;
-    public Icon title3;
-    public Icon title4;
-    public Icon button1;
-    public Icon button2;
-    public Icon button3;
-    public Icon button4;
-    public JButton start;
-    public JButton challenge;
-    public JButton highscore;
-    public JButton quit;
+    private Icon title1,title2,title3,title4;
+    private Icon button1,button2,button3,button4;
+    private JButton start,challenge,highscore,quit;
+    private HighscoreFrame highscoreFrame;
 
     protected static BlinkingThread bt;
 
@@ -92,30 +84,23 @@ public class StartBallsFrame implements ActionListener{
                 startBalls.setVisible(false);
                 BouncingBallsChallenge bBC = new BouncingBallsChallenge(startBalls);
                 bBC.setVisible(true);
-
-
             }
         });
 
         //Alles für Highscore Button
         highscore.setBounds(111,450,300,50);
-        highscore.setBackground(Color.black);
+        highscore.setBackground(Color.BLACK);
         highscore.setContentAreaFilled(false);
         highscore.setBorder(new BasicBorders.ButtonBorder(Color.black, Color.black,Color.black, Color.black));
         highscore.setForeground(Color.WHITE);
-        highscore.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-                startBalls.setVisible(false);
-                HighscoreFrame highscoreFrame = new HighscoreFrame(startBalls);
-
-            }
+        highscore.addActionListener(e -> {
+            startBalls.setVisible(false);
+            highscoreFrame = new HighscoreFrame(startBalls);
         });
 
         //Alles für den QUIT Button
         quit.setBounds(193, 550, 122, 50);
-        quit.setBackground(Color.black);
+        quit.setBackground(Color.BLACK);
         quit.setContentAreaFilled(false);
         quit.setBorder(new BasicBorders.ButtonBorder(Color.BLACK, Color.BLACK, Color.BLACK, Color.BLACK));
         quit.setForeground(Color.white);

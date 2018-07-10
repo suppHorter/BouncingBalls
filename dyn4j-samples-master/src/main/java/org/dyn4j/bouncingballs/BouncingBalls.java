@@ -48,7 +48,6 @@ public class BouncingBalls extends SimulationFrame {
     //Menubutton
     private MenuButtonBox menuBox;
     // Zweidimensionales array 3 spalten 4 zeilen
-    static  boolean targetPresent[][] = new boolean[4][3];
 	static ArrayList<TargetBody> targetSack= new ArrayList<>();
 	//Point um Mauspos. zu speichern
 	private Point point;
@@ -478,45 +477,10 @@ public class BouncingBalls extends SimulationFrame {
     }
 
     public void removeTarget(TargetBody target)
-            {
-                world.removeBody(target);
-                targetSack.remove(target);
-                target.removeAllFixtures();
-
-                int j;
-                switch((int)target.getPosX()){
-                    case -5:
-                        j=0;
-                        break;
-                    case 0:
-                        j=1;
-                        break;
-                    case 5:
-                        j=2;
-                        break;
-                    default:
-                        throw new IllegalArgumentException("Das Setzen der X-Koordinate auf einen ungültigen Wert ist nicht erlaubt");
-                }
-                int i;
-                switch((int)target.getPosY()){
-                    case -8:
-                        i=3;
-                        break;
-                    case -4:
-                        i=2;
-                        break;
-                    case 0:
-                        i=1;
-                        break;
-            case 4:
-                i=0;
-                break;
-            default:
-                throw new IllegalArgumentException("Das Setzen der Y-Koordinate auf einen ungültigen Wert ist nicht erlaubt");
-
-
-        }
-        targetPresent[i][j]= false;
+    {
+        world.removeBody(target);
+        targetSack.remove(target);
+        target.removeAllFixtures();
     }
 
     //Animation durchführen oder beenden
@@ -595,41 +559,6 @@ UNUSED
         target.setColor(getSemiRandomColor(target.getHitNumber()));
         target.setPosX(xKoord);
         target.setPosY(yKoord);
-        int j;
-        switch((int)xKoord){
-            case -5:
-                j=0;
-                break;
-            case 0:
-                j=1;
-                break;
-            case 5:
-                j=2;
-                break;
-            default:
-                throw new IllegalArgumentException("Das Setzen der X-Koordinate auf einen ungültigen Wert ist nicht erlaubt");
-
-
-
-        }
-        int i;
-        switch((int)yKoord){
-            case -8:
-                i=3;
-                break;
-            case -4:
-                i=2;
-                break;
-            case 0:
-                i=1;
-                break;
-            case 4:
-                i=0;
-                break;
-            default:
-                throw new IllegalArgumentException("Das Setzen der Y-Koordinate auf einen ungültigen Wert ist nicht erlaubt");
-        }
-        targetPresent[i][j]= true;
 
         target.setCurrRadius(rad);
         target.addFixture(fixture);
@@ -675,50 +604,17 @@ UNUSED
 	}
 
     //Targets eine Reihe nach oben verschieben
-	public void liftBalls() {
-
-        for(int i=0; i<=3; i++){
-            for(int j = 0; j <= 2; j++){
-                System.out.print(targetPresent[i][j] + ", ");
-            }
-            System.out.println();
-        }
-
-        for (eg = 0; eg < targetSack.size(); eg++) {
-                boolean save0 = targetPresent[0][0];
-                boolean save1 = targetPresent[0][1];
-                boolean save2 = targetPresent[0][2];
-                if (save0== true ||save1== true||save2== true) {
-                    this.endGame();
+    public void liftBalls() {
+        for (int i = 0; i < targetSack.size(); i++) {
+            if (targetSack.get(i).getTransform().getTranslationY() >= 3) {
+                targetSack.get(i).removeAllFixtures();
+                this.endGame();
             } else {
-                targetSack.get(eg).translate(0, 4);
-                targetSack.get(eg).setPosX(targetSack.get(eg).getPosX());
-                targetSack.get(eg).setPosY(targetSack.get(eg).getPosY()+4);
+                targetSack.get(i).translate(0, 4);
+                targetSack.get(i).setPosX(targetSack.get(i).getPosX());
+                targetSack.get(i).setPosY(targetSack.get(i).getPosY()+4);
             }
-
         }
-        for(int i = 0; i<=2; i++){
-            for(int j=0; j<=2; j++){
-                targetPresent[i][j] = targetPresent[i+1][j];
-            }
-
-        }
-        int k;
-        for(k=0; k<=2; k++){
-
-            targetPresent[3][k] = false;
-
-        }
-
-        System.out.println();
-        System.out.println("Nach LiftBalls");
-        for(int i=0; i<=3; i++){
-            for(int j=0; j<=2; j++){
-                System.out.print(targetPresent[i][j] + ", ");
-            }
-            System.out.println();
-        }
-
     }
 
     //Farbe anhand der restlichen HitNumbers für die Targets wählen
@@ -769,11 +665,6 @@ UNUSED
         }
     }
     public void setStandard(){
-        for(int i = 0; i<=3; i++){
-            for(int j=0; j<=2; j++){
-                targetPresent[i][j] = false;
-            }
-        }
         maxBalls = 5;
         shootStyle = true;
         ballsCreated = 0;
@@ -784,10 +675,4 @@ UNUSED
         ballsInGame = 0;
         bulletRadius = 0.6;
 	}
-/*
-	public static void main(String[] args) {
-		BouncingBalls simulation = new BouncingBalls();
-		simulation.run();
-	}
-*/
 }

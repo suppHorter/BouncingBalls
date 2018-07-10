@@ -43,20 +43,20 @@ public class StartBallsFrame implements ActionListener{
         startBalls = new JFrame("Bouncing Balls");
 
         //Erzeugen der ImageIcons für den blinkenden Titel
-        title1 = new ImageIcon(".\\dyn4j-samples-master\\src\\main\\java\\org\\dyn4j\\bouncingballs\\resources\\bb1klein.png");
-        title2 = new ImageIcon(".\\dyn4j-samples-master\\src\\main\\java\\org\\dyn4j\\bouncingballs\\resources\\bb2klein.png");
-        title3 = new ImageIcon(".\\dyn4j-samples-master\\src\\main\\java\\org\\dyn4j\\bouncingballs\\resources\\bb3klein.png");
-        title4 = new ImageIcon(".\\dyn4j-samples-master\\src\\main\\java\\org\\dyn4j\\bouncingballs\\resources\\bb4klein.png");
+        title1 = new ImageIcon(getClass().getResource("resources/bb1klein.png"));
+        title2 = new ImageIcon(getClass().getResource("resources/bb2klein.png"));
+        title3 = new ImageIcon(getClass().getResource("resources/bb3klein.png"));
+        title4 = new ImageIcon(getClass().getResource("resources/bb4klein.png"));
 
         // Array für wechselndes Titelbild
         labellist = new int[]{1, 2, 3, 4};
         label = new JLabel(title1);
 
         //Erzeugen der ImageIcons als Button
-        button1 = new ImageIcon(".\\dyn4j-samples-master\\src\\main\\java\\org\\dyn4j\\bouncingballs\\resources\\startklein.png");
-        button2 = new ImageIcon(".\\dyn4j-samples-master\\src\\main\\java\\org\\dyn4j\\bouncingballs\\resources\\challengeklein.png");
-        button3 = new ImageIcon(".\\dyn4j-samples-master\\src\\main\\java\\org\\dyn4j\\bouncingballs\\resources\\highscoreklein.png");
-        button4 = new ImageIcon(".\\dyn4j-samples-master\\src\\main\\java\\org\\dyn4j\\bouncingballs\\resources\\quitklein.png");
+        button1 = new ImageIcon(getClass().getResource("resources/startklein.png"));
+        button2 = new ImageIcon(getClass().getResource("resources/challengeklein.png"));
+        button3 = new ImageIcon(getClass().getResource("resources/highscoreklein.png"));
+        button4 = new ImageIcon(getClass().getResource("resources/quitklein.png"));
 
         //Erzeugen der Buttons in Form der ImageIcons
         start = new JButton(button1);

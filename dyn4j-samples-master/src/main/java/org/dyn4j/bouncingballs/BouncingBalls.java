@@ -758,9 +758,10 @@ UNUSED
 
     public void endGame() {
 	    this.stop();
-        if (ScoreEntry.checkPlace(lvlCnt) <= 10) {
+	    int place = ScoreEntry.checkPlace(lvlCnt);
+        if (place <= 10) {
             //Neuer Leaderboard Eintrag
-            ScoreDialog scoreDialog = new ScoreDialog(this);
+            ScoreDialog scoreDialog = new ScoreDialog(this, parentFrame, place, lvlCnt);
             setStandard();
         }
         else {

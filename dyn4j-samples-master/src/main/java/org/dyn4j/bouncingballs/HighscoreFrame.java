@@ -44,8 +44,8 @@ public class HighscoreFrame {
         highscoreFrame.setUndecorated(true);
         this.parentFrame = parentFrame;
 
-        menuIcon = new ImageIcon(".\\dyn4j-samples-master\\src\\main\\java\\org\\dyn4j\\bouncingballs\\resources\\menu klein.png");
-        highScoreIcon = new ImageIcon(".\\dyn4j-samples-master\\src\\main\\java\\org\\dyn4j\\bouncingballs\\resources\\highscoreklein.png");
+        menuIcon = new ImageIcon(getClass().getResource("resources/menu klein.png"));
+        highScoreIcon = new ImageIcon(getClass().getResource("resources/highscoreklein.png"));
 
         /*
         try

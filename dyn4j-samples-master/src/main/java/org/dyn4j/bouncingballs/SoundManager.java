@@ -19,12 +19,9 @@ public class SoundManager {
 
     private AudioInputStream stream;
 
-    String path;
-
 
     public SoundManager()
     {
-        path = "C:\\Users\\Maximilian\\IdeaProjects\\BouncingBalls\\dyn4j-samples-master\\src\\main\\java\\org\\dyn4j\\bouncingballs\\Sounds\\";
     }
 
     public void play(Sound sound)
@@ -42,8 +39,7 @@ public class SoundManager {
                     break;
             }
 
-            File f = new File(path + fileName);
-            stream = AudioSystem.getAudioInputStream(f.toURI().toURL());
+            stream = AudioSystem.getAudioInputStream(getClass().getResource("Sounds/" + fileName));
             Clip clip = AudioSystem.getClip();
             clip.open(stream);
             clip.start();

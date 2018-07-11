@@ -62,7 +62,7 @@ public class HighscoreFrame {
         }catch (Exception e)
         {
             //noch keine Highscores hinterlegt
-        }
+
         }
 */
         menu = new JButton(menuIcon);
@@ -85,13 +85,13 @@ public class HighscoreFrame {
 
         //Höhe der Zellen anpassen
         highScoreTable = new JTable(data, columnNames);
-        for (int i=0;i<10;i++)
+        for (int i=0;i<11;i++)
         {
             highScoreTable.setRowHeight(i, 30);
         }
         //HighscoreTable erstellen
         highScoreTable.setLayout(null);
-        highScoreTable.setBounds(10,150,480,300);
+        highScoreTable.setBounds(10,150,480,330);
         highScoreTable.setBackground(Color.BLACK);
         highScoreTable.setForeground(Color.WHITE);
 
@@ -99,6 +99,9 @@ public class HighscoreFrame {
         DefaultTableCellRenderer rightRenderer = new DefaultTableCellRenderer();
         rightRenderer.setHorizontalAlignment(JLabel.CENTER);
         highScoreTable.getColumnModel().getColumn(0).setCellRenderer(rightRenderer);
+        highScoreTable.getColumnModel().getColumn(1).setCellRenderer(rightRenderer);
+        highScoreTable.getColumnModel().getColumn(2).setCellRenderer(rightRenderer);
+        highScoreTable.getColumnModel().getColumn(3).setCellRenderer(rightRenderer);
 
         //Gelber Rand:
         Border b;

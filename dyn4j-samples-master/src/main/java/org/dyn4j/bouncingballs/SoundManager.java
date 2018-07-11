@@ -24,7 +24,7 @@ public class SoundManager {
 
     public SoundManager()
     {
-        path = System.getProperty("user.dir")+"/Sounds/";
+        path = "C:\\Users\\Maximilian\\IdeaProjects\\BouncingBalls\\dyn4j-samples-master\\src\\main\\java\\org\\dyn4j\\bouncingballs\\Sounds\\";
     }
 
     public void play(Sound sound)
@@ -33,8 +33,12 @@ public class SoundManager {
             String fileName = "";
             switch(sound)
             {
-                case BUTTON_CLICKED:
-                    fileName = "Button_1.wav";
+                case SCHUSS:
+                    fileName = "Schuss.wav";
+                    break;
+
+                case TREFFER:
+                    fileName = "Treffer.wav";
                     break;
             }
 

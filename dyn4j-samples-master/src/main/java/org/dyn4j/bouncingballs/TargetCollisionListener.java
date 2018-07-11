@@ -21,7 +21,7 @@ public class TargetCollisionListener extends CollisionAdapter {
         this.world = world;
         this.hitCnt = hits;
         this.bB = bB;
-        this.targetSack = targetSack;
+        //this.targetSack = targetSack;
     }
     TargetCollisionListener(BoosterBody booster, World world, BouncingBalls bB) {
         this.booster = booster;
@@ -51,6 +51,8 @@ public class TargetCollisionListener extends CollisionAdapter {
             }else
             {
                 target.setHitNumber(target.getHitNumber()-1);
+                SoundManager sm = new SoundManager();
+                sm.play(Sound.TREFFER);
                 target.setColor(BouncingBalls.getSemiRandomColor(target.getHitNumber()));
                 aT.run(target,false);
             }

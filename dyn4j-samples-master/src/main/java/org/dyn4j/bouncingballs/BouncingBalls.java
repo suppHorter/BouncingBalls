@@ -111,6 +111,7 @@ public class BouncingBalls extends SimulationFrame {
 		public void mousePressed(MouseEvent e) {
 		    //Maus Klick Position speichern
             point = new Point(canvas.getMousePosition());
+            //Menü angeklickt
             if ((point.getX()>23 && point.getX()<96)&&(point.getY()>22 && point.getY()<45))
             {
                 this.bouncingBalls.stop();
@@ -121,6 +122,8 @@ public class BouncingBalls extends SimulationFrame {
             }else if (canShoot) {
 				lvlCnt++;
 				//Benötigte Schuesse für Ziele in abhängigkeitd es Levels hochsetzen
+                //TODO
+                //BALANCE
 				min_hit_number = Math.round((1+lvlCnt/100)*min_hit_number);
                 max_hit_number = Math.round((1+lvlCnt/100)*max_hit_number);
                 //Neuen Vektor für die Schuesse erstellen
@@ -250,6 +253,7 @@ public class BouncingBalls extends SimulationFrame {
                 if (!trampActive)
                 {
                     this.world.addBody(boosterTramp);
+                    trampBoosterTimer = 0;
                     trampActive = true;
                 }
                 break;
@@ -325,7 +329,7 @@ public class BouncingBalls extends SimulationFrame {
 			double angle = xAxis.getAngleBetween(shootToVector.to(aimLine));
             cannon.getTransform().setRotation(angle);
         }
-        //Zeit zwischen den Schüsen einer Salve messen
+        //Zeit zwischen den Schüssen einer Salve messen
 		timercounter_between_balls += elapsedTime;
 		//Allgemeine vergangene Zeit (noch nicht verwendet)
 		timer += elapsedTime;
@@ -334,7 +338,6 @@ public class BouncingBalls extends SimulationFrame {
         //Zeit für Trampolintimer
         if (trampBoosterTimer>=10)
         {
-            trampBoosterTimer = 0;
             deActivateBooster(0);
         }
         highScoreBox.lvlNumber = currScore;
@@ -347,6 +350,11 @@ public class BouncingBalls extends SimulationFrame {
                     lvlBox.lvlNumber = lvlCnt;
                 }
                 createTargets();
+        }
+
+        if (targetSack.isEmpty())
+        {
+            System.out.println("Clear");
         }
 
         //Animation für Targetfeedback anhand des Timers beenden
@@ -396,6 +404,8 @@ public class BouncingBalls extends SimulationFrame {
                 ball.setMass(MassType.NORMAL);
                 //Schuss der Welt hinzufuegen
 				this.world.addBody(ball);
+				SoundManager sm = new SoundManager();
+				sm.play(Sound.SCHUSS);
 				ballsInGame += 1;
 				ballsCreated += 1;
                 currShotsBox.lvlNumber = maxBalls - ballsCreated;
@@ -505,9 +515,7 @@ public class BouncingBalls extends SimulationFrame {
     }
 
     protected void createBooster(int type, double xKoord, double yKoord)
-
     {
-
         BoosterBody booster = new BoosterBody();
         BodyFixture fixture = new BodyFixture(Geometry.createCircle(0.7));
         booster.setPosX(xKoord);

@@ -30,6 +30,7 @@ public class ScoreDialog extends JDialog{
             @Override
             public void actionPerformed(ActionEvent e) {
                 ScoreEntry entry = new ScoreEntry(place, nameInput.getText(), lvlCnt);
+                entry.save();
                 window.setVisible(false);
                 mainMenu.setVisible(true);
             }

@@ -51,6 +51,7 @@ public class BouncingBalls extends SimulationFrame {
 	static ArrayList<TargetBody> targetSack= new ArrayList<>();
 	//Point um Mauspos. zu speichern
 	private Point point;
+    private Point point_menu;
 	//Vektor fuer Schüsse
 
 	private Vector2 shootingVector;
@@ -115,16 +116,17 @@ public class BouncingBalls extends SimulationFrame {
 		@Override
 		public void mousePressed(MouseEvent e) {
 		    //Maus Klick Position speichern
-            point = new Point(canvas.getMousePosition());
+            point_menu = new Point(canvas.getMousePosition());
             //Menü angeklickt
-            if ((point.getX()>23 && point.getX()<96)&&(point.getY()>22 && point.getY()<45))
+            if ((point_menu.getX()>23 && point_menu.getX()<96)&&(point_menu.getY()>22 && point_menu.getY()<45))
             {
                 this.bouncingBalls.stop();
                 this.bouncingBalls.setVisible(false);
                 this.bouncingBalls.parentFrame.setVisible(true);
                 setStandard();
 
-            }else if (canShoot) {
+            }else if (canShoot && ballsCreated == 0) {
+                point = new Point(canvas.getMousePosition());
 				lvlCnt++;
 				//Benötigte Schuesse für Ziele in abhängigkeitd es Levels hochsetzen
                 //TODO
@@ -138,6 +140,7 @@ public class BouncingBalls extends SimulationFrame {
                 double dy = -0.15 * (point.getY() - POINTSHOOTER.getY());
                 shootingVector.set(dx, dy);
             }
+
 
 		}
 		@Override
@@ -157,6 +160,8 @@ public class BouncingBalls extends SimulationFrame {
 	}
 
 	protected void initializeWorld() {
+        min_hit_number = MIN_HIT_NUMBER_START;
+        max_hit_number = MAX_HIT_NUMBER_START;
 		lvlCnt = 1;
         shootStyle = false;
         trampBoosterTimer = 0;
@@ -203,7 +208,7 @@ public class BouncingBalls extends SimulationFrame {
 
 
         BodyFixture trampFix = new BodyFixture(Geometry.createRectangle(50, 0.5));
-		trampFix.setRestitution(200);
+		trampFix.setRestitution(80);
         boosterTramp.addFixture(trampFix);
         boosterTramp.getTransform().setRotation(0.1);
         boosterTramp.setColor(Color.GREEN);
@@ -440,7 +445,7 @@ public class BouncingBalls extends SimulationFrame {
                     point = null;
                     deActivateBooster(3);
                 }
-				else if ((ballsCreated == maxBalls)&& !shootStyle){
+				else if ((ballsCreated >= maxBalls) && !shootStyle){
 				    //Kein Schiessen mehr moeglich nachdem alle Schuesse einer Salve abgefeuert wurden
 				    canShoot = false;
                     ballsCreated = 0;
@@ -561,7 +566,7 @@ public class BouncingBalls extends SimulationFrame {
         target.setBouncingBallContr(this);
 		double rad;
 		int hitNo;
-		rad =  Math.random()+0.5;
+		rad =  Math.random()+0.75;
         BodyFixture fixture = new BodyFixture(Geometry.createCircle(rad));
         hitNo = ThreadLocalRandom.current().nextInt(min_hit_number,max_hit_number);
         target.setHitNumber(hitNo);

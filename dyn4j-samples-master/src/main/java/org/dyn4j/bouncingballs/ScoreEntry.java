@@ -48,6 +48,7 @@ public class ScoreEntry implements Serializable {
             }
 
             for (ScoreEntry entry : entries) {
+                //TODO: Plätze neu berechnen!!
                 outputWriter.writeObject(entry);
             }
 

@@ -15,7 +15,6 @@ public class BoundaryCollisionListener extends CollisionAdapter {
         this.world = world;
     }
 
-
     @Override
     public boolean collision(Body body1, BodyFixture fixture1, Body body2, BodyFixture fixture2, Penetration penetration) {
         if ((body1 instanceof ShotBallBody && body2 == boundary) || (body2 instanceof ShotBallBody && body1 == boundary)) {

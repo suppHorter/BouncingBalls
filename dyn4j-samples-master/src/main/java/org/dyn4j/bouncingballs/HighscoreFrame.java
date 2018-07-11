@@ -24,7 +24,7 @@ public class HighscoreFrame {
             "Name",
             "Level",
             "Score"};
-    private String[][] data = new String[10][4];
+    private String[][] data = new String[11][4];
 
     public HighscoreFrame(JFrame parentFrame){
         highscoreFrame = new JFrame("Highscore");
@@ -47,7 +47,7 @@ public class HighscoreFrame {
             for (int i=1;i<=scoreEntry.size();i++)
             {
                 //data[i][0] = scoreEntry.get(i).getPlace()+" "+i;
-                data[i][0] = Integer.toString(scoreEntry.get(i-1).getPlace());
+                data[i][0] = Integer.toString(i);
                 data[i][1] = scoreEntry.get(i-1).getName();
                 data[i][2] = Integer.toString(scoreEntry.get(i-1).getLevel());
                 data[i][3] = Integer.toString(scoreEntry.get(i-1).getScore());
@@ -58,6 +58,7 @@ public class HighscoreFrame {
             System.out.print(e);
 
         }
+        
         menu = new JButton(menuIcon);
         menu.setBounds(10,10,100,50);
         menu.setBorder(new BasicBorders.ButtonBorder(Color.BLACK,Color.BLACK,Color.BLACK,Color.BLACK));

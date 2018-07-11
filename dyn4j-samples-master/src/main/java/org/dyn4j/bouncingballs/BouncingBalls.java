@@ -669,6 +669,7 @@ UNUSED
             setStandard();
         }
         else {
+            ScoreDialog scoreDialog = new ScoreDialog(this, parentFrame);
             setStandard();
             //Kein neuer Leaderboardeintrag
         }

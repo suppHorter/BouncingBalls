@@ -31,10 +31,12 @@ public class ScoreDialog extends JDialog{
         okButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                ScoreEntry entry = new ScoreEntry(place, nameInput.getText(), lvlCnt, score);
-                entry.save();
-                window.setVisible(false);
-                mainMenu.setVisible(true);
+                if(!nameInput.getText().trim().isEmpty()) {
+                    ScoreEntry entry = new ScoreEntry(place, nameInput.getText(), lvlCnt, score);
+                    entry.save();
+                    window.setVisible(false);
+                    mainMenu.setVisible(true);
+                }
             }
         });
 

@@ -24,17 +24,7 @@ public class HighscoreFrame {
             "Name",
             "Level",
             "Score"};
-    private String[][] data =  {{"Platz","Name","Level","Score"},
-                                {"1","Peter","123","432"},
-                                {"2","Paul","122","332"},
-                                {"3","Sven","121","223"},
-                                {"4","karl","121","223"},
-                                {"5","sad","121","223"},
-                                {"6","sqerfd","121","223"},
-                                {"7","dddd","121","223"},
-                                {"8","wqer","121","223"},
-                                {"9","qewrh","121","223"},
-                                {"10","Kathi","112","112"}};
+    private String[][] data = new String[10][4];
 
     public HighscoreFrame(JFrame parentFrame){
         highscoreFrame = new JFrame("Highscore");
@@ -47,24 +37,27 @@ public class HighscoreFrame {
         menuIcon = new ImageIcon(".\\dyn4j-samples-master\\src\\main\\java\\org\\dyn4j\\bouncingballs\\resources\\menu klein.png");
         highScoreIcon = new ImageIcon(".\\dyn4j-samples-master\\src\\main\\java\\org\\dyn4j\\bouncingballs\\resources\\highscoreklein.png");
 
-        /*
         try
         {
             ArrayList<ScoreEntry> scoreEntry = ScoreEntry.getLeaderboard();
-            for (int i=0;i<scoreEntry.size();i++)
+            data[0][0] = columnNames[0];
+            data[0][1] = columnNames[1];
+            data[0][2] = columnNames[2];
+            data[0][3] = columnNames[3];
+            for (int i=1;i<=scoreEntry.size();i++)
             {
                 //data[i][0] = scoreEntry.get(i).getPlace()+" "+i;
-                data[i][0] = " "+i+1;
-                data[i][1] = " Peter"+i;
-                data[i][2] = " 12"+i;
+                data[i][0] = Integer.toString(scoreEntry.get(i-1).getPlace());
+                data[i][1] = scoreEntry.get(i-1).getName();
+                data[i][2] = Integer.toString(scoreEntry.get(i-1).getLevel());
+                data[i][3] = Integer.toString(scoreEntry.get(i-1).getScore());
             }
 
         }catch (Exception e)
         {
-            //noch keine Highscores hinterlegt
+            System.out.print(e);
 
         }
-*/
         menu = new JButton(menuIcon);
         menu.setBounds(10,10,100,50);
         menu.setBorder(new BasicBorders.ButtonBorder(Color.BLACK,Color.BLACK,Color.BLACK,Color.BLACK));

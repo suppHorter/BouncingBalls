@@ -534,29 +534,6 @@ public class BouncingBalls extends SimulationFrame {
         targetSack.add(booster);
     }
 
-/*
-UNUSED
-    private void createTargetBall(double xKoord, double yKoord,double rad,int hitNo,Color color,boolean growed)
-    {
-        TargetBody target = new TargetBody();
-        target.setBouncingBallContr(this);
-        BodyFixture fixture = new BodyFixture(Geometry.createCircle(rad));
-        target.setHitNumber(hitNo);
-        target.setPosX(xKoord);
-        target.setPosY(yKoord);
-        target.setColor(color);
-        target.setGrowed(growed);
-        target.setCurrRadius(rad);
-        target.addFixture(fixture);
-        fixture.setRestitution(1);
-        target.translate(xKoord,yKoord);
-        target.setMass(MassType.INFINITE);
-        this.world.addBody(target);
-        targetSack.add(target);
-        this.world.addListener(new TargetCollisionListener(target, world, target.getHitNumber(), this));
-    }
-*/
-
 	private void createTargetBall(double xKoord, double yKoord)
     {
 		TargetBody target = new TargetBody();
@@ -665,10 +642,10 @@ UNUSED
 
     public void endGame() {
 	    this.stop();
-	    int place = ScoreEntry.checkPlace(lvlCnt);
+	    int place = ScoreEntry.checkPlace(currScore);
         if (place <= 10) {
             //Neuer Leaderboard Eintrag
-            ScoreDialog scoreDialog = new ScoreDialog(this, parentFrame, place, lvlCnt);
+            ScoreDialog scoreDialog = new ScoreDialog(this, parentFrame, place, lvlCnt,currScore);
             setStandard();
         }
         else {

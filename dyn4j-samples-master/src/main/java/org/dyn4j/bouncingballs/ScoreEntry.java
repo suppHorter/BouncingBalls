@@ -7,11 +7,13 @@ public class ScoreEntry implements Serializable {
     private int place;
     private String name;
     private int level;
+    private int score;
 
-    public ScoreEntry(int place, String name, int level) {
+    public ScoreEntry(int place, String name, int level, int score) {
         this.place = place;
         this.name = name;
         this.level = level;
+        this.score = score;
     }
     public int getPlace() {
         return place;
@@ -21,8 +23,10 @@ public class ScoreEntry implements Serializable {
         return name;
     }
 
-    public int getLevel() {
-        return level;
+    public int getLevel() { return level; }
+
+    public int getScore() {
+        return score;
     }
 
     public void save() {
@@ -30,7 +34,7 @@ public class ScoreEntry implements Serializable {
 
         try {
             entries = getLeaderboard();
-            this.place = checkPlace(this.level);
+            this.place = checkPlace(this.score);
         } catch (IOException ex) {
             this.place = 1;
         }
@@ -38,7 +42,7 @@ public class ScoreEntry implements Serializable {
         try {
             ObjectOutputStream outputWriter = new ObjectOutputStream(new FileOutputStream(new File("./highscore")));
 
-            entries.add(this.place - 1, new ScoreEntry(place, this.name, this.level));
+            entries.add(this.place - 1, new ScoreEntry(place, this.name, this.level, this.score));
             if (entries.size() > 10) {
                 entries.subList(10, entries.size()).clear();
             }
@@ -54,7 +58,7 @@ public class ScoreEntry implements Serializable {
         }
     }
 
-    public static int checkPlace(int level) {
+    public static int checkPlace(int score) {
         ArrayList<ScoreEntry> places;
 
         try {
@@ -64,10 +68,11 @@ public class ScoreEntry implements Serializable {
         }
 
         int i = 1;
+        int tempI=0;
         for (ScoreEntry entry : places) {
-            int score = entry.getLevel();
+            int _score = entry.getScore();
 
-            if (score < level) {
+            if (_score < score) {
                 return i;
             }
             i++;

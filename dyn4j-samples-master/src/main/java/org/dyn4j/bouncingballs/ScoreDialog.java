@@ -8,13 +8,15 @@ import java.awt.event.ActionListener;
 public class ScoreDialog extends JDialog{
     int place;
     int lvlCnt;
+    int score;
     JFrame mainMenu;
 
-    public ScoreDialog(Window window, JFrame mainMenu, int place, int lvlCnt) {
+    public ScoreDialog(Window window, JFrame mainMenu, int place, int lvlCnt, int score) {
         super(window);
         this.place = place;
         this.lvlCnt = lvlCnt;
         this.mainMenu = mainMenu;
+        this.score = score;
 
         this.setUndecorated(true);
         ImageIcon gameOver = new ImageIcon(getClass().getResource("resources/gameOver.png"));
@@ -29,7 +31,7 @@ public class ScoreDialog extends JDialog{
         okButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                ScoreEntry entry = new ScoreEntry(place, nameInput.getText(), lvlCnt);
+                ScoreEntry entry = new ScoreEntry(place, nameInput.getText(), lvlCnt, score);
                 entry.save();
                 window.setVisible(false);
                 mainMenu.setVisible(true);

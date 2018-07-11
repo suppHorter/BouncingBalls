@@ -60,8 +60,8 @@ public class TargetBody extends SimulationBody {
             g.setFont(new Font("Default", Font.PLAIN, 20));
             //Offset für Beschriftung anhand der hitNumber erstellen
             //Schriftbreite = 7 also bei zweistelligen zahlen 2 * 7
-            int offsetX = String.valueOf(hitNumber).length() * 7;
-            int offsetY = 7;
+            int offsetX = String.valueOf(hitNumber).length() * 6;
+            int offsetY = 8;
             g.drawString(String.valueOf(hitNumber), (int)center.x-offsetX, (int)center.y+offsetY);
     }
 }

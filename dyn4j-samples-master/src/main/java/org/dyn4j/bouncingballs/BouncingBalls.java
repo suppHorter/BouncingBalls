@@ -67,10 +67,15 @@ public class BouncingBalls extends SimulationFrame {
     private static double trampBoosterTimer;
     //Zaehlt die vergangenen Sekunden - wird zurückgedsetzt
     private static double timercounter_between_balls;
-    private static int min_hit_number = 5; //Minimalanzahl Treffer benötigt für zerstörung von targets
-    private static int max_hit_number = 20;//Maximalanzahl Treffer benötigt für zerstörung von targets
-    //Constants für die Gamelogik
-	private static double TIME_BETWEEN_BALLS = 0.3; //Zeit zwischen den Schuessen einer Salve
+    private static int MIN_HIT_NUMBER_START = 5; //Minimalanzahl Treffer benötigt für zerstörung von targets - Constant
+    private static int MAX_HIT_NUMBER_START = 10; //Maximalanzahl Treffer benötigt für zerstörung von targets - Constant
+    private static int min_hit_number = MIN_HIT_NUMBER_START; //Minimalanzahl Treffer wird erhöht wärend Laufzeit
+    private static int max_hit_number = MAX_HIT_NUMBER_START; //Maximalanzahl Treffer wird erhöht wärend Laufzeit
+    private static boolean trampRotateRight = true;
+    private static double trampRotationStep = 0.01;
+    //Constants für die Gamelogik    
+    private static double TIME_BETWEEN_BALLS = 0.3; //Zeit zwischen den Schuessen einer Salve
+    private static double MAX_BALL_RADIUS = 0.8; //Maximaler Radius der Schüsse
     private static int MIN_BALLS_TO_CREATE = 1;
     private static int MAX_BALLS_TO_CREATE = 3;
 
@@ -78,7 +83,7 @@ public class BouncingBalls extends SimulationFrame {
         return maxBalls;
     }
 
-    private static int maxBalls = 5; //Anzahl an Schuessen pro Salve
+    private static int maxBalls = 4; //Anzahl an Schuessen pro Salve
 	private static Point POINTSHOOTER = new Point(250,40); //Punkt an dem Schuesse abgefeuert werden
     private static boolean allowedBoosters = true;
 
@@ -124,8 +129,8 @@ public class BouncingBalls extends SimulationFrame {
 				//Benötigte Schuesse für Ziele in abhängigkeitd es Levels hochsetzen
                 //TODO
                 //BALANCE
-				min_hit_number = Math.round((1+lvlCnt/100)*min_hit_number);
-                max_hit_number = Math.round((1+lvlCnt/100)*max_hit_number);
+                min_hit_number = Math.round((1+lvlCnt/10)*MIN_HIT_NUMBER_START);
+                max_hit_number = Math.round((1+lvlCnt/10)*MAX_HIT_NUMBER_START);
                 //Neuen Vektor für die Schuesse erstellen
                 //Faktor 0,15 da sonst Schüsse zu stark
                 shootingVector = new Vector2();
@@ -178,7 +183,7 @@ public class BouncingBalls extends SimulationFrame {
 		lowerBounds = new SimulationBody();
 
 		BodyFixture wallFixture = new BodyFixture(Geometry.createRectangle(12, 100));
-		wallFixture.setRestitution(1);
+		wallFixture.setRestitution(0.5);
 
 		leftWall.addFixture(wallFixture);
 		leftWall.setColor(Color.GRAY);
@@ -200,6 +205,7 @@ public class BouncingBalls extends SimulationFrame {
         BodyFixture trampFix = new BodyFixture(Geometry.createRectangle(50, 0.5));
 		trampFix.setRestitution(200);
         boosterTramp.addFixture(trampFix);
+        boosterTramp.getTransform().setRotation(0.1);
         boosterTramp.setColor(Color.GREEN);
         boosterTramp.translate(0,-10);
         boosterTramp.setMass(MassType.INFINITE);
@@ -268,9 +274,9 @@ public class BouncingBalls extends SimulationFrame {
                 }
                 break;
             case 2: //großere Schüsse
-                if (bulletRadius<1.2)
+                if (bulletRadius<MAX_BALL_RADIUS)
                 {
-                    bulletRadius+=0.1;
+                    bulletRadius+=0.05;
                 }
                 break;
             case 3: //Rapid Fire
@@ -333,7 +339,26 @@ public class BouncingBalls extends SimulationFrame {
 		timercounter_between_balls += elapsedTime;
 		//Allgemeine vergangene Zeit (noch nicht verwendet)
 		timer += elapsedTime;
+		
+		//Wiggle that Tramp biatch
+        if (boosterTramp != null){
+            double radTramp = boosterTramp.getTransform().getRotation();
+            if(radTramp >= 0.2){
+                trampRotateRight = false;
+            }
+            if (radTramp <= -0.2){
+                trampRotateRight = true;
+            }
+            if (trampRotateRight){
+                radTramp = radTramp + trampRotationStep;
+            }else{
+                radTramp = radTramp - trampRotationStep;
+            }
 
+            boosterTramp.getTransform().setRotation(radTramp);
+        }
+        
+		
         trampBoosterTimer += elapsedTime;
         //Zeit für Trampolintimer
         if (trampBoosterTimer>=10)
@@ -346,7 +371,6 @@ public class BouncingBalls extends SimulationFrame {
 		if(turn > 1 && rowsOfTargetsCreated < turn){
                 if (targetSack.size() > 0) {
                     liftBalls();
-                    lvlCnt++;
                     lvlBox.lvlNumber = lvlCnt;
                 }
                 createTargets();
@@ -537,7 +561,7 @@ public class BouncingBalls extends SimulationFrame {
         target.setBouncingBallContr(this);
 		double rad;
 		int hitNo;
-		rad =  Math.random()+1;
+		rad =  Math.random()+0.5;
         BodyFixture fixture = new BodyFixture(Geometry.createCircle(rad));
         hitNo = ThreadLocalRandom.current().nextInt(min_hit_number,max_hit_number);
         target.setHitNumber(hitNo);
@@ -572,7 +596,7 @@ public class BouncingBalls extends SimulationFrame {
             if ((boosterPosib > 0)&&(boosterPosib < 40)&&allowedBoosters)
             {
                 //Prüfung ob schon groß genug
-                while ((bulletRadius>=1.2)&&(boosterTypePosib==2))
+                while ((bulletRadius>=MAX_BALL_RADIUS)&&(boosterTypePosib==2))
                 {
                     //Wenn ja dann solange random bis keine 2 mehr
                     boosterTypePosib = ThreadLocalRandom.current().nextInt(0,  4);
@@ -605,27 +629,27 @@ public class BouncingBalls extends SimulationFrame {
     //Farbe anhand der restlichen HitNumbers für die Targets wählen
     public static final Color getSemiRandomColor(int i) {
         int diff = max_hit_number - min_hit_number;
-        int step = 	Math.round(diff/6);
-        if(i < max_hit_number) {
+        int step = 	Math.round(diff/5);
+        if(i < min_hit_number) {
             return new Color(0,255,0);
         }
-        if (i < max_hit_number + step) {
-            return new Color(81,124,14);
+        /*if (i < min_hit_number + step) {
+            return new Color(120,220,30);
+        }*/
+        if (i < min_hit_number + step * 1) {
+            return new Color(170,220,30);
         }
-        if (i < max_hit_number + step * 2) {
-            return new Color(166,215,31);
-        }
-        if (i < max_hit_number + step * 3) {
+        if (i < min_hit_number + step * 2) {
             return new Color(255,255,0);
         }
-        if (i < max_hit_number + step * 4) {
+        if (i < min_hit_number + step * 3) {
             return new Color(255,160,62);
         }
-        if (i < max_hit_number + step * 5) {
-            return new Color(255,0,0);
+        if (i < min_hit_number + step * 4) {
+            return new Color(255,100,30);
         }
         if (i <= max_hit_number) {
-            return new Color(138,0,0);
+            return new Color(255,0,0);
         }
         return Color.WHITE;
     }

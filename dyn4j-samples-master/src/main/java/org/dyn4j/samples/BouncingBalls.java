@@ -65,13 +65,15 @@ public class BouncingBalls extends SimulationFrame {
     private static double trampBoosterTimer;
     //Zaehlt die vergangenen Sekunden - wird zurückgedsetzt
     private static double timercounter_between_balls;
-    private static int min_hit_number = 5; //Minimalanzahl Treffer benötigt für zerstörung von targets
-    private static int max_hit_number = 20;//Maximalanzahl Treffer benötigt für zerstörung von targets
+    private static int min_hit_number; //steigende Minimalanzahl Treffer benötigt für zerstörung von targets
+    private static int max_hit_number; //steigende Maximalanzahl Treffer benötigt für zerstörung von targets
 
     //Constants für die Gamelogik
 	private static double TIME_BETWEEN_BALLS = 0.3; //Zeit zwischen den Schuessen einer Salve
     private static int MIN_BALLS_TO_CREATE = 1;
     private static int MAX_BALLS_TO_CREATE = 3;
+    private static int MIN_HIT_NUMBER_START = 5; //Start Konstante Minimalanzahl Treffer benötigt für zerstörung von targets
+    private static int MAX_HIT_NUMBER_START = 20;//Start Konstante Maximalanzahl Treffer benötigt für zerstörung von targets
 
     public static int getMaxBalls() {
         return maxBalls;
@@ -107,8 +109,8 @@ public class BouncingBalls extends SimulationFrame {
             if (canShoot) {
 				lvlCnt++;
 				//Benötigte Schuesse für Ziele in abhängigkeitd es Levels hochsetzen
-				min_hit_number = Math.round((1+lvlCnt/100)*min_hit_number);
-                max_hit_number = Math.round((1+lvlCnt/100)*max_hit_number);
+				min_hit_number = Math.round((1+lvlCnt/50)*MIN_HIT_NUMBER_START);
+                max_hit_number = Math.round((1+lvlCnt/50)*MAX_HIT_NUMBER_START);
                 point = new Point(canvas.getMousePosition());
                 //Neuen Vektor für die Schuesse erstellen
                 //Faktor 0,15 da sonst Schüsse zu stark
@@ -248,7 +250,7 @@ public class BouncingBalls extends SimulationFrame {
                 }
                 break;
             case 2: //großere Schüsse
-                if (bulletRadius<1.2)
+                if (bulletRadius<0.9)
                 {
                     bulletRadius+=0.1;
                 }
@@ -566,7 +568,7 @@ public class BouncingBalls extends SimulationFrame {
             if ((boosterPosib > 0)&&(boosterPosib < 40)&&allowedBoosters)
             {
                 //Prüfung ob schon groß genug
-                while ((bulletRadius>=1.2)&&(boosterTypePosib==2))
+                while ((bulletRadius>=0.9)&&(boosterTypePosib==2))
                 {
                     //Wenn ja dann solange random bis keine 2 mehr
                     boosterTypePosib = ThreadLocalRandom.current().nextInt(0,  4);
@@ -601,22 +603,22 @@ public class BouncingBalls extends SimulationFrame {
     public static final Color getSemiRandomColor(int i) {
         int diff = max_hit_number - min_hit_number;
         int step = 	Math.round(diff/6);
-        if(i < max_hit_number) {
+        if(i < min_hit_number) {
             return new Color(0,255,0);
         }
-        if (i < max_hit_number + step) {
+        if (i < min_hit_number + step) {
             return new Color(81,124,14);
         }
-        if (i < max_hit_number + step * 2) {
+        if (i < min_hit_number + step * 2) {
             return new Color(166,215,31);
         }
-        if (i < max_hit_number + step * 3) {
+        if (i < min_hit_number + step * 3) {
             return new Color(255,255,0);
         }
-        if (i < max_hit_number + step * 4) {
+        if (i < min_hit_number + step * 4) {
             return new Color(255,160,62);
         }
-        if (i < max_hit_number + step * 5) {
+        if (i < min_hit_number + step * 5) {
             return new Color(255,0,0);
         }
         if (i <= max_hit_number) {

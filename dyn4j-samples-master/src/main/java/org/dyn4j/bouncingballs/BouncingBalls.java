@@ -78,6 +78,7 @@ public class BouncingBalls extends SimulationFrame {
     private static boolean trampRotateRight = true;
     private static double trampRotationStep = 0.01;
     //Constants für die Gamelogik
+    private static int BOOSTER_CHANCE = 40; //Prozentuale Chance auf Booster in einer Reihe
     private static double TIME_BETWEEN_BALLS = 0.3; //Zeit zwischen den Schuessen einer Salve
     private static double MAX_BALL_RADIUS = 0.8; //Maximaler Radius der Schüsse
     private static int MIN_BALLS_TO_CREATE = 1;
@@ -140,8 +141,8 @@ public class BouncingBalls extends SimulationFrame {
 				//Benötigte Schuesse für Ziele in abhängigkeitd es Levels hochsetzen
                 //TODO
                 //BALANCE
-				min_hit_number = Math.round((1+lvlCnt/100)*min_hit_number);
-                max_hit_number = Math.round((1+lvlCnt/100)*max_hit_number);
+                min_hit_number = Math.round((1+lvlCnt/10)*MIN_HIT_NUMBER_START);
+                max_hit_number = Math.round((1+lvlCnt/10)*MAX_HIT_NUMBER_START);
                 //Neuen Vektor für die Schuesse erstellen
                 //Faktor 0,15 da sonst Schüsse zu stark
                 shootingVector = new Vector2();
@@ -149,6 +150,7 @@ public class BouncingBalls extends SimulationFrame {
                 double dy = -0.15 * (point.getY() - POINTSHOOTER.getY());
                 shootingVector.set(dx, dy);
             }
+
 
 		}
 		@Override
@@ -313,7 +315,7 @@ public class BouncingBalls extends SimulationFrame {
             case 2: //großere Schüsse
                 if (bulletRadius<MAX_BALL_RADIUS)
                 {
-                    bulletRadius+=0.05;
+                    bulletRadius+=0.02;
                 }
                 break;
             case 3: //Rapid Fire
@@ -328,6 +330,7 @@ public class BouncingBalls extends SimulationFrame {
                 maxBalls++;
                 break;
         }
+
     }
 
 
@@ -339,7 +342,7 @@ public class BouncingBalls extends SimulationFrame {
             case 0:
                 this.world.removeBody(boosterTramp);
                 trampActive = false;
-                trampBoosterTimer = 0;
+                trampBoosterTimer = 1000;
                 break;
             case 1:
                 break;
@@ -376,7 +379,7 @@ public class BouncingBalls extends SimulationFrame {
 		timercounter_between_balls += elapsedTime;
 		//Allgemeine vergangene Zeit (noch nicht verwendet)
 		timer += elapsedTime;
-
+		
 		//Wiggle that Tramp biatch
         if (boosterTramp != null){
             double radTramp = boosterTramp.getTransform().getRotation();
@@ -520,6 +523,7 @@ public class BouncingBalls extends SimulationFrame {
 		lvlBox.setMass(MassType.INFINITE);
 		this.world.addBody(lvlBox);
 	}
+
     private void createCurrScore()
     {
         BodyFixture fixture = new BodyFixture(Geometry.createRectangle(2,2));
@@ -632,7 +636,7 @@ public class BouncingBalls extends SimulationFrame {
             boosterPosib = ThreadLocalRandom.current().nextInt(0, 100);
             boosterTypePosib = ThreadLocalRandom.current().nextInt(0, 5);
 
-            if ((boosterPosib > 0) && (boosterPosib < 30) && allowedBoosters) {
+            if ((boosterPosib > 0) && (boosterPosib < BOOSTER_CHANCE) && allowedBoosters) {
                 //Prüfung ob schon groß genug
                 while ((bulletRadius >= MAX_BALL_RADIUS) && (boosterTypePosib == 2)) {
                     //Wenn ja dann solange random bis keine 2 mehr
@@ -645,9 +649,11 @@ public class BouncingBalls extends SimulationFrame {
             } else {
                 createTargetBall(Xebenen[i], Yebenen[3]); //-4|-8
             }
+
         }
         allowedBoosters = true;
-    }
+	}
+
     //Targets eine Reihe nach oben verschieben
     public void liftBalls() {
         for (int i = 0; i < targetSack.size(); i++) {

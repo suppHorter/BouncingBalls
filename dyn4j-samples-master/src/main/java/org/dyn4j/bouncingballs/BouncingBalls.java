@@ -98,6 +98,7 @@ public class BouncingBalls extends SimulationFrame {
     public int getMaxBalls() {return maxBalls;}
 
     private static int maxBalls = 4; //Anzahl an Schuessen pro Salve
+    private static int maxBallsTemp;
 	private static Point POINTSHOOTER = new Point(250,40); //Punkt an dem Schuesse abgefeuert werden
     private static boolean allowedBoosters = true;
 
@@ -329,13 +330,15 @@ public class BouncingBalls extends SimulationFrame {
             case 3: //Rapid Fire
                 if (!shootStyle)
                 {
-                    maxBalls += 20;
+                    maxBallsTemp = maxBalls;
+                    maxBalls = (maxBallsTemp * 4);
                     TIME_BETWEEN_BALLS = 0.1;
                     shootStyle = true;
                 }
                 break;
             case 4: // Zusatzschuss
                 maxBalls++;
+                maxBallsTemp++;
                 break;
         }
 
@@ -358,7 +361,7 @@ public class BouncingBalls extends SimulationFrame {
                 break;
             case 3:
                 shootStyle = false;
-                maxBalls -= 20;
+                maxBalls = maxBallsTemp;
                 TIME_BETWEEN_BALLS = 0.3;
                 ballsCreated = 0;
                 break;
@@ -641,7 +644,7 @@ public class BouncingBalls extends SimulationFrame {
         currShotsBox.lvlNumber = maxBalls;
         rowsOfTargetsCreated += 1;
         //Zufallsanzahl an Baellen
-        int randomNoBalls = ThreadLocalRandom.current().nextInt(MIN_BALLS_TO_CREATE, MAX_BALLS_TO_CREATE);
+        int randomNoBalls = 2;//ThreadLocalRandom.current().nextInt(MIN_BALLS_TO_CREATE, MAX_BALLS_TO_CREATE);
         int boosterPosib;
         int boosterTypePosib;
         for (int i = 0; i < randomNoBalls + 1; i++) {

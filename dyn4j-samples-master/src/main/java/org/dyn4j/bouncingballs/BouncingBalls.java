@@ -311,10 +311,12 @@ public class BouncingBalls extends SimulationFrame {
             case 1: //Bombe
                 for (int i=0;i<targetSack.size();i++)
                 {
-                    targetSack.get(i).setHitNumber(targetSack.get(i).getHitNumber()-(5*(1+lvlCnt/10)));
+                    int bombStrength = 5*(1+lvlCnt/10);
+                    targetSack.get(i).setHitNumber(targetSack.get(i).getHitNumber()-bombStrength);
                     if ((targetSack.get(i).getHitNumber()<=0) &&(!(targetSack.get(i) instanceof BoosterBody)))
                     {
                         this.removeTarget(targetSack.get(i));
+                        i -= 1;
                     }
                 }
                 break;
@@ -646,7 +648,6 @@ public class BouncingBalls extends SimulationFrame {
             ///createTargetBall(Xebenen[0],Yebenen[3]); //-4|-8
             boosterPosib = ThreadLocalRandom.current().nextInt(0, 100);
             boosterTypePosib = ThreadLocalRandom.current().nextInt(0, 5);
-
             if ((boosterPosib > 0) && (boosterPosib < BOOSTER_CHANCE) && allowedBoosters) {
                 //Prüfung ob schon groß genug
                 while ((bulletRadius >= MAX_BALL_RADIUS) && (boosterTypePosib == 2)) {

@@ -8,9 +8,8 @@ public class BouncingBallsChallenge extends BouncingBalls {
 
     private static LiftThread lt;
 
-
-    public BouncingBallsChallenge(JFrame parentFrame) {
-        super(parentFrame);
+    public BouncingBallsChallenge(JFrame parentFrame, boolean muteMode) {
+        super(parentFrame,muteMode);
         this.setMode(true);
     }
 }

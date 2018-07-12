@@ -423,90 +423,90 @@ public class BouncingBalls extends SimulationFrame {
                     createTargets();
                 }
         }
-
-        if (targetSack.isEmpty())
-        {
-            //System.out.print("Clear");
-            deActivateBooster(0);
-            //currScoreBox.lvlNumber = lvlCnt;
-            lvlBox.lvlNumber = lvlCnt;
-        }
-
-        //Animation für Targetfeedback anhand des Timers beenden
-        if (targetSack.size()>0)
-        {
-            for (int i=0;i<targetSack.size();i++)
+        if (!this.isStopped()) {
+            if (targetSack.isEmpty())
             {
-                if (targetSack.get(i).getTimer() > 0)
+                //System.out.print("Clear");
+                deActivateBooster(0);
+                //currScoreBox.lvlNumber = lvlCnt;
+                lvlBox.lvlNumber = lvlCnt;
+            }
+
+            //Animation für Targetfeedback anhand des Timers beenden
+            if (targetSack.size()>0)
+            {
+                for (int i=0;i<targetSack.size();i++)
                 {
-                    targetSack.get(i).setTimer(targetSack.get(i).getTimer()-1);
-                }else
-                {
-                    if (targetSack.get(i).getGrowed())
+                    if (targetSack.get(i).getTimer() > 0)
                     {
-                        TargetBody tb = targetSack.get(i);
-                        tb.setGrowed(false);
-                        getsHitAni(tb, false);
+                        targetSack.get(i).setTimer(targetSack.get(i).getTimer()-1);
+                    }else
+                    {
+                        if (targetSack.get(i).getGrowed())
+                        {
+                            TargetBody tb = targetSack.get(i);
+                            tb.setGrowed(false);
+                            getsHitAni(tb, false);
+                        }
                     }
                 }
             }
+            //Nur schießen falls Salve noch nicht beendet wurde
+            if (timercounter_between_balls > TIME_BETWEEN_BALLS
+                    //&& ballsCreated < (maxBalls * turn)
+                    && canShoot){
+                timercounter_between_balls = 0;
+
+                //Wurde geklickt und gibt es einen Vektor
+                if (this.point != null && this.shootingVector != null && this.rapidShootingVector != null) {
+                    //Neuen Schuss erstellen
+                    ShotBallBody ball = new ShotBallBody();
+                    BodyFixture fixture = new BodyFixture(Geometry.createCircle(bulletRadius));
+                    fixture.setDensity(200);
+                    fixture.setRestitution(0.6);
+                    ball.addFixture(fixture);
+                    ball.translate(shootToVector);
+                    ball.translate(0,-0.2);
+                    if (!shootStyle)
+                    {
+                        ball.setLinearVelocity(shootingVector);
+                    }
+                    else
+                    {
+                        ball.setLinearVelocity(rapidShootingVector);
+                    }
+
+                    ball.setMass(MassType.NORMAL);
+                    //Schuss der Welt hinzufuegen
+                    this.world.addBody(ball);
+                    if (!muteMode)
+                    {
+                        SoundManager sm = new SoundManager();
+                        sm.play(Sound.SCHUSS);
+                    }
+                    ballsInGame += 1;
+                    ballsCreated += 1;
+                    currShotsBox.lvlNumber = maxBalls - ballsCreated;
+                    if ((ballsCreated >= maxBalls)&&shootStyle==true)
+                    {
+                        rapidShootingVector = null;
+                        canShoot = false;
+                        point = null;
+                        deActivateBooster(3);
+                    }
+                    else if ((ballsCreated >= maxBalls) && !shootStyle){
+                        //Kein Schiessen mehr moeglich nachdem alle Schuesse einer Salve abgefeuert wurden
+                        canShoot = false;
+                        ballsCreated = 0;
+                        //Mausposition nullen
+                        point = null;
+                    }
+
+                }
+            }
+            super.update(g, elapsedTime);
         }
-		//Nur schießen falls Salve noch nicht beendet wurde
-		if (timercounter_between_balls > TIME_BETWEEN_BALLS
-                //&& ballsCreated < (maxBalls * turn)
-                && canShoot){
-			timercounter_between_balls = 0;
-
-			//Wurde geklickt und gibt es einen Vektor
-			if (this.point != null && this.shootingVector != null && this.rapidShootingVector != null) {
-				//Neuen Schuss erstellen
-				ShotBallBody ball = new ShotBallBody();
-				BodyFixture fixture = new BodyFixture(Geometry.createCircle(bulletRadius));
-				fixture.setDensity(200);
-				fixture.setRestitution(0.6);
-				ball.addFixture(fixture);
-				ball.translate(shootToVector);
-				ball.translate(0,-0.2);
-                if (!shootStyle)
-                {
-                    ball.setLinearVelocity(shootingVector);
-                }
-				else
-                {
-                    ball.setLinearVelocity(rapidShootingVector);
-                }
-
-                ball.setMass(MassType.NORMAL);
-                //Schuss der Welt hinzufuegen
-				this.world.addBody(ball);
-				if (!muteMode)
-                {
-                    SoundManager sm = new SoundManager();
-                    sm.play(Sound.SCHUSS);
-                }
-				ballsInGame += 1;
-				ballsCreated += 1;
-                currShotsBox.lvlNumber = maxBalls - ballsCreated;
-                if ((ballsCreated >= maxBalls)&&shootStyle==true)
-                {
-                    rapidShootingVector = null;
-                    canShoot = false;
-                    point = null;
-                    deActivateBooster(3);
-                }
-				else if ((ballsCreated >= maxBalls) && !shootStyle){
-				    //Kein Schiessen mehr moeglich nachdem alle Schuesse einer Salve abgefeuert wurden
-				    canShoot = false;
-                    ballsCreated = 0;
-				    //Mausposition nullen
-				    point = null;
-                }
-
-			}
-		}
-		super.update(g, elapsedTime);
-	}
-
+    }
 
     private void createCurrShotsBox()
     {
@@ -715,7 +715,7 @@ public class BouncingBalls extends SimulationFrame {
     }
 
     public void endGame() {
-	    //this.stop();
+	    this.stop();
 	    int place = ScoreEntry.checkPlace(currScore);
         if (place <= 10) {
             //Neuer Leaderboard Eintrag
@@ -729,7 +729,7 @@ public class BouncingBalls extends SimulationFrame {
         }
     }
     public void setStandard(){
-        maxBalls = 5;
+        maxBalls = 4;
         shootStyle = true;
         ballsCreated = 0;
         canShoot = true;

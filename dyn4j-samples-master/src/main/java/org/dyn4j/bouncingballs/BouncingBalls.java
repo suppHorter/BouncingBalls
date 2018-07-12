@@ -416,7 +416,9 @@ public class BouncingBalls extends SimulationFrame {
                     liftBalls();
                     lvlBox.lvlNumber = lvlCnt;
                 }
-                createTargets();
+                if(!this.isStopped()) {
+                    createTargets();
+                }
         }
 
         if (targetSack.isEmpty())
@@ -716,12 +718,12 @@ public class BouncingBalls extends SimulationFrame {
 	    int place = ScoreEntry.checkPlace(currScore);
         if (place <= 10) {
             //Neuer Leaderboard Eintrag
-            ScoreDialog scoreDialog = new ScoreDialog(this, parentFrame, place, lvlCnt,currScore);
             setStandard();
+            ScoreDialog scoreDialog = new ScoreDialog(this, parentFrame, place, lvlCnt,currScore);
         }
         else {
-            ScoreDialog scoreDialog = new ScoreDialog(this, parentFrame);
             setStandard();
+            ScoreDialog scoreDialog = new ScoreDialog(this, parentFrame);
             //Kein neuer Leaderboardeintrag
         }
     }

@@ -37,7 +37,12 @@ public class BouncingBalls extends SimulationFrame {
     static int rowsOfTargetsCreated;
     //Runden zählen
     public static int turn = 1;
-	private static int lvlCnt;
+
+    public static int getLvlCnt() {
+        return lvlCnt;
+    }
+
+    private static int lvlCnt;
 	//Koordinaten für die Target Reihen
 	static double[] Yebenen = {4,0,-4,-8};
 	static double[] Xebenen = {-5, 0, 5};
@@ -406,7 +411,7 @@ public class BouncingBalls extends SimulationFrame {
         highScoreBox.lvlNumber = currScore;
 
 		//targets erstellen falls momentane Runde abgeschlossen wurde
-		if(turn > 1 && rowsOfTargetsCreated < turn){
+		if((turn > 1) && (rowsOfTargetsCreated < turn)){
                 if (targetSack.size() > 0) {
                     liftBalls();
                     lvlBox.lvlNumber = lvlCnt;
@@ -705,7 +710,7 @@ public class BouncingBalls extends SimulationFrame {
     }
 
     public void endGame() {
-	    this.stop();
+	    //this.stop();
 	    int place = ScoreEntry.checkPlace(currScore);
         if (place <= 10) {
             //Neuer Leaderboard Eintrag

@@ -104,7 +104,6 @@ public final class Graphics2DRenderer {
 				radius2 * scale);
 
 		color = getSemiRandomColor();
-		System.out.print(color);
 		g.setColor(color);
 		g.setColor(getOutlineColor(color));
 		g.draw(c);

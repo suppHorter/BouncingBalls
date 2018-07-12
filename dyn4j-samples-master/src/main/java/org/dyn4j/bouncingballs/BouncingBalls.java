@@ -432,8 +432,6 @@ public class BouncingBalls extends SimulationFrame {
             lvlBox.lvlNumber = lvlCnt;
         }
 
-        System.out.println(this.muteMode);
-
         //Animation für Targetfeedback anhand des Timers beenden
         if (targetSack.size()>0)
         {

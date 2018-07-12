@@ -27,7 +27,7 @@ public class BouncingBalls extends SimulationFrame {
     static double bulletRadius = 0.6;
     //Anzahl an Schuessen die momentan im Spiel vorhanden sind (maximal MAXBALLS)
     static int ballsInGame = 0;
-    //Anzahl aller Schuesse die jemals erstellt wurden
+    //Anzahl aller Schuesse die erstellt wurden. Wird nach einer Salve zurückgesetzt
     static int ballsCreated = 0;
     //Automatik oder Einzelschuss
     static boolean shootStyle;
@@ -37,7 +37,12 @@ public class BouncingBalls extends SimulationFrame {
     static int rowsOfTargetsCreated;
     //Runden zählen
     public static int turn = 1;
-	private static int lvlCnt;
+
+    public static int getLvlCnt() {
+        return lvlCnt;
+    }
+
+    private static int lvlCnt;
 	//Koordinaten für die Target Reihen
 	static double[] Yebenen = {4,0,-4,-8};
 	static double[] Xebenen = {-5, 0, 5};
@@ -140,7 +145,7 @@ public class BouncingBalls extends SimulationFrame {
             }else if (canShoot && ballsCreated == 0) {
                 point = new Point(canvas.getMousePosition());
 				lvlCnt++;
-				//Benötigte Schuesse für Ziele in abhängigkeitd es Levels hochsetzen
+				//Benötigte Schuesse für Ziele in abhängigkeit des Levels hochsetzen
                 //TODO
                 //BALANCE
                 min_hit_number = Math.round((1+lvlCnt/10)*MIN_HIT_NUMBER_START);
@@ -152,8 +157,6 @@ public class BouncingBalls extends SimulationFrame {
                 double dy = -0.15 * (point.getY() - POINTSHOOTER.getY());
                 shootingVector.set(dx, dy);
             }
-
-
 		}
 		@Override
 		public void mouseReleased(MouseEvent e) {
@@ -308,7 +311,7 @@ public class BouncingBalls extends SimulationFrame {
             case 1: //Bombe
                 for (int i=0;i<targetSack.size();i++)
                 {
-                    targetSack.get(i).setHitNumber(targetSack.get(i).getHitNumber()-5);
+                    targetSack.get(i).setHitNumber(targetSack.get(i).getHitNumber()-(5*(1+lvlCnt/10)));
                     if ((targetSack.get(i).getHitNumber()<=0) &&(!(targetSack.get(i) instanceof BoosterBody)))
                     {
                         this.removeTarget(targetSack.get(i));
@@ -411,7 +414,7 @@ public class BouncingBalls extends SimulationFrame {
         highScoreBox.lvlNumber = currScore;
 
 		//targets erstellen falls momentane Runde abgeschlossen wurde
-		if(turn > 1 && rowsOfTargetsCreated < turn){
+		if((turn > 1) && (rowsOfTargetsCreated < turn)){
                 if (targetSack.size() > 0) {
                     liftBalls();
                     lvlBox.lvlNumber = lvlCnt;
@@ -714,7 +717,7 @@ public class BouncingBalls extends SimulationFrame {
     }
 
     public void endGame() {
-	    this.stop();
+	    //this.stop();
 	    int place = ScoreEntry.checkPlace(currScore);
         if (place <= 10) {
             //Neuer Leaderboard Eintrag

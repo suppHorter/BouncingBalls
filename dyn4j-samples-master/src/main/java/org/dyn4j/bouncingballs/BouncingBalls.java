@@ -200,11 +200,11 @@ public class BouncingBalls extends SimulationFrame {
         trampActive = false;
 		lvlBox = new LvlBoxBody();
 		highScoreBox = new LvlBoxBody();
-		currScoreBox = new LvlBoxBody();
+		//currScoreBox = new LvlBoxBody();
         currShotsBox = new LvlBoxBody();
 		createLvlLbl();
         createHighScore();
-        createCurrScore();
+        //createCurrScore();
         createCurrShotsBox();
         menuBox = new MenuButtonBox();
 		//Gravitation der Welt anpassen
@@ -415,9 +415,9 @@ public class BouncingBalls extends SimulationFrame {
 
         if (targetSack.isEmpty())
         {
-            System.out.print("Clear");
+            //System.out.print("Clear");
             deActivateBooster(0);
-            currScoreBox.lvlNumber = lvlCnt;
+            //currScoreBox.lvlNumber = lvlCnt;
             lvlBox.lvlNumber = lvlCnt;
         }
 
@@ -531,9 +531,6 @@ public class BouncingBalls extends SimulationFrame {
         currScoreBox.translate(7,9);
         currScoreBox.setMass(MassType.INFINITE);
         this.world.addBody(currScoreBox);
-
-        //g.setFont(new Font("Default", Font.PLAIN, 20));
-        //g.drawString(String.valueOf(hitNumber), (int)radius-12, (int)radius+5);
     }
 
     private void createHighScore()
@@ -544,7 +541,7 @@ public class BouncingBalls extends SimulationFrame {
         highScoreBox.lvlNumber = highScore;
         fixture.setRestitution(0);
         highScoreBox.setColor(Color.WHITE);
-        highScoreBox.translate(7,8);
+        highScoreBox.translate(7,9);
         highScoreBox.setMass(MassType.INFINITE);
         this.world.addBody(highScoreBox);
 

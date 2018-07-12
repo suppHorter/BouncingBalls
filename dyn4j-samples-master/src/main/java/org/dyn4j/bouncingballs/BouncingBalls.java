@@ -307,7 +307,7 @@ public class BouncingBalls extends SimulationFrame {
             case 0:
                 this.world.removeBody(boosterTramp);
                 trampActive = false;
-                trampBoosterTimer = 0;
+                trampBoosterTimer = 1000;
                 break;
             case 1:
                 break;
@@ -383,7 +383,8 @@ public class BouncingBalls extends SimulationFrame {
 
         if (targetSack.isEmpty())
         {
-            System.out.println("Clear");
+            //System.out.println("Clear");
+            deActivateBooster(0);
         }
 
         //Animation für Targetfeedback anhand des Timers beenden

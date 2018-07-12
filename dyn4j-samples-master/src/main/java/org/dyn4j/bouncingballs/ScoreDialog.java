@@ -11,6 +11,7 @@ public class ScoreDialog extends JDialog{
     int score;
     JFrame mainMenu;
 
+
     public ScoreDialog(Window window, JFrame mainMenu, int place, int lvlCnt, int score) {
         super(window);
         this.place = place;
@@ -26,8 +27,14 @@ public class ScoreDialog extends JDialog{
         JLabel losing = new JLabel(gameOver);
         JLabel namePrompt = new JLabel("Bitte geben Sie Ihren Namen ein");
         JTextField nameInput = new JTextField();
-        JButton okButton = new JButton("OK");
-
+        ImageIcon okButtonImage = new ImageIcon(getClass().getResource("resources/okButton.png"));
+        JButton okButton = new JButton(okButtonImage);
+        namePrompt.setForeground(Color.WHITE);
+        nameInput.setBackground(Color.BLACK);
+        nameInput.setForeground(Color.WHITE);
+        okButton.setBackground(Color.BLACK);
+        okButton.setForeground(Color.WHITE);
+        okButton.setContentAreaFilled(false);
         okButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

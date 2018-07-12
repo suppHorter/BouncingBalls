@@ -338,9 +338,7 @@ public class BouncingBalls extends SimulationFrame {
                 maxBalls++;
                 break;
         }
-
     }
-
 
     public void deActivateBooster(int type)
     {
@@ -670,7 +668,7 @@ public class BouncingBalls extends SimulationFrame {
     public void liftBalls() {
         for (int i = 0; i < targetSack.size(); i++) {
             if (targetSack.get(i).getTransform().getTranslationY() >= 3) {
-                targetSack.get(i).removeAllFixtures();
+                removeTarget(targetSack.get(i));
                 this.endGame();
             } else {
                 targetSack.get(i).translate(0, 4);
@@ -729,6 +727,7 @@ public class BouncingBalls extends SimulationFrame {
             //Kein neuer Leaderboardeintrag
         }
     }
+
     public void setStandard(){
         maxBalls = 4;
         shootStyle = false;

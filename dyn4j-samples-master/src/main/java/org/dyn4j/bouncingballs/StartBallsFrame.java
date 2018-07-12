@@ -8,16 +8,16 @@ import java.awt.event.ActionListener;
 
 public class StartBallsFrame implements ActionListener{
 
-    private JFrame startBalls;
-    private JPanel panel;
-    private JLabel label;
+    private JFrame startBalls,helpFrame;
+    private JPanel panel,helpPanel;
+    private JLabel label,helpLbl;
 
     private int[] labellist;
     private int labelPosistion;
 
     private Icon title1,title2,title3,title4;
-    private Icon button1,button2,button3,button4,muteTrue,muteFalse;
-    private JButton start,challenge,highscore,quit,btnMuteFalse,btnMuteTrue;
+    private Icon button1,button2,button3,button4,muteTrue,muteFalse,helpImg;
+    private JButton start,challenge,highscore,quit,quit_Help,btnMuteFalse,btnMuteTrue,btnHelp;
     private HighscoreFrame highscoreFrame;
     private boolean muteMode;
 
@@ -34,6 +34,7 @@ public class StartBallsFrame implements ActionListener{
     public StartBallsFrame() {
         //Erzeugen des Frames
         startBalls = new JFrame("Bouncing Balls");
+        helpFrame = new JFrame("Help");
 
         //Erzeugen der ImageIcons für den blinkenden Titel
         title1 = new ImageIcon(getClass().getResource("resources/bb1klein.png"));
@@ -52,14 +53,18 @@ public class StartBallsFrame implements ActionListener{
         button4 = new ImageIcon(getClass().getResource("resources/quitklein.png"));
         muteTrue = new ImageIcon(getClass().getResource("resources/MuteFalse.png"));
         muteFalse = new ImageIcon(getClass().getResource("resources/MuteTrue.png"));
+        helpImg = new ImageIcon(getClass().getResource("resources/help.png"));
 
+        helpLbl = new JLabel(helpImg);
         //Erzeugen der Buttons in Form der ImageIcons
         start = new JButton(button1);
         challenge = new JButton(button2);
         highscore = new JButton(button3);
         quit = new JButton(button4);
+        quit_Help = new JButton(button4);
         btnMuteTrue = new JButton(muteFalse);
         btnMuteFalse = new JButton(muteTrue);
+        btnHelp = new JButton("HELP");
 
         //Alles für den START Button
         start.setBounds(175, 250, 158, 50);
@@ -86,11 +91,12 @@ public class StartBallsFrame implements ActionListener{
         btnMuteTrue.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                muteMode =false;
+                muteMode = false;
                 btnMuteTrue.setVisible(false);
                 btnMuteFalse.setVisible(true);
             }
         });
+
         //Alles für den Mute Button
         btnMuteFalse.setBounds(0, 600, 158, 80);
         btnMuteFalse.setBorder(new BasicBorders.ButtonBorder(Color.BLACK, Color.BLACK, Color.BLACK, Color.BLACK));
@@ -100,12 +106,25 @@ public class StartBallsFrame implements ActionListener{
         btnMuteFalse.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                muteMode =true;
+                muteMode = true;
                 btnMuteTrue.setVisible(true);
                 btnMuteFalse.setVisible(false);
             }
         });
 
+        //Alles für den Help Button
+        btnHelp.setBounds(350, 600, 100, 50);
+        btnHelp.setBorder(new BasicBorders.ButtonBorder(Color.BLACK, Color.BLACK, Color.BLACK, Color.BLACK));
+        btnHelp.setBackground(Color.black);
+        btnHelp.setForeground(Color.white);
+        btnHelp.setContentAreaFilled(false);
+        btnHelp.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                startBalls.setVisible(false);
+                helpFrame.setVisible(true);
+            }
+        });
         //Alles für den CHALLENGE Button
         challenge.setBounds(111, 350, 286, 50);
         challenge.setBackground(Color.black);
@@ -145,6 +164,34 @@ public class StartBallsFrame implements ActionListener{
            }
         });
 
+        //Alles für den QUIT Button
+        quit_Help.setBounds(193, 550, 122, 50);
+        quit_Help.setBackground(Color.BLACK);
+        quit_Help.setContentAreaFilled(false);
+        quit_Help.setBorder(new BasicBorders.ButtonBorder(Color.BLACK, Color.BLACK, Color.BLACK, Color.BLACK));
+        quit_Help.setForeground(Color.white);
+        quit_Help.addActionListener(new ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                startBalls.setVisible(true);
+                helpFrame.setVisible(false);
+            }
+        });
+
+        //Erzeugen des JPanels und hinzufügen der Buttons
+        helpPanel= new JPanel();
+        helpPanel.setLayout(null);
+        helpPanel.setBackground(Color.black);
+        helpLbl.setSize(500,700);
+        helpPanel.add(helpLbl);
+        helpPanel.add(quit_Help);
+
+        helpFrame.setSize(500, 700);
+        helpFrame.setResizable(false);
+        helpFrame.setLocationRelativeTo(null);
+        helpFrame.setUndecorated(true);
+        helpFrame.add(helpPanel);
+        helpFrame.setVisible(false);
+
         //Erzeugen des JPanels und hinzufügen der Buttons
         panel = new JPanel();
         panel.setLayout(null);
@@ -154,7 +201,7 @@ public class StartBallsFrame implements ActionListener{
         panel.add(quit);
         panel.add(challenge);
         panel.add(highscore);
-
+        panel.add(btnHelp);
         panel.add(btnMuteFalse);
         panel.add(btnMuteTrue);
 
@@ -165,7 +212,6 @@ public class StartBallsFrame implements ActionListener{
         startBalls.setUndecorated(true);
         startBalls.add(panel);
         startBalls.setVisible(true);
-
     }
 
     //Funktion die im Thread aufgerufen wird um die verschiedenen LAbels einzublenden
@@ -220,9 +266,7 @@ public class StartBallsFrame implements ActionListener{
     }
 
     @Override
-    public void actionPerformed(ActionEvent e) {
-
-    }
+    public void actionPerformed(ActionEvent e) {}
 }
 
 

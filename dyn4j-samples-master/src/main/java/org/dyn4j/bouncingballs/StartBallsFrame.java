@@ -16,9 +16,10 @@ public class StartBallsFrame implements ActionListener{
     private int labelPosistion;
 
     private Icon title1,title2,title3,title4;
-    private Icon button1,button2,button3,button4;
-    private JButton start,challenge,highscore,quit;
+    private Icon button1,button2,button3,button4,muteTrue,muteFalse;
+    private JButton start,challenge,highscore,quit,btnMuteFalse,btnMuteTrue;
     private HighscoreFrame highscoreFrame;
+    private boolean muteMode;
 
     protected static BlinkingThread bt;
 
@@ -49,12 +50,16 @@ public class StartBallsFrame implements ActionListener{
         button2 = new ImageIcon(getClass().getResource("resources/challengeklein.png"));
         button3 = new ImageIcon(getClass().getResource("resources/highscoreklein.png"));
         button4 = new ImageIcon(getClass().getResource("resources/quitklein.png"));
+        muteTrue = new ImageIcon(getClass().getResource("resources/MuteFalse.png"));
+        muteFalse = new ImageIcon(getClass().getResource("resources/MuteTrue.png"));
 
         //Erzeugen der Buttons in Form der ImageIcons
         start = new JButton(button1);
         challenge = new JButton(button2);
         highscore = new JButton(button3);
         quit = new JButton(button4);
+        btnMuteTrue = new JButton(muteFalse);
+        btnMuteFalse = new JButton(muteTrue);
 
         //Alles für den START Button
         start.setBounds(175, 250, 158, 50);
@@ -66,9 +71,40 @@ public class StartBallsFrame implements ActionListener{
             @Override
             public void actionPerformed(ActionEvent e) {
                 startBalls.setVisible(false);
-                BouncingBalls bB = new BouncingBalls(startBalls);
+                BouncingBalls bB = new BouncingBalls(startBalls,muteMode);
                 bB.setVisible(true);
 
+            }
+        });
+
+        //Alles für den Mute Button
+        btnMuteTrue.setBounds(0, 600, 158, 80);
+        btnMuteTrue.setBorder(new BasicBorders.ButtonBorder(Color.BLACK, Color.BLACK, Color.BLACK, Color.BLACK));
+        btnMuteTrue.setBackground(Color.black);
+        btnMuteTrue.setForeground(Color.white);
+        btnMuteTrue.setContentAreaFilled(false);
+        btnMuteTrue.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                muteMode =false;
+                System.out.println("Mute = false");
+                btnMuteTrue.setVisible(false);
+                btnMuteFalse.setVisible(true);
+            }
+        });
+        //Alles für den Mute Button
+        btnMuteFalse.setBounds(0, 600, 158, 80);
+        btnMuteFalse.setBorder(new BasicBorders.ButtonBorder(Color.BLACK, Color.BLACK, Color.BLACK, Color.BLACK));
+        btnMuteFalse.setBackground(Color.black);
+        btnMuteFalse.setForeground(Color.white);
+        btnMuteFalse.setContentAreaFilled(false);
+        btnMuteFalse.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                muteMode =true;
+                System.out.println("Mute = true");
+                btnMuteTrue.setVisible(true);
+                btnMuteFalse.setVisible(false);
             }
         });
 
@@ -82,7 +118,7 @@ public class StartBallsFrame implements ActionListener{
             @Override
             public void actionPerformed(ActionEvent e) {
                 startBalls.setVisible(false);
-                BouncingBallsChallenge bBC = new BouncingBallsChallenge(startBalls);
+                BouncingBallsChallenge bBC = new BouncingBallsChallenge(startBalls,muteMode);
                 bBC.setVisible(true);
             }
         });
@@ -105,10 +141,10 @@ public class StartBallsFrame implements ActionListener{
         quit.setBorder(new BasicBorders.ButtonBorder(Color.BLACK, Color.BLACK, Color.BLACK, Color.BLACK));
         quit.setForeground(Color.white);
         quit.addActionListener(new ActionListener() {
-                                   public void actionPerformed(java.awt.event.ActionEvent e) {
+           public void actionPerformed(java.awt.event.ActionEvent e) {
 
-                                       System.exit(0);
-                                   }
+               System.exit(0);
+           }
         });
 
         //Erzeugen des JPanels und hinzufügen der Buttons
@@ -120,6 +156,9 @@ public class StartBallsFrame implements ActionListener{
         panel.add(quit);
         panel.add(challenge);
         panel.add(highscore);
+
+        panel.add(btnMuteFalse);
+        panel.add(btnMuteTrue);
 
         //Einstellen des Fensters und Sichtbar machen sowie aufgebautes Panel hinzufügen
         startBalls.setSize(500, 700);

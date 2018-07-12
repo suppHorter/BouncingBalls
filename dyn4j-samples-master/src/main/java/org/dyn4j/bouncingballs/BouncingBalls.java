@@ -85,10 +85,12 @@ public class BouncingBalls extends SimulationFrame {
     private static int MAX_BALLS_TO_CREATE = 3;
 
     private boolean challengeMode = false;
+    private boolean muteMode = false;
 
-    public static int getMaxBalls() {
-        return maxBalls;
-    }
+    public boolean getMuteMode(){return this.muteMode;}
+    public void setMuteMode(boolean muteMode){this.muteMode = muteMode;}
+
+    public int getMaxBalls() {return maxBalls;}
 
     private static int maxBalls = 4; //Anzahl an Schuessen pro Salve
 	private static Point POINTSHOOTER = new Point(250,40); //Punkt an dem Schuesse abgefeuert werden
@@ -159,13 +161,14 @@ public class BouncingBalls extends SimulationFrame {
 		}
 	}
 
-	public BouncingBalls(JFrame parentFrame) {
+	public BouncingBalls(JFrame parentFrame, boolean muteMode) {
 		super("Bouncing Balls", 32.0);
 		this.parentFrame = parentFrame;
 		MouseAdapter ml = new CustomMouseAdapter(this);
 		this.canvas.addMouseMotionListener(ml);
 		this.canvas.addMouseWheelListener(ml);
 		this.canvas.addMouseListener(ml);
+		this.muteMode = muteMode;
 		this.run();
 		/*
 		if (challengeMode)
@@ -424,6 +427,8 @@ public class BouncingBalls extends SimulationFrame {
             lvlBox.lvlNumber = lvlCnt;
         }
 
+        System.out.println(this.muteMode);
+
         //Animation für Targetfeedback anhand des Timers beenden
         if (targetSack.size()>0)
         {
@@ -471,8 +476,11 @@ public class BouncingBalls extends SimulationFrame {
                 ball.setMass(MassType.NORMAL);
                 //Schuss der Welt hinzufuegen
 				this.world.addBody(ball);
-				SoundManager sm = new SoundManager();
-				sm.play(Sound.SCHUSS);
+				if (!muteMode)
+                {
+                    SoundManager sm = new SoundManager();
+                    sm.play(Sound.SCHUSS);
+                }
 				ballsInGame += 1;
 				ballsCreated += 1;
                 currShotsBox.lvlNumber = maxBalls - ballsCreated;

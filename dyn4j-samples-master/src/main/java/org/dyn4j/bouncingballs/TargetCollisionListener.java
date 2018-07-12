@@ -51,8 +51,10 @@ public class TargetCollisionListener extends CollisionAdapter {
             }else
             {
                 target.setHitNumber(target.getHitNumber()-1);
-                SoundManager sm = new SoundManager();
-                sm.play(Sound.TREFFER);
+                if (!bB.getMuteMode()) {
+                    SoundManager sm = new SoundManager();
+                    sm.play(Sound.TREFFER);
+                }
                 target.setColor(BouncingBalls.getSemiRandomColor(target.getHitNumber()));
                 aT.run(target,false);
             }

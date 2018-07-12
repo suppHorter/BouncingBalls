@@ -87,7 +87,6 @@ public class StartBallsFrame implements ActionListener{
             @Override
             public void actionPerformed(ActionEvent e) {
                 muteMode =false;
-                System.out.println("Mute = false");
                 btnMuteTrue.setVisible(false);
                 btnMuteFalse.setVisible(true);
             }
@@ -102,7 +101,6 @@ public class StartBallsFrame implements ActionListener{
             @Override
             public void actionPerformed(ActionEvent e) {
                 muteMode =true;
-                System.out.println("Mute = true");
                 btnMuteTrue.setVisible(true);
                 btnMuteFalse.setVisible(false);
             }

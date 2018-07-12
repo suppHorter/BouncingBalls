@@ -66,13 +66,15 @@ public class ScoreDialog extends JDialog{
 
         this.setUndecorated(true);
         ImageIcon gameOver = new ImageIcon(getClass().getResource("resources/gameOver.png"));
-
+        ImageIcon backButtonImage = new ImageIcon(getClass().getResource("resources/backButton.png"));
         JPanel panel = new JPanel();
         panel.setLayout(new GridLayout(0, 1));
 
         JLabel losing = new JLabel(gameOver);
-        JButton backButton = new JButton("Zurück zum Hauptmenü");
-
+        JButton backButton = new JButton(backButtonImage);
+        backButton.setBackground(Color.BLACK);
+        backButton.setForeground(Color.WHITE);
+        backButton.setContentAreaFilled(false);
         backButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

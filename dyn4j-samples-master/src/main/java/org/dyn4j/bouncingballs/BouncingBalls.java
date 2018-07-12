@@ -731,7 +731,7 @@ public class BouncingBalls extends SimulationFrame {
     }
     public void setStandard(){
         maxBalls = 4;
-        shootStyle = true;
+        shootStyle = false;
         ballsCreated = 0;
         canShoot = true;
         targetSack.clear();

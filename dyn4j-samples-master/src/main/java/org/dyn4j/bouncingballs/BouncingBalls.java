@@ -27,7 +27,7 @@ public class BouncingBalls extends SimulationFrame {
     static double bulletRadius = 0.6;
     //Anzahl an Schuessen die momentan im Spiel vorhanden sind (maximal MAXBALLS)
     static int ballsInGame = 0;
-    //Anzahl aller Schuesse die jemals erstellt wurden
+    //Anzahl aller Schuesse die erstellt wurden. Wird nach einer Salve zurückgesetzt
     static int ballsCreated = 0;
     //Automatik oder Einzelschuss
     static boolean shootStyle;
@@ -138,7 +138,7 @@ public class BouncingBalls extends SimulationFrame {
             }else if (canShoot && ballsCreated == 0) {
                 point = new Point(canvas.getMousePosition());
 				lvlCnt++;
-				//Benötigte Schuesse für Ziele in abhängigkeitd es Levels hochsetzen
+				//Benötigte Schuesse für Ziele in abhängigkeit des Levels hochsetzen
                 //TODO
                 //BALANCE
                 min_hit_number = Math.round((1+lvlCnt/10)*MIN_HIT_NUMBER_START);
@@ -150,8 +150,6 @@ public class BouncingBalls extends SimulationFrame {
                 double dy = -0.15 * (point.getY() - POINTSHOOTER.getY());
                 shootingVector.set(dx, dy);
             }
-
-
 		}
 		@Override
 		public void mouseReleased(MouseEvent e) {
@@ -305,7 +303,7 @@ public class BouncingBalls extends SimulationFrame {
             case 1: //Bombe
                 for (int i=0;i<targetSack.size();i++)
                 {
-                    targetSack.get(i).setHitNumber(targetSack.get(i).getHitNumber()-5);
+                    targetSack.get(i).setHitNumber(targetSack.get(i).getHitNumber()-(5*(1+lvlCnt/10)));
                     if ((targetSack.get(i).getHitNumber()<=0) &&(!(targetSack.get(i) instanceof BoosterBody)))
                     {
                         this.removeTarget(targetSack.get(i));

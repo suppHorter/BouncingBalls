@@ -11,9 +11,7 @@ public class BouncingBallsChallenge extends BouncingBalls {
 
     public BouncingBallsChallenge(JFrame parentFrame) {
         super(parentFrame);
-        activateBooster(3);
-        //lt = new LiftThread(this);
-        //lt.run();
+        this.setMode(true);
     }
 }
 

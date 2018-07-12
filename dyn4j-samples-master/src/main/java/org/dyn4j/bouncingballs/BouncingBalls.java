@@ -2,6 +2,8 @@
 package org.dyn4j.bouncingballs;
 
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Line2D;
@@ -14,6 +16,7 @@ import org.dyn4j.bouncingballs.framework.SimulationBody;
 import org.dyn4j.bouncingballs.framework.SimulationFrame;
 
 import javax.swing.*;
+import java.util.Timer;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class BouncingBalls extends SimulationFrame {
@@ -74,11 +77,13 @@ public class BouncingBalls extends SimulationFrame {
     private static int max_hit_number = MAX_HIT_NUMBER_START; //Maximalanzahl Treffer wird erhöht wärend Laufzeit
     private static boolean trampRotateRight = true;
     private static double trampRotationStep = 0.01;
-    //Constants für die Gamelogik    
+    //Constants für die Gamelogik
     private static double TIME_BETWEEN_BALLS = 0.3; //Zeit zwischen den Schuessen einer Salve
     private static double MAX_BALL_RADIUS = 0.8; //Maximaler Radius der Schüsse
     private static int MIN_BALLS_TO_CREATE = 1;
     private static int MAX_BALLS_TO_CREATE = 3;
+
+    private boolean challengeMode = false;
 
     public static int getMaxBalls() {
         return maxBalls;
@@ -93,8 +98,12 @@ public class BouncingBalls extends SimulationFrame {
     private boolean bombActive = false;
 
     private int highScore,currScore;
+    private Timer timerChallenge;
+
     public void setCurrScore(int score){this.currScore = score;}
+
     public int getCurrScore(){return this.currScore;}
+    public void setMode(boolean mode){this.challengeMode = mode;}
 
 	private final class CustomMouseAdapter extends MouseAdapter {
         private BouncingBalls bouncingBalls;
@@ -157,7 +166,31 @@ public class BouncingBalls extends SimulationFrame {
 		this.canvas.addMouseWheelListener(ml);
 		this.canvas.addMouseListener(ml);
 		this.run();
-	}
+		/*
+		if (challengeMode)
+        {
+
+            timerChallenge = new Timer(1000, new ActionListener() {
+
+                public void actionPerformed(ActionEvent e) {
+                    // 1 Sekunde abziehen
+                    timerChallenge.counterValue--;
+
+                    // Zahl in Label darstellen
+                    Countdown.label.setText(String.valueOf(counterValue));
+
+                    // Falls Zähler = 0, Countdown abgelaufen!
+                    if(Countdown.counterValue == 0){
+                        System.out.println("Counterdown ausgelaufen!");
+
+                        // Timer stoppen
+                        Countdown.timer.stop();
+                    }
+                }
+            });
+        }*/
+
+    }
 
 	protected void initializeWorld() {
         min_hit_number = MIN_HIT_NUMBER_START;
@@ -299,6 +332,7 @@ public class BouncingBalls extends SimulationFrame {
 
     }
 
+
     public void deActivateBooster(int type)
     {
         //Hier alle Booster löschen (nach Zugende)this.world.removeBody(boosterTramp);
@@ -362,8 +396,8 @@ public class BouncingBalls extends SimulationFrame {
 
             boosterTramp.getTransform().setRotation(radTramp);
         }
-        
-		
+
+
         trampBoosterTimer += elapsedTime;
         //Zeit für Trampolintimer
         if (trampBoosterTimer>=10)
@@ -383,8 +417,10 @@ public class BouncingBalls extends SimulationFrame {
 
         if (targetSack.isEmpty())
         {
-            //System.out.println("Clear");
+            System.out.print("Clear");
             deActivateBooster(0);
+            currScoreBox.lvlNumber = lvlCnt;
+            lvlBox.lvlNumber = lvlCnt;
         }
 
         //Animation für Targetfeedback anhand des Timers beenden
@@ -459,6 +495,20 @@ public class BouncingBalls extends SimulationFrame {
 		super.update(g, elapsedTime);
 	}
 
+
+    private void createCurrShotsBox()
+    {
+        BodyFixture fixture = new BodyFixture(Geometry.createRectangle(2,2));
+        fixture.setSensor(true);
+        currShotsBox.addFixture(fixture);
+        currShotsBox.lvlNumber = currScore;
+        fixture.setRestitution(0);
+        currShotsBox.setColor(Color.GREEN);
+        currShotsBox.translate(2,8.5);
+        currShotsBox.setMass(MassType.INFINITE);
+        this.world.addBody(currShotsBox);
+    }
+
 	private void createLvlLbl()
 	{
 	    //Levelzähler anzeigen
@@ -472,18 +522,7 @@ public class BouncingBalls extends SimulationFrame {
 		lvlBox.setMass(MassType.INFINITE);
 		this.world.addBody(lvlBox);
 	}
-    private void createCurrShotsBox()
-    {
-        BodyFixture fixture = new BodyFixture(Geometry.createRectangle(2,2));
-        fixture.setSensor(true);
-        currShotsBox.addFixture(fixture);
-        currShotsBox.lvlNumber = currScore;
-        fixture.setRestitution(0);
-        currShotsBox.setColor(Color.GREEN);
-        currShotsBox.translate(2,8.5);
-        currShotsBox.setMass(MassType.INFINITE);
-        this.world.addBody(currShotsBox);
-    }
+
     private void createCurrScore()
     {
         BodyFixture fixture = new BodyFixture(Geometry.createRectangle(2,2));
@@ -587,31 +626,30 @@ public class BouncingBalls extends SimulationFrame {
 	}
 
 	//Zu zerstörende Baelle generieren
-    public void createTargets(){
+    public void createTargets() {
         currShotsBox.lvlNumber = maxBalls;
         rowsOfTargetsCreated += 1;
-		//Zufallsanzahl an Baellen
-		int randomNoBalls = ThreadLocalRandom.current().nextInt(MIN_BALLS_TO_CREATE, MAX_BALLS_TO_CREATE );
+        //Zufallsanzahl an Baellen
+        int randomNoBalls = ThreadLocalRandom.current().nextInt(MIN_BALLS_TO_CREATE, MAX_BALLS_TO_CREATE);
         int boosterPosib;
         int boosterTypePosib;
-		for(int i = 0; i < randomNoBalls + 1; i++){
+        for (int i = 0; i < randomNoBalls + 1; i++) {
             ///createTargetBall(Xebenen[0],Yebenen[3]); //-4|-8
-              boosterPosib = ThreadLocalRandom.current().nextInt(0,  100);
-              boosterTypePosib = ThreadLocalRandom.current().nextInt(0,  5);
+            boosterPosib = ThreadLocalRandom.current().nextInt(0, 100);
+            boosterTypePosib = ThreadLocalRandom.current().nextInt(0, 5);
 
-            if ((boosterPosib > 0)&&(boosterPosib < 40)&&allowedBoosters)
-            {
+            if ((boosterPosib > 0) && (boosterPosib < 30) && allowedBoosters) {
                 //Prüfung ob schon groß genug
-                while ((bulletRadius>=MAX_BALL_RADIUS)&&(boosterTypePosib==2))
-                {
+                while ((bulletRadius >= MAX_BALL_RADIUS) && (boosterTypePosib == 2)) {
                     //Wenn ja dann solange random bis keine 2 mehr
-                    boosterTypePosib = ThreadLocalRandom.current().nextInt(0,  4);
+                    boosterTypePosib = ThreadLocalRandom.current().nextInt(0, 4);
                 }
-                createBooster(boosterTypePosib,Xebenen[i],Yebenen[3]);
+                if ((!challengeMode)&&(turn>1)) {
+                    createBooster(boosterTypePosib, Xebenen[i], Yebenen[3]);
+                }
                 allowedBoosters = false;
-            }else
-            {
-                createTargetBall(Xebenen[i],Yebenen[3]); //-4|-8
+            } else {
+                createTargetBall(Xebenen[i], Yebenen[3]); //-4|-8
             }
 
         }

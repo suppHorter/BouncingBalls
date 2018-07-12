@@ -21,8 +21,7 @@ public class SoundManager {
 
 
     public SoundManager()
-    {
-    }
+    {}
 
     public void play(Sound sound)
     {
@@ -33,9 +32,11 @@ public class SoundManager {
                 case SCHUSS:
                     fileName = "Schuss.wav";
                     break;
-
                 case TREFFER:
                     fileName = "Treffer.wav";
+                    break;
+                case BOOSTER:
+                    fileName = "Booster.wav";
                     break;
             }
 

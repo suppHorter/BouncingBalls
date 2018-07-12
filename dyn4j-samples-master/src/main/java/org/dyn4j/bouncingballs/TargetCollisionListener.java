@@ -34,6 +34,11 @@ public class TargetCollisionListener extends CollisionAdapter {
 
         if((body1 == booster && body2 instanceof ShotBallBody) || ( body1 instanceof ShotBallBody) && (body2  == booster))
         {
+            if (!bB.getMuteMode()) {
+                SoundManager sm = new SoundManager();
+                sm.play(Sound.BOOSTER);
+            }
+
             if (!booster.getActive())
             {
                 booster.setActive(true);

@@ -78,6 +78,7 @@ public class BouncingBalls extends SimulationFrame {
     private static boolean trampRotateRight = true;
     private static double trampRotationStep = 0.01;
     //Constants für die Gamelogik
+    private static int BOOSTER_CHANCE = 40; //Prozentuale Chance auf Booster in einer Reihe
     private static double TIME_BETWEEN_BALLS = 0.3; //Zeit zwischen den Schuessen einer Salve
     private static double MAX_BALL_RADIUS = 0.8; //Maximaler Radius der Schüsse
     private static int MIN_BALLS_TO_CREATE = 1;
@@ -314,7 +315,7 @@ public class BouncingBalls extends SimulationFrame {
             case 2: //großere Schüsse
                 if (bulletRadius<MAX_BALL_RADIUS)
                 {
-                    bulletRadius+=0.05;
+                    bulletRadius+=0.02;
                 }
                 break;
             case 3: //Rapid Fire
@@ -638,7 +639,7 @@ public class BouncingBalls extends SimulationFrame {
             boosterPosib = ThreadLocalRandom.current().nextInt(0, 100);
             boosterTypePosib = ThreadLocalRandom.current().nextInt(0, 5);
 
-            if ((boosterPosib > 0) && (boosterPosib < 30) && allowedBoosters) {
+            if ((boosterPosib > 0) && (boosterPosib < BOOSTER_CHANCE) && allowedBoosters) {
                 //Prüfung ob schon groß genug
                 while ((bulletRadius >= MAX_BALL_RADIUS) && (boosterTypePosib == 2)) {
                     //Wenn ja dann solange random bis keine 2 mehr
